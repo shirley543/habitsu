@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import logo from '../logo.svg'
+import Heatmap from '@/components/custom/Heatmap'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -14,6 +15,7 @@ function App() {
           className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
           alt="logo"
         />
+        <Heatmap />
         <p>
           Edit <code>src/routes/index.tsx</code> and save to reload.
         </p>
