@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router'
 import { cva } from 'class-variance-authority';
+import HoverPopover from './HoverPopup';
 
 // TODOs
 // Heatmap of gridcells. Will comprise of:
@@ -9,10 +10,91 @@ import { cva } from 'class-variance-authority';
 export default function Heatmap() {
   const selectedYear = 2025;
   const daysInYear = getDaysInYear(selectedYear);
+  const baseColour = "#ADADAD";
 
   // Assume start day of week = Monday.
 
   // Grid!! 1 col x 7 rows 
+
+
+  /**
+   * 4 bins
+   * @param colour 
+   * @param value 
+   * @param threshold 
+   */
+  const computeBinnedColour = (value: number, threshold: number) => {
+    // Using threshold, compute 4 equal "bins"
+    // e.g. if threshold is 20, then bin array would be:
+    // [ 5, 10, 15, 20 ]
+    
+    
+    const BIN_COUNT = 4;
+    const binIncrement = threshold / BIN_COUNT;
+
+    const OPACITY_COUNT = BIN_COUNT + 1;
+    const opacityIncrement = 100 / OPACITY_COUNT;
+
+    const binArray: number[] = [];
+    for (let i = 0; i <= BIN_COUNT; i++) {
+      binArray.push(binIncrement * i);
+    }
+
+    const opacityArray: number[] = [];
+    for (let i = 1; i <= OPACITY_COUNT; i++) {
+      opacityArray.push(opacityIncrement * i);
+    }
+    
+    // Using value, determine which "bin" it falls under
+    // e.g. if value is >= 20, belongs in bin 4
+    //      if value is >= 15 and < 20, belongs in bin 3
+    // const binIndex = (() => {
+    //   for (let i = BIN_COUNT; i > 0; i--) {
+    //     if (i === BIN_COUNT) {
+    //       const upper = binArray[i];
+    //       if (value >= upper) {
+    //         return i;
+    //       }
+    //     } else if (i === 1) {
+    //       const lower = binArray[i];
+    //       if (value <= lower) {
+    //         return i;
+    //       }
+    //     } else {
+    //       const upper = binArray[i];
+    //       const lower = binArray[i - 1];
+    //       if (value >= lower && value < upper) {
+    //         return i;
+    //       }
+    //     }
+    //   }
+    // })();
+
+    const binIndex = (() => {
+      let limit = 0;
+      let idx = 0;
+      while (value > limit && idx < BIN_COUNT) {
+        limit = binArray[idx];
+        idx++;
+      };
+      return idx;
+    })();
+
+    console.log(`value: ${value}, threshold: ${threshold}, binIndex: ${binIndex}, binArray: ${binArray}, opacityArray: ${opacityArray}, opacity: ${opacityArray[binIndex]}`)
+  }
+
+  // TODOsss: fix this. Incorrect opacity for lowest bin. Also need to ensure empty values (undefined, null, 0) are greyed out
+  computeBinnedColour(1, 20);
+  computeBinnedColour(4, 20);
+  computeBinnedColour(0, 20);
+  computeBinnedColour(5, 20);
+  computeBinnedColour(9, 20);
+  computeBinnedColour(10, 20);
+  computeBinnedColour(20, 20);
+  computeBinnedColour(21, 20);
+  console.log("______________________________________________")
+
+
 
   const arrr = [...Array(daysInYear)].map((_, i) => {
     const cellDay = (() => {
@@ -20,7 +102,7 @@ export default function Heatmap() {
       newDate.setDate(newDate.getDate() + i);
       return newDate;
     })();
-    return <Cell key={i} date={cellDay} value={1} note={"test"}></Cell>
+    return <Cell key={i} date={cellDay} value={1} baseColour={baseColour} note={`test ${i}`}></Cell>
   })
 
   return (
@@ -62,6 +144,8 @@ function getDaysInYear(year: number) {
 interface CellProps {
   date: Date,
   value: number | boolean,
+  units?: string,
+  baseColour: string,
   threshold?: number,
   note?: string,
 }
@@ -72,22 +156,12 @@ const cellVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-amber-200 hover:bg-amber-200/90",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
+        default: "h-8 w-8 rounded-md",
+        sm: "h-4 w-4 rounded-md",
+        lg: "h-16 w-16 rounded-md",
       },
     },
     defaultVariants: {
@@ -100,6 +174,8 @@ const cellVariants = cva(
 function Cell({
   date,
   value,
+  units,
+  baseColour,
   threshold,
   note
 }: CellProps) {
@@ -107,16 +183,30 @@ function Cell({
   // console.log(value);
   // console.log(note);
 
+  const variant = 'default';
+  const size = 'default'
+
   return (
-    // <div className="w-[20px] h-[20px] bg-amber-200 rounded-sm" onClick={() => {
-    //   console.log(date);
-    // }}>
-    // </div>
-    <div className={cn(cellVariants({ variant, size, className }))} onClick={() => {
-      console.log(date);
-    }}>
-    </div>
-
-
+    // ${`bg-[rgb(#,#,#)]/{opacity}`}
+    <HoverPopover 
+      triggerElem=
+      {
+        <div className={cn(cellVariants({ variant, size }))} onClick={() => {
+          console.log(date);
+        }} />
+      }
+      contentElem={
+        <div className={`flex flex-col gap-2`}
+             style={{
+              backgroundColor:
+                'rgba(5, 5, 5, 1)',
+            }}
+        >
+          {date.toDateString()}
+          {units ? `${value} ${units}` : value}
+          {note}
+        </div>
+      }>
+    </HoverPopover>
   )
 }
