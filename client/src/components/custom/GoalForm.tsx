@@ -16,6 +16,10 @@ import { z } from "zod";
 //   - Boolean goal:
 //     - Value: boolean
 
+/**
+ * Types
+ */
+
 export enum GoalPublicityType {
   Public = 'public',
   Private = 'private',
@@ -26,6 +30,28 @@ export enum GoalQuantifyType {
   Boolean = 'boolean',
 }
 
+type SchemaType = NumericalInterface | BooleanInterface;
+
+interface BaseInterface {
+  title: string;
+  description: string;
+  colour: string;
+  publicity: GoalPublicityType,
+}
+
+interface BooleanInterface extends BaseInterface {
+  type: GoalQuantifyType.Boolean;
+  targetValue: undefined;
+}
+
+interface NumericalInterface {
+  type: GoalQuantifyType.Numerical;
+  targetValue: number;
+}
+
+/**
+ * Schemas
+ */
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
 // TODOs: define schemas in shared folder/ lib/ package for use on both client and server-side.
@@ -53,6 +79,10 @@ const goalSchema = z.object({
 }).and(typeDiscriminatorSchema);
 
 
+/**
+ * Components
+ */
+
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
@@ -64,26 +94,16 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
   )
 }
 
-interface GoalSchemaInterface
-{
-  title: string;
-  description: string;
-  colour: string;
-  type: string;
-  targetValue?: number | undefined;
-}
-
 export default function GoalForm() {
   const form = useForm({
     defaultValues: {
       title: "",
       description: "",
       colour: "",
-      // publicity: 'private' as GoalPublicity,
-      // goalType: undefined,
-      type: "numerical",
+      publicity: GoalPublicityType.Private,
+      type: GoalQuantifyType.Numerical,
       targetValue: "" as unknown as number,
-    } as GoalSchemaInterface,
+    } as SchemaType,
     validators: {
       onChange: goalSchema,
     },
