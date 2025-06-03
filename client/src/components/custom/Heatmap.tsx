@@ -40,8 +40,21 @@ export default function Heatmap() {
     return <div></div>
   })
 
+  // Weekday labels
+  const weekdayLabels = [...Array(7)].map((_, i) => {
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const daysOfWeekShort = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
+    const weekdayString = daysOfWeekShort[i];
+    if (i % 2) {
+      return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
+    } else {
+      return <div></div>
+    }
+  })
+
   return (
     <div className="grid grid-rows-7 grid-flow-col gap-1 w-full overflow-x-auto p-6">
+      {weekdayLabels}
       {holderCells}
       {cells}
     </div>
