@@ -22,7 +22,7 @@ export default function Heatmap() {
 
 
   // Cells: for displaying progress
-  const cells = [...Array(daysInYear)].map((_, i) => {
+  const progressCells = [...Array(daysInYear)].map((_, i) => {
     const cellDay = (() => {
       const newDate = new Date(selectedYear, 0, 1);
       newDate.setDate(newDate.getDate() + i);
@@ -40,6 +40,44 @@ export default function Heatmap() {
     return <div></div>
   })
 
+  // Group holder cells and add column title
+  const cells = [...holderCells, ...progressCells];
+  const a = cells.slice();
+  var arrays = [], size = 7;
+    
+  while (a.length > 0) {
+    arrays.push(a.splice(0, size));
+  }
+
+  // Iterate over week-grouped arrays and add month label
+  for (let i = 0; i < arrays.length; i++) {
+    const firstDayOfMonthElem = arrays[i].find((elem) => {
+      if (elem.type === Cell) {
+        const elDate = elem.props.date as Date;
+        return elDate.getDate() === 1;
+      };
+      return false;
+    });
+
+    const monthsOfYear = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    const monthsOfYearShort = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    const labelElement = firstDayOfMonthElem ? 
+      <div className='w-8 text-base font-medium flex justify-center items-center'>
+        {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
+      </div> :
+      <div></div>
+    arrays[i].unshift(labelElement)
+  }
+  const finalArray = arrays.flat()
+
   // Weekday labels
   const weekdayLabels = [...Array(7)].map((_, i) => {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -53,10 +91,10 @@ export default function Heatmap() {
   })
 
   return (
-    <div className="grid grid-rows-7 grid-flow-col gap-1 w-full overflow-x-auto p-6">
+    <div className="grid grid-rows-8 grid-flow-col gap-1 w-full overflow-x-auto p-6">
+      <div></div>
       {weekdayLabels}
-      {holderCells}
-      {cells}
+      {finalArray}
     </div>
   )
 }
