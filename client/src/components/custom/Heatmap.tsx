@@ -1,14 +1,7 @@
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
 import HoverPopover from './HoverPopup';
-
 import * as d3 from 'd3';
-
-// TODOs
-// Heatmap of gridcells. Will comprise of:
-// - Year. Determines number of days in a year (leap year or not + )
-
-
 
 export default function Heatmap() {
   const selectedYear = 2025;
@@ -243,15 +236,10 @@ function Cell({
         />
       }
       contentElem={
-        <div className={`flex flex-col gap-2`}
-             style={{
-              backgroundColor:
-                cellColor,
-            }}
-        >
-          {date.toDateString()}
-          {units ? `${value} ${units}` : value}
-          {note}
+        <div className={'flex flex-col gap-2 justify-start bg-white text-black p-2'}>
+          <h1>{date.toDateString()}</h1>
+          <p>{units ? `${value} ${units}` : value}</p>
+          <p>{note}</p>
         </div>
       }>
     </HoverPopover>
