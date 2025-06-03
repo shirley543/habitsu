@@ -16,22 +16,42 @@ import { z } from "zod";
 //   - Boolean goal:
 //     - Value: boolean
 
-export enum Publicity {
+export enum GoalPublicityType {
   Public = 'public',
   Private = 'private',
 }
 
+export enum GoalQuantifyType {
+  Numerical = 'numerical',
+  Boolean = 'boolean',
+}
+
+const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
+
 // TODOs: define schemas in shared folder/ lib/ package for use on both client and server-side.
 // To investigate setting up monorepo and/ or package, or workspaces
-const GoalSchema = z.object({
+export const typeDiscriminatorSchema = z.discriminatedUnion("type", [
+  // Numerical goal schema
+  z.object({
+    type: z.literal(GoalQuantifyType.Numerical),
+    targetValue: z.number({ required_error: "Target value is required" }),
+  }),
+  // Boolean goal schema
+  z.object({
+    type: z.literal(GoalQuantifyType.Boolean),
+    targetValue: z.undefined(),
+  }),
+]);
+
+const goalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   colour: z.string()
     .min(1, "Colour is required")
     .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),
-  // publicity: z.string().min(1, "Publicity type is required"),
-  // goalType: z.string().min(1, "Goal type is required"),
-})
+  publicity: GoalPublicityTypeSchema,
+}).and(typeDiscriminatorSchema);
+
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -44,17 +64,28 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
   )
 }
 
+interface GoalSchemaInterface
+{
+  title: string;
+  description: string;
+  colour: string;
+  type: string;
+  targetValue?: number | undefined;
+}
+
 export default function GoalForm() {
   const form = useForm({
     defaultValues: {
       title: "",
       description: "",
       colour: "",
-      // publicity: 'private' as Publicity,
+      // publicity: 'private' as GoalPublicity,
       // goalType: undefined,
-    },
+      type: "numerical",
+      targetValue: "" as unknown as number,
+    } as GoalSchemaInterface,
     validators: {
-      onChange: GoalSchema,
+      onChange: goalSchema,
     },
   })
 
