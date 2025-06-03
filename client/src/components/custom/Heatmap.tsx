@@ -8,6 +8,8 @@ import * as d3 from 'd3';
 // Heatmap of gridcells. Will comprise of:
 // - Year. Determines number of days in a year (leap year or not + )
 
+
+
 export default function Heatmap() {
   const selectedYear = 2025;
   const daysInYear = getDaysInYear(selectedYear);
@@ -19,18 +21,29 @@ export default function Heatmap() {
   // Grid!! 1 col x 7 rows 
 
 
-  const arrr = [...Array(daysInYear)].map((_, i) => {
+  // Cells: for displaying progress
+  const cells = [...Array(daysInYear)].map((_, i) => {
     const cellDay = (() => {
       const newDate = new Date(selectedYear, 0, 1);
       newDate.setDate(newDate.getDate() + i);
       return newDate;
     })();
     return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} threshold={threshold} note={`test ${i}`}></Cell>
+  });
+
+  // Holder cells: for gap/ placeholder to align 
+  // first day of year to week day
+  const weekStartDay = 0; // 0 for Sunday, 1 for Monday
+  const firstDate = new Date(selectedYear, 0, 1);
+  const firstDay = firstDate.getDay();
+  const holderCells = [...Array(firstDay - weekStartDay)].map(() => {
+    return <div></div>
   })
 
   return (
-    <div className="grid grid-rows-7 grid-flow-col gap-1 w-full overflow-x-auto">
-      {arrr}
+    <div className="grid grid-rows-7 grid-flow-col gap-1 w-full overflow-x-auto p-6">
+      {holderCells}
+      {cells}
     </div>
   )
 }
@@ -152,11 +165,8 @@ function Cell({
   const size = 'default'
 
   const cellColor = (() => {
-    console.log(typeof value);
-    console.log(typeof value === 'number' && threshold)
     if (typeof value === 'number' && threshold) {
       const color = computeBinnedColour(baseColour, threshold, value);
-      console.log(`COMPUTED COLOR: ${color}`)
       return color;
     } else if (typeof value === 'boolean') {
       const color = computeBinnedColour(baseColour, 1, value ? 1 : 0);

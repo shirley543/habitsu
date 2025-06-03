@@ -11,7 +11,7 @@ function App() {
     <div className="text-center">
       <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
         <Heatmap />
-        <p>
+        {/* <p>
           Edit <code>src/routes/index.tsx</code> and save to reload.
         </p>
         <a
@@ -29,7 +29,7 @@ function App() {
           rel="noopener noreferrer"
         >
           Learn TanStack
-        </a>
+        </a> */}
       </header>
     </div>
   )
