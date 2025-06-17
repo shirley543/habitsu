@@ -7,27 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  content   String?
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  userId Int     @unique
-  user   User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+enum GoalType {
+  NUMERIC
+  BOOLEAN
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  name    String?  @db.VarChar(255)
-  email   String   @unique @db.VarChar(255)
-  posts   Post[]
-  profile Profile?
+  id    Int     @id @default(autoincrement())
+  name  String? @db.VarChar(255)
+  email String  @unique @db.VarChar(255)
+  goals Goal[]
 }
+
+model Goal {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime    @updatedAt
+  title         String      @db.VarChar(255)
+  description   String?
+  colour        String      @db.VarChar(6)
+  public        Boolean     @default(false)
+  goalType      GoalType
+  numericTarget Int?
+  numericUnit   String?     @db.VarChar(20)
+  entries       GoalEntry[]
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id])
+}
+
+model GoalEntry {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @updatedAt
+  entryDate    DateTime
+  goalId       Int
+  goal         Goal     @relation(fields: [goalId], references: [id])
+  numericValue Int?
+  booleanValue Boolean?
+  note         String?
+  // TODOs: Figure out onDelete action and onUpdate action (NoAction?)
+
+  @@unique([goalId, entryDate])
+}
+
+// TODOs: Figure out if a Profile model is necessary (what summary stats to show)
+// Activity log? Number of days filled out a goal? Number of filled out gridcells total?
