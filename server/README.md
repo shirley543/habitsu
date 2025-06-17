@@ -17,3 +17,8 @@ To build this application for production:
 npm run build
 npm start
 ```
+
+# Introspect DB
+```bash
+npx prisma db pull
+```
