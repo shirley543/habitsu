@@ -1,11 +1,16 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
 
+app.use('/users', userRoutes);
+// app.use('/goals', goalRoutes);
+
+// TODOs: Major refactor in progress. Split routes into separate files + split across services and controllers
 
 /**
  * User routes
