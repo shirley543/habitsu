@@ -1,69 +1,83 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, GoalType } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
   // Clear existing data
-  await prisma.post.deleteMany();
-  await prisma.profile.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.goalEntry.deleteMany()
+  await prisma.goal.deleteMany()
+  await prisma.user.deleteMany()
 
-  // Create users
-  const user1 = await prisma.user.create({
+  // Create a user
+  const user = await prisma.user.create({
     data: {
       name: 'Alice',
       email: 'alice@example.com',
-      profile: {
-        create: {
-          bio: 'I am Alice',
-        },
-      },
-      posts: {
+      goals: {
         create: [
           {
-            title: 'This is Alice\'s first post',
-            content: 'This is my first post',
-            published: true,
+            title: 'Run 10k steps daily',
+            description: 'Aim for 10,000 steps every day',
+            colour: 'FF5733',
+            public: true,
+            goalType: GoalType.NUMERIC,
+            numericTarget: 10000,
+            numericUnit: 'steps',
+            entries: {
+              create: [
+                {
+                  entryDate: new Date('2025-06-01'),
+                  numericValue: 9500,
+                  note: 'Almost reached the target',
+                },
+                {
+                  entryDate: new Date('2025-06-02'),
+                  numericValue: 10200,
+                  note: 'Exceeded the goal!',
+                },
+              ],
+            },
           },
           {
-            title: 'This is Alice\'s second post',
-            content: 'This is my second post',
-            published: false,
+            title: 'Drink 2L water daily',
+            description: 'Track if you drank 2 liters of water each day',
+            colour: '33A1FF',
+            public: false,
+            goalType: GoalType.BOOLEAN,
+            entries: {
+              create: [
+                {
+                  entryDate: new Date('2025-06-01'),
+                  booleanValue: true,
+                },
+                {
+                  entryDate: new Date('2025-06-02'),
+                  booleanValue: false,
+                  note: 'Forgot to drink enough',
+                },
+              ],
+            },
           },
         ],
       },
     },
-  });
-
-  const user2 = await prisma.user.create({
-    data: {
-      name: 'Bob',
-      email: 'bob@example.com',
-      profile: {
-        create: {
-          bio: 'I am Bob',
+    include: {
+      goals: {
+        include: {
+          entries: true,
         },
       },
-      posts: {
-        create: [
-          {
-            title: 'This is a post from Bob',
-            content: 'Bob is great',
-            published: true,
-          },
-        ],
-      },
     },
-  });
+  })
 
-  console.log('Database seeded');
+  console.log('Seeded user with goals:', JSON.stringify(user, null, 2))
 }
 
 main()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error(e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })
