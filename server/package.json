@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "node --watch -r ts-node/register src/app.ts"
+    "dev": "node --watch -r ts-node/register src/app.ts",
+    "seed": "ts-node src/seed.ts"
   },
   "keywords": [],
   "author": "",
