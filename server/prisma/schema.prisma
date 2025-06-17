@@ -21,7 +21,7 @@ model User {
 
 model Goal {
   id            Int         @id @default(autoincrement())
-  createdAt     DateTime    @default(now()) @db.Timestamp(6)
+  createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   title         String      @db.VarChar(255)
   description   String?
@@ -37,7 +37,7 @@ model Goal {
 
 model GoalEntry {
   id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   entryDate    DateTime
   goalId       Int
