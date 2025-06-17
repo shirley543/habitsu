@@ -51,3 +51,11 @@ npx prisma migrate resolve --applied 0_init
 
 4. To make further changes to database schema (after baselining), can update Prisma schema and then use
 `prisma migrate dev` to apply the changes to the database
+
+# Prisma Client Generate
+After installing Prisma Client package, each time you modify your Prisma schema, you also need to update the Prisma Client via
+`npx prisma generate`
+
+Whenever you update your Prisma schema, you also need to update your database schema using either:
+`prisma migrate dev` or `prisma db push` to keep the database schema in sync with your Prisma schema.
+Note that these commands will also run `prisma` generate under the hood to re-generate your Prisma client.
