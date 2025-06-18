@@ -11,6 +11,7 @@
 // Note: for GET request, should allow for request params e.g.
 // - Search string for title, description
 // - Order by title (asc/ desc), created date, updated date
+// - Goals associated with a given user ID
 
 // -----------------------------
 // Goal Entry endpoints (nested)
@@ -21,3 +22,12 @@
 // PUT    /goals/:goalId/entries/:id  -> Update an entry
 // DELETE /goals/:goalId/entries/:id  -> Delete an entry
 
+import { Router } from "express";
+import { handleGetGoals, handleCreateGoal } from "../controllers/goalController";
+
+const router = Router();
+
+router.get('/', handleGetGoals);
+router.post('/', handleCreateGoal);
+
+export default router;

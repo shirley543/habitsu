@@ -1,9 +1,19 @@
-import { PrismaClient, User } from '@prisma/client'
+import { User } from '@prisma/client'
+import prisma from '../prisma/prisma';
 
-const prisma = new PrismaClient();
-
-export async function fetchAllUsers(): Promise<User[]> {
-  return prisma.user.findMany()
+export async function fetchAllUsers(orderBy?: string, order?: string, search?: string): Promise<User[]> {
+  return prisma.user.findMany({
+    where: search
+      ? {
+          OR: [
+            { name: { contains: String(search), mode: 'insensitive' } },
+            { email: { contains: String(search), mode: 'insensitive' } },
+          ],
+        }
+      : undefined,
+    include: { goals: true },
+    orderBy: { [orderBy as string]: order },
+  })
 }
 
 export async function fetchUserById(id: number): Promise<User | null> {
