@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { fetchAllGoals, registerNewBooleanGoal, registerNewNumericGoal } from "../services/goalService";
 import { GoalType } from "@prisma/client";
+import { fetchAllGoals, registerNewBooleanGoal, registerNewNumericGoal } from "../services/goalService";
+import { CreateGoalInput, GoalParamsInput, UpdateGoalInput } from "../schemas/goalSchemas";
 
 export async function handleGetGoals(req: Request, res: Response) {
   const { orderBy = 'id', order = 'asc', search } = req.query;
@@ -11,13 +12,13 @@ export async function handleGetGoals(req: Request, res: Response) {
   // res.status(400).json({ error: 'Invalid query' });
 }
 
-export async function handleCreateGoal(req: Request, res: Response) {
+export async function handleCreateGoal(req: Request<{}, {}, CreateGoalInput>, res: Response) {
   const { 
     goalType, 
     title, 
     description, 
     colour, 
-    isPublic, 
+    publicity,
     numericTarget, 
     numericUnit, 
     userId

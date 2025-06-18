@@ -1,6 +1,7 @@
 {
-  "name": "habit-tracker",
+  "name": "@habit-tracker/client",
   "private": true,
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
@@ -39,7 +40,7 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.25.49"
+    "@habit-tracker/shared": "*"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",

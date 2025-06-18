@@ -1,83 +1,7 @@
 import { useForm, type AnyFieldApi } from '@tanstack/react-form'
 import { useStore } from '@tanstack/react-store'
-import { z } from "zod";
-
-// Form for creating a new goal or editing an existing goal.
-// Goal comprises of a:
-// - Title: string
-// - Description: string
-// - Colour: hex code, hence string?
-// - Emoji: hex code, hence string?
-// - Private/ Public: whether private (only visible to them), or public (visible to everyone)
-// - Type: discrete (count) or continuous (measured value) [number] or checkbox (yes/ no) [boolean] (used by frontend for determining colour intensity)
-//   - Numerical goal:
-//     - Unit: string
-//     - target: number
-//   - Boolean goal:
-//     - Value: boolean
-
-/**
- * Types
- */
-
-export enum GoalPublicityType {
-  Public = 'public',
-  Private = 'private',
-}
-
-export enum GoalQuantifyType {
-  Numerical = 'numerical',
-  Boolean = 'boolean',
-}
-
-type SchemaType = NumericalInterface | BooleanInterface;
-
-interface BaseInterface {
-  title: string;
-  description: string;
-  colour: string;
-  publicity: GoalPublicityType,
-}
-
-interface BooleanInterface extends BaseInterface {
-  type: GoalQuantifyType.Boolean;
-  targetValue: undefined;
-}
-
-interface NumericalInterface {
-  type: GoalQuantifyType.Numerical;
-  targetValue: number;
-}
-
-/**
- * Schemas
- */
-const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
-
-// TODOs: define schemas in shared folder/ lib/ package for use on both client and server-side.
-// To investigate setting up monorepo and/ or package, or workspaces
-export const typeDiscriminatorSchema = z.discriminatedUnion("type", [
-  // Numerical goal schema
-  z.object({
-    type: z.literal(GoalQuantifyType.Numerical),
-    targetValue: z.number({ required_error: "Target value is required" }),
-  }),
-  // Boolean goal schema
-  z.object({
-    type: z.literal(GoalQuantifyType.Boolean),
-    targetValue: z.undefined(),
-  }),
-]);
-
-const goalSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  colour: z.string()
-    .min(1, "Colour is required")
-    .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),
-  publicity: GoalPublicityTypeSchema,
-}).and(typeDiscriminatorSchema);
-
+import { GoalPublicityType, GoalQuantifyType, goalSchema, type GoalSchemaType } from '@habit-tracker/shared'
+// TODOsss import shared schemas
 
 /**
  * Components
@@ -101,9 +25,10 @@ export default function GoalForm() {
       description: "",
       colour: "",
       publicity: GoalPublicityType.Private,
-      type: GoalQuantifyType.Numerical,
-      targetValue: "" as unknown as number,
-    } as SchemaType,
+      goalType: GoalQuantifyType.Numerical,
+      numericTarget: 0,
+      numericUnits: "",
+    } as GoalSchemaType,
     validators: {
       onChange: goalSchema,
     },

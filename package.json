@@ -1,0 +1,13 @@
+{
+  "name": "habit-tracker-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "zod": "^3.25.67"
+  },
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ]
+}
