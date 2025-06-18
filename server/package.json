@@ -9,6 +9,9 @@
     "dev": "node --watch -r ts-node/register src/app.ts",
     "seed": "ts-node src/prisma/seed.ts"
   },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

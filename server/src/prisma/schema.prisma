@@ -7,9 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum GoalType {
+enum GoalQuantify {
   NUMERIC
   BOOLEAN
+}
+
+enum GoalPublicity {
+  PUBLIC
+  PRIVATE
 }
 
 model User {
@@ -20,19 +25,19 @@ model User {
 }
 
 model Goal {
-  id            Int         @id @default(autoincrement())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  title         String      @db.VarChar(255)
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  title         String        @db.VarChar(255)
   description   String?
-  colour        String      @db.VarChar(6)
-  public        Boolean     @default(false)
-  goalType      GoalType
+  colour        String        @db.VarChar(6)
+  publicity     GoalPublicity @default(PRIVATE)
+  goalType      GoalQuantify
   numericTarget Int?
-  numericUnit   String?     @db.VarChar(20)
+  numericUnit   String?       @db.VarChar(20)
   entries       GoalEntry[]
   userId        Int
-  user          User        @relation(fields: [userId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
 }
 
 model GoalEntry {

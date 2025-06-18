@@ -1,4 +1,4 @@
-import { PrismaClient, GoalType } from '@prisma/client'
+import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -19,8 +19,8 @@ async function main() {
             title: 'Run 10k steps daily',
             description: 'Aim for 10,000 steps every day',
             colour: 'FF5733',
-            public: true,
-            goalType: GoalType.NUMERIC,
+            publicity: GoalPublicity.PUBLIC,
+            goalType: GoalQuantify.NUMERIC,
             numericTarget: 10000,
             numericUnit: 'steps',
             entries: {
@@ -42,8 +42,8 @@ async function main() {
             title: 'Drink 2L water daily',
             description: 'Track if you drank 2 liters of water each day',
             colour: '33A1FF',
-            public: false,
-            goalType: GoalType.BOOLEAN,
+            publicity: GoalPublicity.PRIVATE,
+            goalType: GoalQuantify.BOOLEAN,
             entries: {
               create: [
                 {
