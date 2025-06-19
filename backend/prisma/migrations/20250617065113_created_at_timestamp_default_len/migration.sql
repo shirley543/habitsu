@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Goal" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "GoalEntry" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMP(3);
