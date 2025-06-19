@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { GoalType } from "@prisma/client";
 import { fetchAllGoals, registerNewBooleanGoal, registerNewNumericGoal } from "../services/goalService";
-import { CreateGoalInput, GoalParamsInput, UpdateGoalInput } from "../schemas/goalSchemas";
+import { CreateGoalInput, GoalParamsInput, UpdateGoalInput } from "../schemas/GoalSchemas";
 
 export async function handleGetGoals(req: Request, res: Response) {
   const { orderBy = 'id', order = 'asc', search } = req.query;

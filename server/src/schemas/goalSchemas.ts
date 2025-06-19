@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { GoalPublicityType, GoalQuantifyType, goalSchema, type GoalSchemaType } from '@habit-tracker/shared'
+import { GoalPublicityType, GoalQuantifyType, GoalSchema, type GoalSchemaType } from '@habit-tracker/shared'
 
 /**
  * Backend-specific schemas
  */
 
 export const createGoalSchema = z.object({
-  body: goalSchema
+  body: GoalSchema
 });
 
 export const goalParamsSchema = z.object({
@@ -19,7 +19,7 @@ export const updateGoalSchema = z.object({
   params: z.object({
     goalId: z.string({ required_error: "Goal ID is required" }),
   }),
-  body: goalSchema,
+  body: GoalSchema,
 });
 
 

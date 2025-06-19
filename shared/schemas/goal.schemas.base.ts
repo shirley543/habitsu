@@ -30,7 +30,7 @@ interface BooleanInterface extends BaseInterface {
 interface NumericalInterface extends BaseInterface {
   goalType: GoalQuantifyType.Numerical;
   numericTarget: number;
-  numericUnits: string;
+  numericUnit: string;
 }
 
 /**
@@ -38,12 +38,12 @@ interface NumericalInterface extends BaseInterface {
  */
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
-export const typeDiscriminatorSchema = z.discriminatedUnion("goalType", [
+export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
   // Numerical goal schema
   z.object({
     goalType: z.literal(GoalQuantifyType.Numerical),
     numericTarget: z.number({ required_error: "Target is required" }),
-    numericUnits: z.string().min(1, "Units are required"),
+    numericUnit: z.string().min(1, "Units are required"),
   }),
   // Boolean goal schema
   z.object({
@@ -51,11 +51,13 @@ export const typeDiscriminatorSchema = z.discriminatedUnion("goalType", [
   }),
 ]);
 
-export const goalSchema = z.object({
+export const BaseGoalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   colour: z.string()
     .min(1, "Colour is required")
     .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),
   publicity: GoalPublicityTypeSchema,
-}).and(typeDiscriminatorSchema);
+});
+
+export const GoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);

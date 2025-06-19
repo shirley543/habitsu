@@ -1,6 +1,6 @@
 import { useForm, type AnyFieldApi } from '@tanstack/react-form'
 import { useStore } from '@tanstack/react-store'
-import { GoalPublicityType, GoalQuantifyType, goalSchema, type GoalSchemaType } from '@habit-tracker/shared'
+import { GoalPublicityType, GoalQuantifyType, GoalSchema, type GoalSchemaType } from '@habit-tracker/shared'
 // TODOsss import shared schemas
 
 /**
@@ -27,10 +27,10 @@ export default function GoalForm() {
       publicity: GoalPublicityType.Private,
       goalType: GoalQuantifyType.Numerical,
       numericTarget: 0,
-      numericUnits: "",
+      numericUnit: "",
     } as GoalSchemaType,
     validators: {
-      onChange: goalSchema,
+      onChange: GoalSchema,
     },
   })
 

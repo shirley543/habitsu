@@ -1,22 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalDto } from './dto/create-goal.dto';
-import { UpdateGoalDto } from './dto/update-goal.dto';
+import { CreateGoalDto, UpdateGoalDto } from './goals.dtos';
+import { GoalQuantify, Prisma } from '@prisma/client';
+import { GoalQuantifyType } from '@habit-tracker/shared';
 
 @Injectable()
 export class GoalsService {
   constructor(private prisma: PrismaService) {}
 
   create(createGoalDto: CreateGoalDto) {
-    return this.prisma.goal.create({ data: createGoalDto });
-  }
+    const userId = 1; //< TODOs: Address this hack, user ID should derived from JWT/ session
+    const prismaInput = (() => {
+      const baseGoal: Prisma.GoalCreateInput = {
+        title: createGoalDto.title,
+        description: createGoalDto.description,
+        colour: createGoalDto.colour,
+        publicity: createGoalDto.publicity,
+        goalType: createGoalDto.goalType as GoalQuantify,
+        user: {
+          connect: { id: userId }
+        }
+      }
+      switch (createGoalDto.goalType) {
+        case GoalQuantifyType.Boolean:
+          return {...baseGoal};
+        case GoalQuantifyType.Numerical:
+          return {
+            ...baseGoal,
+            numericTarget: createGoalDto.numericTarget,
+            numericUnit: createGoalDto.numericUnit,
+          }
+      }
+    })();
 
-  findDrafts() {
-    return this.prisma.goal.findMany({ where: { published: false } });
+    return this.prisma.goal.create({ data: prismaInput });
   }
 
   findAll() {
-    return this.prisma.goal.findMany({ where: { published: true } });
+    return this.prisma.goal.findMany();
   }
 
   findOne(id: number) {
@@ -24,9 +45,29 @@ export class GoalsService {
   }
 
   update(id: number, updateGoalDto: UpdateGoalDto) {
+    const prismaInput = (() => {
+      const baseGoal: Prisma.GoalUpdateInput = {
+        title: updateGoalDto.title,
+        description: updateGoalDto.description,
+        colour: updateGoalDto.colour,
+        publicity: updateGoalDto.publicity,
+        goalType: updateGoalDto.goalType as GoalQuantify,
+      }
+      switch (updateGoalDto.goalType) {
+        case GoalQuantifyType.Boolean:
+          return {...baseGoal};
+        case GoalQuantifyType.Numerical:
+          return {
+            ...baseGoal,
+            numericTarget: updateGoalDto.numericTarget,
+            numericUnit: updateGoalDto.numericUnit,
+          }
+      }
+    })();
+
     return this.prisma.goal.update({
       where: { id },
-      data: updateGoalDto,
+      data: prismaInput,
     });
   }
 

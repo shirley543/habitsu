@@ -9,10 +9,10 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
-import { CreateGoalDto } from './dto/create-goal.dto';
-import { UpdateGoalDto } from './dto/update-goal.dto';
+import { CreateGoalDto, CreateGoalSchema, UpdateGoalDto, UpdateGoalSchema } from './goals.dtos';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GoalEntity } from './entities/goal.entity';
+import { GoalEntity } from './goal.entity';
+import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -21,7 +21,8 @@ export class GoalsController {
 
   @Post()
   @ApiCreatedResponse({ type: GoalEntity })
-  create(@Body() createGoalDto: CreateGoalDto) {
+  // @ApiBody({}) // TODOs: update to format API body properly with Swagger/ OpenAPI.
+  create(@Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto) {
     return this.goalsService.create(createGoalDto);
   }
 
@@ -29,12 +30,6 @@ export class GoalsController {
   @ApiOkResponse({ type: GoalEntity, isArray: true })
   findAll() {
     return this.goalsService.findAll();
-  }
-
-  @Get('drafts')
-  @ApiOkResponse({ type: GoalEntity, isArray: true })
-  findDrafts() {
-    return this.goalsService.findDrafts();
   }
 
   @Get(':id')
@@ -47,7 +42,7 @@ export class GoalsController {
   @ApiCreatedResponse({ type: GoalEntity })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateGoalDto: UpdateGoalDto,
+    @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
     return this.goalsService.update(id, updateGoalDto);
   }
