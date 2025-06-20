@@ -2,7 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGoalDto, UpdateGoalDto } from './goals.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
-import { GoalQuantifyType } from '@habit-tracker/shared';
+// import { GoalQuantifyType } from '@habit-tracker/shared';
+
+// TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
+enum GoalQuantifyType {
+  Numerical = 'NUMERICAL',
+  Boolean = 'BOOLEAN',
+}
 
 @Injectable()
 export class GoalsService {
