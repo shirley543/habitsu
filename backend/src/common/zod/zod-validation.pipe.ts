@@ -8,6 +8,8 @@ import { ZodSchema } from "zod";
 export class ZodValidationPipe implements PipeTransform {
   constructor(private readonly schema: ZodSchema<any>) {}
 
+  // TODOs: Fix this. Appears that result error not working (showing generic "Required" error but no field-specific text)
+  // + code 400 undocumented
   transform(value: any) {
     const result = this.schema.safeParse(value);
     if (!result.success) {
