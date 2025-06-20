@@ -29,6 +29,7 @@ export class GoalsService {
       }
       switch (createGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
+        default:
           return {...baseGoal};
         case GoalQuantifyType.Numerical:
           return {
@@ -61,6 +62,7 @@ export class GoalsService {
       }
       switch (updateGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
+        default:
           return {...baseGoal};
         case GoalQuantifyType.Numerical:
           return {
