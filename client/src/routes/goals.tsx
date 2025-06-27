@@ -5,5 +5,7 @@ export const Route = createFileRoute('/goals')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/goals"!</div>
+  return <>
+    <div>Hello "/goals" goals by itself!</div>
+  </>
 }
