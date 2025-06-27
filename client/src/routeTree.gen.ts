@@ -18,9 +18,9 @@ import { Route as GoalsIndexRouteImport } from './routes/goals.index'
 import { Route as EntrysIndexRouteImport } from './routes/entrys.index'
 import { Route as SettingsGoalvisibilityRouteImport } from './routes/settings_/goalvisibility'
 import { Route as SettingsGoalorderRouteImport } from './routes/settings_/goalorder'
-import { Route as GoalsGoalIdRouteImport } from './routes/goals_.$goalId'
+import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
 import { Route as EntrysEntryIdRouteImport } from './routes/entrys_/$entryId'
-import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_.$goalId_.edit'
+import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
 import { Route as EntrysEntryIdEditRouteImport } from './routes/entrys_/$entryId_.edit'
 
 const SettingsRoute = SettingsRouteImport.update({
