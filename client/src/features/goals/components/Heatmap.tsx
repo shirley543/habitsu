@@ -3,6 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
+import { CalendarDays } from 'lucide-react';
 
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
@@ -43,7 +44,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
     const isCellForTodaysDate = cellDay.getTime() === today.getTime();
 
     return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-      threshold={threshold} note={`test ${i}`} 
+      threshold={threshold} units="minutes" note={`Test note for day ${i}. Piece played today was "Hornet" from Hollow Knight`} 
       variant={isCellForTodaysDate ? "outlined" : "default"}
     ></Cell>
   });
@@ -268,11 +269,18 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
           }}
         />
       }
+      // TODOs:
+      // - Fix bug where hover popup content is underneath header icon for e.g. Drink water
+      // - Test on small screen e.g. phone (width sufficient)
+      // - Add fade in/ out animation to make display less jarring
       contentElem={
-        <div className={'flex flex-col gap-2 justify-start bg-white text-black p-2'}>
-          <h1>{date.toDateString()}</h1>
-          <p>{units ? `${value} ${units}` : value}</p>
-          <p>{note}</p>
+        <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px]'}>
+          <h2 className="text-sm font-semibold">{units ? `${value} ${units}` : value}</h2>
+          <p className="text-sm font-normal pt-1">{note}</p>
+          <div className="text-zinc-500 flex flex-row gap-2 pt-2">
+            <CalendarDays size={16}/>
+            <p className="text-xs font-normal">{date.toDateString()}</p>
+          </div>
         </div>
       }>
     </HoverPopover>
