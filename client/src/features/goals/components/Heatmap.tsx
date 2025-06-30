@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 
@@ -14,25 +14,23 @@ interface HeatmapProps {
 }
 
 const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
-  const selectedYear = 2024;
+  const selectedYear = 2025;
   const daysInYear = getDaysInYear(selectedYear);
-  // const baseColour = "#6667AB";
-  // const threshold = 10
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
 
-  // Assume start day of week = Monday.
-
-  // Grid!! 1 col x 7 rows 
-
-
   // Cells: for displaying progress
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
+
   const progressCells = [...Array(daysInYear)].map((_, i) => {
     const cellDay = (() => {
-      const newDate = new Date(selectedYear, 0, 1);
-      newDate.setDate(newDate.getDate() + i);
+      const newDate = new Date(Date.UTC(selectedYear, 0, 1));
+      newDate.setUTCDate(newDate.getUTCDate() + i);
       return newDate;
     })();
-    return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} threshold={threshold} note={`test ${i}`}></Cell>
+    const isCellForTodaysDate = cellDay.getTime() === today.getTime();
+
+    return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} threshold={threshold} note={`test ${i}`} variant={isCellForTodaysDate ? "outlined" : "default"}></Cell>
   });
 
   // Holder cells: for gap/ placeholder to align 
@@ -152,16 +150,15 @@ const cellVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "text-pink-500",
-          // "bg-amber-200 hover:bg-amber-200/90 text-pink-500",
-
+        default: "border-0",
+        outlined: "border-solid border-black border-2"
       },
       size: {
         default: "h-5 w-5 rounded-sm",
         sm: "h-4 w-4 rounded-md",
         lg: "h-16 w-16 rounded-md",
       },
+
     },
     defaultVariants: {
       variant: "default",
@@ -176,8 +173,12 @@ function Cell({
   units,
   baseColour,
   threshold,
-  note
-}: CellProps) {
+  note,
+  variant,
+  size,
+}: CellProps & 
+  VariantProps<typeof cellVariants>
+) {
 
   /**
    * Function for converting value to a color shade
@@ -223,9 +224,6 @@ function Cell({
     const colorShade = thresholdScale(value);
     return colorShade;
   }
-
-  const variant = 'default';
-  const size = 'default'
 
   const cellColor = (() => {
     if (typeof value === 'number' && threshold) {
