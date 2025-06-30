@@ -1,13 +1,19 @@
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
-import HoverPopover from './HoverPopup';
+import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 
+export enum HeatmapDisplayState {
+  WITH_LABELS = 'with-labels',
+  NO_LABELS = 'no-labels',
+}
+
 export default function Heatmap() {
-  const selectedYear = 2025;
+  const selectedYear = 2024;
   const daysInYear = getDaysInYear(selectedYear);
   const baseColour = "#6667AB";
   const threshold = 10
+  const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
 
   // Assume start day of week = Monday.
 
@@ -26,11 +32,11 @@ export default function Heatmap() {
 
   // Holder cells: for gap/ placeholder to align 
   // first day of year to week day
-  const weekStartDay = 0; // 0 for Sunday, 1 for Monday
+  const weekStartDay = 1; // 0 for Sunday, 1 for Monday
   const firstDate = new Date(selectedYear, 0, 1);
   const firstDay = firstDate.getDay();
   const holderCells = [...Array(firstDay - weekStartDay)].map(() => {
-    return <div></div>
+    return <div className="holder-cell"></div>
   })
 
   // Group holder cells and add column title
@@ -69,25 +75,29 @@ export default function Heatmap() {
       <div></div>
     arrays[i].unshift(labelElement)
   }
-  const finalArray = arrays.flat()
+
+  const gridWithMonthLabels = arrays.flat().slice();
+  const gridNoMonthLabels = cells.slice();
+  const finalGridCells = displayState === HeatmapDisplayState.WITH_LABELS ? gridWithMonthLabels : gridNoMonthLabels;
 
   // Weekday labels
   const weekdayLabels = [...Array(7)].map((_, i) => {
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const daysOfWeekShort = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const daysOfWeekShort = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
     const weekdayString = daysOfWeekShort[i];
-    if (i % 2) {
+    if (['Mon', 'Wed', 'Fri'].includes(weekdayString)) {
       return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
     } else {
-      return <div></div>
+      return <div className="weekday-empty"></div>
     }
   })
+  const finalWeekdayLabels = displayState === HeatmapDisplayState.WITH_LABELS ? weekdayLabels : undefined;
 
   return (
-    <div className="grid grid-rows-8 grid-flow-col gap-1 w-full overflow-x-auto p-6">
-      <div></div>
-      {weekdayLabels}
-      {finalArray}
+    <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} grid-flow-col gap-1 w-full overflow-x-auto p-6`}>
+      {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
+      {finalWeekdayLabels}
+      {finalGridCells}
     </div>
   )
 }
