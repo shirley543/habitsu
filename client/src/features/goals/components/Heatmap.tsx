@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
+import { forwardRef, useEffect, useRef } from 'react';
 
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
@@ -17,6 +18,17 @@ const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
   const selectedYear = 2025;
   const daysInYear = getDaysInYear(selectedYear);
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
+  const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
+
+  // Scroll into view today's cell
+  useEffect(() => {
+    if (todayCellTargetRef.current) {
+      todayCellTargetRef.current.scrollIntoView({
+        behavior: 'auto',
+        block: 'start',
+      })
+    }
+  }, [])
 
   // Cells: for displaying progress
   const now = new Date();
@@ -30,7 +42,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
     })();
     const isCellForTodaysDate = cellDay.getTime() === today.getTime();
 
-    return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} threshold={threshold} note={`test ${i}`} variant={isCellForTodaysDate ? "outlined" : "default"}></Cell>
+    return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
+      threshold={threshold} note={`test ${i}`} 
+      variant={isCellForTodaysDate ? "outlined" : "default"}
+    ></Cell>
   });
 
   // Holder cells: for gap/ placeholder to align 
@@ -167,18 +182,19 @@ const cellVariants = cva(
   }
 )
 
-function Cell({
-  date,
-  value,
-  units,
-  baseColour,
-  threshold,
-  note,
-  variant,
-  size,
-}: CellProps & 
-  VariantProps<typeof cellVariants>
-) {
+const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVariants>>((
+  {
+    date,
+    value,
+    units,
+    baseColour,
+    threshold,
+    note,
+    variant,
+    size,
+  },
+  ref
+) => {
 
   /**
    * Function for converting value to a color shade
@@ -242,7 +258,7 @@ function Cell({
     <HoverPopover 
       triggerElem=
       {
-        <div className={cn(cellVariants({ variant, size }))} 
+        <div className={cn(cellVariants({ variant, size }))} ref={ref}
           style={{
             backgroundColor:
               cellColor,
@@ -261,6 +277,6 @@ function Cell({
       }>
     </HoverPopover>
   )
-}
+})
 
 export default Heatmap;
