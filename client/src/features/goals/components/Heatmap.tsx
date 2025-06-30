@@ -8,11 +8,16 @@ export enum HeatmapDisplayState {
   NO_LABELS = 'no-labels',
 }
 
-export default function Heatmap() {
+interface HeatmapProps {
+  baseColour: string,
+  threshold: number,
+}
+
+const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
   const selectedYear = 2024;
   const daysInYear = getDaysInYear(selectedYear);
-  const baseColour = "#6667AB";
-  const threshold = 10
+  // const baseColour = "#6667AB";
+  // const threshold = 10
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
 
   // Assume start day of week = Monday.
@@ -94,7 +99,9 @@ export default function Heatmap() {
   const finalWeekdayLabels = displayState === HeatmapDisplayState.WITH_LABELS ? weekdayLabels : undefined;
 
   return (
-    <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} grid-flow-col gap-1 w-full overflow-x-auto p-6`}>
+    <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} 
+      grid-flow-col gap-1 w-full overflow-x-auto`
+    }>
       {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
       {finalWeekdayLabels}
       {finalGridCells}
@@ -151,7 +158,7 @@ const cellVariants = cva(
 
       },
       size: {
-        default: "h-8 w-8 rounded-md",
+        default: "h-5 w-5 rounded-sm",
         sm: "h-4 w-4 rounded-md",
         lg: "h-16 w-16 rounded-md",
       },
@@ -200,6 +207,8 @@ function Cell({
     // e.g. if base color is rgb(255, 0, 0), then color array would be:
     // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)', 
     //  'rgba(255, 0, 0, 0.75)', 'rgb(255, 0, 0)']
+
+    // TODOs: change opacity bins to be hardcoded? 20%, 40%, 65%, 100% for manually-tweaked visibility/ design?
     const COLOR_COUNT = BIN_COUNT + 1;
     const colorArray: string[] = [];
     for (let i = 1; i <= COLOR_COUNT; i++) {
@@ -255,3 +264,5 @@ function Cell({
     </HoverPopover>
   )
 }
+
+export default Heatmap;
