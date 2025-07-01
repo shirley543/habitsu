@@ -5,6 +5,7 @@ import { GoalCard, type GoalCardProps, GoalCardType } from "./components/GoalCar
 import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
+import { MonthAreaChart } from "./components/MonthAreaChart";
 
 interface GoalStats {
   dailyAverage: number,
@@ -102,6 +103,7 @@ export const GoalDetailsPage = () => {
         }
       </div>
       {/* Line graph */}
+      <MonthAreaChart />
       {/* TODOs */}
     </div>
   );
