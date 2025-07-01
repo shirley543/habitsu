@@ -9,9 +9,54 @@ import * as ShadcnSelect from '@/components/ui/select'
 import { Slider as ShadcnSlider } from '@/components/ui/slider'
 import { Switch as ShadcnSwitch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
+import type { ChangeEvent } from 'react'
+
+
+export const StandardIcons: IconName[] = [
+  "biceps-flexed",
+  "apple",
+  "droplet",
+  "book",
+  "alarm-clock",
+  "bed",
+  "brain",
+  "banknote",
+  "paintbrush",
+  "hourglass",
+  "palette",
+  "calendar",
+  "pencil-line",
+]
+
+/**
+ * From TailwindCSS hues for e.g. red/400
+ */
+export enum ColourEnum {
+  Red = "F87171",
+  Orange = "FB923C",
+  Amber = "FBBF24",
+  Yellow = "FACC15",
+  Lime = "A3E635",
+  Green = "4ADE80",
+  Emerald = "34D399",
+  Teal = "2DD4BF",
+  Cyan = "22D3EE",
+  Sky = "38BDF8",
+  Blue = "60A5FA",
+  Indigo = "818CF8",
+  Violet = "A78BFA",
+  Purple = "C084FC",
+  Fuschia = "E879F9",
+  Pink = "F472B6",
+  Rose = "FB7185",
+}
+
+
 
 export function SubscribeButton({ label }: { label: string }) {
   const form = useFormContext()
+
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
@@ -170,6 +215,61 @@ export function Switch({ label }: { label: string }) {
           onCheckedChange={(checked) => field.handleChange(checked)}
         />
         <Label htmlFor={label}>{label}</Label>
+      </div>
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  )
+}
+
+export function ColourSelect({ label }: { label: string }) {
+  const field = useFieldContext<string>()
+  const errors = useStore(field.store, (state) => state.meta.errors)
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    field.handleChange(event.target.value)
+  };
+  
+  return (
+    <div>
+      <Label htmlFor={label} className="mb-2 text-xl font-bold">{label}</Label>
+      <div className="flex flex-row flex-wrap gap-1.5">
+        {Object.values(ColourEnum).map((colourEnum) => {
+          // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
+          return <label>
+            <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" onChange={handleChange} readOnly={false}/>
+            <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+              <div className="w-6 h-6 rounded-lg" style={{backgroundColor: `#${colourEnum}`}}></div>
+            </div>
+          </label>
+        })}
+      </div>
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  )
+}
+
+export function IconSelect({ label }: { label: string }) {
+  const field = useFieldContext<string>()
+  const errors = useStore(field.store, (state) => state.meta.errors)
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    field.handleChange(event.target.value)
+  };
+
+  return (
+    <div>
+      <Label htmlFor={label} className="mb-2 text-xl font-bold">{label}</Label>
+      <div className="flex flex-row flex-wrap gap-1.5">
+        {StandardIcons.map((standardIcon) => {
+          // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
+          // TODOs: check for more accessible alternatives to `hidden`/ `display: none`
+          return <label>
+            <input type="radio" name="icon" value={standardIcon} className="peer hidden" onChange={handleChange} readOnly={false}/>
+            <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+              <DynamicIcon name={standardIcon} />
+            </div>
+          </label>
+        })}
       </div>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>

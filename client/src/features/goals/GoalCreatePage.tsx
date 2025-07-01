@@ -1,49 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-
-
-// type StandardIcons = Extract<IconName, "biceps-flexed" | "apple", >
-
-const StandardIcons: IconName[] = [
-  "biceps-flexed",
-  "apple",
-  "droplet",
-  "book",
-  "alarm-clock",
-  "bed",
-  "brain",
-  "banknote",
-  "paintbrush",
-  "hourglass",
-  "palette",
-  "calendar",
-  "pencil-line",
-]
-
-/**
- * From TailwindCSS hues for e.g. red/400
- */
-enum ColourEnum {
-  Red = "F87171",
-  Orange = "FB923C",
-  Amber = "FBBF24",
-  Yellow = "FACC15",
-  Lime = "A3E635",
-  Green = "4ADE80",
-  Emerald = "34D399",
-  Teal = "2DD4BF",
-  Cyan = "22D3EE",
-  Sky = "38BDF8",
-  Blue = "60A5FA",
-  Indigo = "818CF8",
-  Violet = "A78BFA",
-  Purple = "C084FC",
-  Fuschia = "E879F9",
-  Pink = "F472B6",
-  Rose = "FB7185",
-}
 
 export function GoalCreatePage() {
   const form = useAppForm({
@@ -55,6 +12,8 @@ export function GoalCreatePage() {
         targetUnit: '',
       },
       privacy: '',
+      colour: '',
+      icon: '',
     },
     validators: {
       onBlur: ({ value }) => {
@@ -137,7 +96,7 @@ export function GoalCreatePage() {
         <form.AppField
           name="privacy"
           validators={{
-            onBlur: ({ value }) => {
+            onChange: ({ value }) => {
               if (!value || value.trim().length === 0) {
                 return 'Privacy type is required'
               }
@@ -158,30 +117,42 @@ export function GoalCreatePage() {
         </form.AppField>
 
         {/* Color selection */}
-        <div className="flex flex-row flex-wrap gap-1.5">
-          {Object.values(ColourEnum).map((colourEnum) => {
-            // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
-            return <label>
-              <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" checked />
-              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
-                <div className="w-6 h-6 rounded-lg" style={{backgroundColor: `#${colourEnum}`}}></div>
-              </div>
-            </label>
-            })}
-        </div>
+        <form.AppField
+          name="colour"
+          validators={{
+            onChange: ({ value }) => {
+              if (!value || value.trim().length === 0) {
+                return 'Colour is required'
+              }
+              return undefined
+            },
+          }}
+        >
+          {(field) => (
+            <field.ColourSelect
+              label="Colour"
+            />
+          )}
+        </form.AppField>
 
         {/* Icon selection */}
-        <div className="flex flex-row flex-wrap gap-1.5">
-          {StandardIcons.map((standardIcon) => {
-            // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
-            return <label>
-              <input type="radio" name="icon" value={standardIcon} className="peer hidden" checked />
-              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
-                <DynamicIcon name={standardIcon} />
-              </div>
-            </label>
-            })}
-        </div>
+        <form.AppField
+          name="icon"
+          validators={{
+            onChange: ({ value }) => {
+              if (!value || value.trim().length === 0) {
+                return 'Icon is required'
+              }
+              return undefined
+            },
+          }}
+        >
+          {(field) => (
+            <field.IconSelect
+              label="Icon"
+            />
+          )}
+        </form.AppField>
 
         <div className="flex justify-end">
           <form.AppForm>
