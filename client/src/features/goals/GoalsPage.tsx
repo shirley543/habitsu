@@ -32,7 +32,7 @@ const DUMMY_GOALS_DATA: GoalCardProps[] = [
 
 export const GoalsPage = () => {
   return (
-    <div className="bg-neutral-100 px-3 py-3">
+    <div>
       {/* Topbar container */}
       <div className="topbar-container flex flex-row justify-between items-center">
         <h1 className="text-base font-extrabold">Goals List</h1>

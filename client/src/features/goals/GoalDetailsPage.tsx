@@ -63,7 +63,7 @@ export const GoalDetailsPage = () => {
   };
 
   return (
-    <div className="bg-neutral-100 px-3 py-3 flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {/* Topbar container */}
       <div className="topbar-container flex flex-row items-center">
         <div className="buttons-container">
