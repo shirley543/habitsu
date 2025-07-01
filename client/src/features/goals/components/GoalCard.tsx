@@ -4,7 +4,7 @@ import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
 import { CalendarDays, CalendarPlus, Pencil, SquarePlus } from "lucide-react";
 import GoalIconText from "./GoalIconText";
 
-enum GoalCardType {
+export enum GoalCardType {
   Description = 'description',
   ControlOnly = 'control-only'
 }
@@ -71,7 +71,8 @@ const GoalCard: React.FC<GoalCardProps> = ({ title, description, baseColour, ico
   }))();
 
   return (
-    <div className="goal-card bg-white rounded-xl p-2.5 flex flex-col gap-3 shadow-sm">
+    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?"
+    <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {/* {descriptionTypeContent} */}
       {cardType === GoalCardType.ControlOnly ? controlOnlyTypeContent : descriptionTypeContent}
       <Heatmap baseColour={baseColour} threshold={goalThreshold}/>
