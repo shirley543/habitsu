@@ -18,6 +18,7 @@ import { Route as GoalsIndexRouteImport } from './routes/goals.index'
 import { Route as EntrysIndexRouteImport } from './routes/entrys.index'
 import { Route as SettingsGoalvisibilityRouteImport } from './routes/settings_/goalvisibility'
 import { Route as SettingsGoalorderRouteImport } from './routes/settings_/goalorder'
+import { Route as GoalsCreateRouteImport } from './routes/goals_/create'
 import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
 import { Route as EntrysEntryIdRouteImport } from './routes/entrys_/$entryId'
 import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
@@ -68,6 +69,11 @@ const SettingsGoalorderRoute = SettingsGoalorderRouteImport.update({
   path: '/settings/goalorder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoalsCreateRoute = GoalsCreateRouteImport.update({
+  id: '/goals_/create',
+  path: '/goals/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GoalsGoalIdRoute = GoalsGoalIdRouteImport.update({
   id: '/goals_/$goalId',
   path: '/goals/$goalId',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRouteWithChildren
   '/entrys/$entryId': typeof EntrysEntryIdRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
+  '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
   '/settings/goalvisibility': typeof SettingsGoalvisibilityRoute
   '/entrys/': typeof EntrysIndexRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/entrys/$entryId': typeof EntrysEntryIdRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
+  '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
   '/settings/goalvisibility': typeof SettingsGoalvisibilityRoute
   '/entrys': typeof EntrysIndexRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRouteWithChildren
   '/entrys_/$entryId': typeof EntrysEntryIdRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
+  '/goals_/create': typeof GoalsCreateRoute
   '/settings_/goalorder': typeof SettingsGoalorderRoute
   '/settings_/goalvisibility': typeof SettingsGoalvisibilityRoute
   '/entrys/': typeof EntrysIndexRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/entrys/$entryId'
     | '/goals/$goalId'
+    | '/goals/create'
     | '/settings/goalorder'
     | '/settings/goalvisibility'
     | '/entrys/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/'
     | '/entrys/$entryId'
     | '/goals/$goalId'
+    | '/goals/create'
     | '/settings/goalorder'
     | '/settings/goalvisibility'
     | '/entrys'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/entrys_/$entryId'
     | '/goals_/$goalId'
+    | '/goals_/create'
     | '/settings_/goalorder'
     | '/settings_/goalvisibility'
     | '/entrys/'
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRouteWithChildren
   EntrysEntryIdRoute: typeof EntrysEntryIdRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
+  GoalsCreateRoute: typeof GoalsCreateRoute
   SettingsGoalorderRoute: typeof SettingsGoalorderRoute
   SettingsGoalvisibilityRoute: typeof SettingsGoalvisibilityRoute
   EntrysEntryIdEditRoute: typeof EntrysEntryIdEditRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/goalorder'
       fullPath: '/settings/goalorder'
       preLoaderRoute: typeof SettingsGoalorderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/goals_/create': {
+      id: '/goals_/create'
+      path: '/goals/create'
+      fullPath: '/goals/create'
+      preLoaderRoute: typeof GoalsCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/goals_/$goalId': {
@@ -326,6 +346,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRouteWithChildren,
   EntrysEntryIdRoute: EntrysEntryIdRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
+  GoalsCreateRoute: GoalsCreateRoute,
   SettingsGoalorderRoute: SettingsGoalorderRoute,
   SettingsGoalvisibilityRoute: SettingsGoalvisibilityRoute,
   EntrysEntryIdEditRoute: EntrysEntryIdEditRoute,
