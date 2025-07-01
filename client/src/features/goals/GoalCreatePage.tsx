@@ -1,45 +1,60 @@
-// import { Button } from "@/components/ui/button";
-// import { X } from "lucide-react";
-
-// export const GoalCreatePage = () => {
-//   return (
-//     <div className="flex flex-col gap-3">
-//       {/* Topbar container */}
-//       <div className="topbar-container flex flex-row justify-between items-center">
-//         <h1 className="text-base font-extrabold">Create Goal</h1>
-//         <div className="buttons-container flex flex-row gap-1.5">
-//           <Button variant="secondary" size="icon">
-//             <X />
-//           </Button>
-//         </div>
-//       </div>
-//       {/* Form controls container */}
-
-//     </div>
-//   );
-// };
-
-// --------------------^^^^
-
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 
-// export const Route = createFileRoute('/demo/form/address')({
-//   component: AddressForm,
-// })
+
+// type StandardIcons = Extract<IconName, "biceps-flexed" | "apple", >
+
+const StandardIcons: IconName[] = [
+  "biceps-flexed",
+  "apple",
+  "droplet",
+  "book",
+  "alarm-clock",
+  "bed",
+  "brain",
+  "banknote",
+  "paintbrush",
+  "hourglass",
+  "palette",
+  "calendar",
+  "pencil-line",
+]
+
+/**
+ * From TailwindCSS hues for e.g. red/400
+ */
+enum ColourEnum {
+  Red = "F87171",
+  Orange = "FB923C",
+  Amber = "FBBF24",
+  Yellow = "FACC15",
+  Lime = "A3E635",
+  Green = "4ADE80",
+  Emerald = "34D399",
+  Teal = "2DD4BF",
+  Cyan = "22D3EE",
+  Sky = "38BDF8",
+  Blue = "60A5FA",
+  Indigo = "818CF8",
+  Violet = "A78BFA",
+  Purple = "C084FC",
+  Fuschia = "E879F9",
+  Pink = "F472B6",
+  Rose = "FB7185",
+}
 
 export function GoalCreatePage() {
   const form = useAppForm({
     defaultValues: {
-      fullName: '',
-      email: '',
-      address: {
-        street: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: '',
+      title: '',
+      description: '',
+      target: {
+        targetValue: '',
+        targetUnit: '',
       },
-      phone: '',
+      privacy: '',
     },
     validators: {
       onBlur: ({ value }) => {
@@ -48,8 +63,8 @@ export function GoalCreatePage() {
         } as {
           fields: Record<string, string>
         }
-        if (value.fullName.trim().length === 0) {
-          errors.fields.fullName = 'Full name is required'
+        if (value.title.trim().length === 0) {
+          errors.fields.title = 'Title is required'
         }
         return errors
       },
@@ -62,160 +77,118 @@ export function GoalCreatePage() {
   })
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white"
-      style={{
-        backgroundImage:
-          'radial-gradient(50% 50% at 5% 40%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)',
-      }}
-    >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
-          }}
-          className="space-y-6"
-        >
-          <form.AppField name="fullName">
-            {(field) => <field.TextField label="Full Name" />}
-          </form.AppField>
-
-          <form.AppField
-            name="email"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return 'Email is required'
-                }
-                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                  return 'Invalid email address'
-                }
-                return undefined
-              },
-            }}
-          >
-            {(field) => <field.TextField label="Email" />}
-          </form.AppField>
-
-          <form.AppField
-            name="address.street"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return 'Street address is required'
-                }
-                return undefined
-              },
-            }}
-          >
-            {(field) => <field.TextField label="Street Address" />}
-          </form.AppField>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <form.AppField
-              name="address.city"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return 'City is required'
-                  }
-                  return undefined
-                },
-              }}
-            >
-              {(field) => <field.TextField label="City" />}
-            </form.AppField>
-            <form.AppField
-              name="address.state"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return 'State is required'
-                  }
-                  return undefined
-                },
-              }}
-            >
-              {(field) => <field.TextField label="State" />}
-            </form.AppField>
-            <form.AppField
-              name="address.zipCode"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return 'Zip code is required'
-                  }
-                  if (!/^\d{5}(-\d{4})?$/.test(value)) {
-                    return 'Invalid zip code format'
-                  }
-                  return undefined
-                },
-              }}
-            >
-              {(field) => <field.TextField label="Zip Code" />}
-            </form.AppField>
-          </div>
-
-          <form.AppField
-            name="address.country"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return 'Country is required'
-                }
-                return undefined
-              },
-            }}
-          >
-            {(field) => (
-              <field.Select
-                label="Country"
-                values={[
-                  { label: 'United States', value: 'US' },
-                  { label: 'Canada', value: 'CA' },
-                  { label: 'United Kingdom', value: 'UK' },
-                  { label: 'Australia', value: 'AU' },
-                  { label: 'Germany', value: 'DE' },
-                  { label: 'France', value: 'FR' },
-                  { label: 'Japan', value: 'JP' },
-                ]}
-                placeholder="Select a country"
-              />
-            )}
-          </form.AppField>
-
-          <form.AppField
-            name="phone"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return 'Phone number is required'
-                }
-                if (
-                  !/^(\+\d{1,3})?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(
-                    value,
-                  )
-                ) {
-                  return 'Invalid phone number format'
-                }
-                return undefined
-              },
-            }}
-          >
-            {(field) => (
-              <field.TextField label="Phone" placeholder="123-456-7890" />
-            )}
-          </form.AppField>
-
-          <div className="flex justify-end">
-            <form.AppForm>
-              <form.SubscribeButton label="Submit" />
-            </form.AppForm>
-          </div>
-        </form>
+    <div className="flex flex-col gap-3">
+      {/* Topbar container */}
+      <div className="topbar-container flex flex-row justify-between items-center">
+        <h1 className="text-base font-extrabold">Create Goal</h1>
+        <div className="buttons-container flex flex-row gap-1.5">
+          <Button variant="secondary" size="icon">
+            <X />
+          </Button>
+        </div>
       </div>
+      {/* Form controls container */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+        className="space-y-6"
+      >
+        <form.AppField name="title">
+          {(field) => <field.TextField label="Title" />}
+        </form.AppField>
+
+        <form.AppField name="description">
+          {(field) => <field.TextField label="Description" />}
+        </form.AppField>
+
+        <form.AppField
+          name="target.targetValue"
+          validators={{
+            onBlur: ({ value }) => {
+              if (!value || value.trim().length === 0) {
+                return 'Target value is required'
+              }
+              return undefined
+            },
+          }}
+        >
+          {(field) => <field.TextField label="Daily Target" />}
+        </form.AppField>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <form.AppField
+            name="target.targetUnit"
+            validators={{
+              onBlur: ({ value }) => {
+                if (!value || value.trim().length === 0) {
+                  return 'Units are required'
+                }
+                return undefined
+              },
+            }}
+          >
+            {(field) => <field.TextField label="Units" />}
+          </form.AppField>
+        </div>
+
+        <form.AppField
+          name="privacy"
+          validators={{
+            onBlur: ({ value }) => {
+              if (!value || value.trim().length === 0) {
+                return 'Privacy type is required'
+              }
+              return undefined
+            },
+          }}
+        >
+          {(field) => (
+            <field.Select
+              label="Privacy"
+              values={[
+                { label: 'Public', value: 'public' },
+                { label: 'Private', value: 'private' },
+              ]}
+              placeholder="Select a privacy type"
+            />
+          )}
+        </form.AppField>
+
+        {/* Color selection */}
+        <div className="flex flex-row flex-wrap gap-1.5">
+          {Object.values(ColourEnum).map((colourEnum) => {
+            // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
+            return <label>
+              <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" checked />
+              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+                <div className="w-6 h-6 rounded-lg" style={{backgroundColor: `#${colourEnum}`}}></div>
+              </div>
+            </label>
+            })}
+        </div>
+
+        {/* Icon selection */}
+        <div className="flex flex-row flex-wrap gap-1.5">
+          {StandardIcons.map((standardIcon) => {
+            // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
+            return <label>
+              <input type="radio" name="icon" value={standardIcon} className="peer hidden" checked />
+              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+                <DynamicIcon name={standardIcon} />
+              </div>
+            </label>
+            })}
+        </div>
+
+        <div className="flex justify-end">
+          <form.AppForm>
+            <form.SubscribeButton label="Submit" />
+          </form.AppForm>
+        </div>
+      </form>
     </div>
   )
 }
