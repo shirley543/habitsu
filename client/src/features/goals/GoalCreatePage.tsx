@@ -1,12 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
+import { useState } from "react";
+
+// TODOss:
+// - Placeholder text for everything
+//  - Title: e.g. Run a half marathon
+//  - Description: Optional. Add more details if needed
+//  - Target Value: e.g. 30
+//  - Units: e.g. km, hours, sessions
+// - Goal Progress option
+//  - checkbox vs. numeric
 
 export function GoalCreatePage() {
   const form = useAppForm({
     defaultValues: {
       title: '',
       description: '',
+      goalType: '',
       target: {
         targetValue: '',
         targetUnit: '',
@@ -34,6 +45,10 @@ export function GoalCreatePage() {
       alert('Form submitted successfully!')
     },
   })
+
+  const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(true);
+  // const goalType = form.getFieldValue("goalType");
+  // console.log(form.getFieldValue("goalType"))
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,20 +79,45 @@ export function GoalCreatePage() {
         </form.AppField>
 
         <form.AppField
-          name="target.targetValue"
+          name="goalType"
           validators={{
-            onBlur: ({ value }) => {
+            onChange: ({ value }) => {
+              setIsDisplayNumericControls(value === 'numeric');
+
               if (!value || value.trim().length === 0) {
-                return 'Target value is required'
+                return 'Goal type is required'
               }
+              
               return undefined
             },
           }}
         >
-          {(field) => <field.TextField label="Daily Target" />}
+          {(field) => (
+            <field.RadioGroup
+              label="Goal Type"
+              values={[
+                { label: 'Numeric', value: 'numeric' },
+                { label: 'Boolean', value: 'boolean' },
+              ]}
+              // placeholder="Select a goal type"
+            />
+          )}
         </form.AppField>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {isDisplayNumericControls && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form.AppField
+            name="target.targetValue"
+            validators={{
+              onBlur: ({ value }) => {
+                if (!value || value.trim().length === 0) {
+                  return 'Target value is required'
+                }
+                return undefined
+              },
+            }}
+          >
+            {(field) => <field.TextField label="Daily Target" />}
+          </form.AppField>
           <form.AppField
             name="target.targetUnit"
             validators={{
@@ -91,7 +131,7 @@ export function GoalCreatePage() {
           >
             {(field) => <field.TextField label="Units" />}
           </form.AppField>
-        </div>
+        </div>}
 
         <form.AppField
           name="privacy"

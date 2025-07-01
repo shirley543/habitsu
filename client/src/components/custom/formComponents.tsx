@@ -8,6 +8,7 @@ import { Textarea as ShadcnTextarea } from '@/components/ui/textarea'
 import * as ShadcnSelect from '@/components/ui/select'
 import { Slider as ShadcnSlider } from '@/components/ui/slider'
 import { Switch as ShadcnSwitch } from '@/components/ui/switch'
+import { RadioGroup as ShadcnRadioGroup, RadioGroupItem as ShadcnRadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
 import type { ChangeEvent } from 'react'
@@ -221,6 +222,32 @@ export function Switch({ label }: { label: string }) {
   )
 }
 
+export function RadioGroup({ label, values }: {
+  label: string
+  values: Array<{ label: string; value: string }>
+}) {
+  const field = useFieldContext<string>()
+
+  return (
+    <div>
+      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+        {label}
+      </Label>
+      <ShadcnRadioGroup defaultValue={values[0].value} className="grid-cols-2" onValueChange={(value) => field.handleChange(value)}>
+        {values.map((value) => (
+          <div className="flex items-center space-x-2">
+            <ShadcnRadioGroupItem key={value.value} value={value.value} />
+            <Label htmlFor={value.value}>{value.label}</Label>
+          </div>
+        ))}
+      </ShadcnRadioGroup>
+    </div>
+  )
+}
+
+// TODOss:
+// - consolidate ColourSelect and IconSelect to be more generic (a lot of similarities)
+// - plus add abiliy to select a custom one via button to open popup (custom icon select, custom colour select)
 export function ColourSelect({ label }: { label: string }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)

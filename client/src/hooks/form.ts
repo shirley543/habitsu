@@ -3,6 +3,7 @@ import { createFormHook } from '@tanstack/react-form'
 import {
   ColourSelect,
   IconSelect,
+  RadioGroup,
   Select,
   SubscribeButton,
   TextArea,
@@ -15,6 +16,7 @@ export const { useAppForm } = createFormHook({
     TextField,
     Select,
     TextArea,
+    RadioGroup,
     ColourSelect,
     IconSelect,
   },
