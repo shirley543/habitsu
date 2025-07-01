@@ -5,7 +5,7 @@ import { GoalCard, type GoalCardProps, GoalCardType } from "./components/GoalCar
 import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
-import { MonthAreaChart } from "./components/MonthAreaChart";
+import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 
 interface GoalStats {
   dailyAverage: number,
@@ -32,6 +32,21 @@ export const GoalDetailsPage = () => {
     longestStreak: 5,
   }
   const [stats, setStats] = useState(initialStats);
+
+  const dummyInputChartData: Record<MonthEnum, number> = {
+    [MonthEnum.January]: 10,
+    [MonthEnum.February]: 20,
+    [MonthEnum.March]: 6,
+    [MonthEnum.April]: 4,
+    [MonthEnum.May]: 2,
+    [MonthEnum.June]: 10,
+    [MonthEnum.July]: 20,
+    [MonthEnum.August]: 10,
+    [MonthEnum.September]: 35,
+    [MonthEnum.October]: 10,
+    [MonthEnum.November]: 6,
+    [MonthEnum.December]: 20,
+  }
 
   type GoalStatsKeys = keyof GoalStats;
   interface GoalStatsDisplay {
@@ -103,8 +118,7 @@ export const GoalDetailsPage = () => {
         }
       </div>
       {/* Line graph */}
-      <MonthAreaChart />
-      {/* TODOs */}
+      <MonthAreaChart baseColour={data.baseColour} inputChartData={dummyInputChartData} />
     </div>
   );
 };
