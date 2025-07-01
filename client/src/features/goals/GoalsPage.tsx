@@ -2,10 +2,19 @@ import { Button } from "@/components/ui/button";
 import { CalendarDays, Plus, Settings } from "lucide-react";
 import Heatmap from "./components/Heatmap";
 import { GoalCard, type GoalCardProps } from "./components/GoalCard";
+import type { IconName } from "lucide-react/dynamic";
+
+interface DummyGoalData {
+  title: string,
+  description: string,
+  baseColour: string,
+  iconName: IconName,
+  goalThreshold: number,
+};
 
 
 // TODOs: Add endpoint for goals being grabbed (including goal entries)
-const DUMMY_GOALS_DATA: GoalCardProps[] = [
+const DUMMY_GOALS_DATA: DummyGoalData[] = [
   {
     title: "Drink water",
     description: "Drink at least 6 cups per day",
@@ -27,24 +36,30 @@ const DUMMY_GOALS_DATA: GoalCardProps[] = [
     iconName: "book",
     goalThreshold: 10,
   },
-
+  {
+    title: "Exercise",
+    description: "Exercise for an hour at least once a week",
+    baseColour: "#C084FC", ///< TODOs: Lime/400
+    iconName: "biceps-flexed",
+    goalThreshold: 1,
+  },
 ]
 
 export const GoalsPage = () => {
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       {/* Topbar container */}
       <div className="topbar-container flex flex-row justify-between items-center">
         <h1 className="text-base font-extrabold">Goals List</h1>
-        <div className="buttons-container">
+        <div className="buttons-container flex flex-row gap-1.5">
           <Button variant="secondary" size="icon">
-            <CalendarDays className="size-4"/>
+            <CalendarDays />
           </Button>
           <Button variant="secondary" size="icon">
-            <Settings className="size-4"/>
+            <Settings />
           </Button>
           <Button variant="secondary" size="icon">
-            <Plus className="size-4"/>
+            <Plus />
           </Button>
         </div>
       </div>
