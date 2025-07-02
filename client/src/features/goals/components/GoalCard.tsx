@@ -6,42 +6,43 @@ import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
 import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
 import { useGoalDetailYear, useGoalDetailYearDispatch, type YearAction } from "../contexts/GoalDetailYearContext";
-import { useEffect } from "react";
 
-export enum GoalCardType {
-  Description = 'description',
-  ControlOnly = 'control-only'
-}
 
 /**
- * Goal Card types: 
- * - Description type: with description, edit, log today, vs.
- * - Control-only type: with year select, add entry, log today
+ * Goal card base:
+ * Displays card with content slot filled, and heatmap
+ * @returns 
  */
+interface GoalCardBaseProps {
+  baseColour: string,
+  goalThreshold: number,
+  selectedYear: number,
+}
 
-interface GoalCardProps {
+const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode }> = ({ contentSlot, baseColour, goalThreshold, selectedYear }) => {
+  return (
+    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
+    <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
+      {contentSlot}
+      <Heatmap baseColour={baseColour} threshold={goalThreshold} year={selectedYear}/>
+    </div>
+  )
+}
+
+
+/**
+ * Goal Card Descriptive-type: 
+ * With description, edit, log today
+ */
+interface GoalCardDescriptiveProps extends GoalCardBaseProps {
   goalId: number,
   title: string,
   description: string,
-  baseColour: string,
   iconName: IconName,
-  goalThreshold: number,
-  cardType?: GoalCardType
 }
 
-/**
- * Goal card: displays goal header (with icon, title, description + edit and add today's entry buttons)
- * @returns 
- */
-const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseColour, iconName, goalThreshold, cardType=GoalCardType.Description }) => {
+const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title, description, iconName, baseColour, goalThreshold, selectedYear }) => {
   const navigate = useNavigate()
-  const selectedYear = useGoalDetailYear();
-  const selectedYearDispatch = useGoalDetailYearDispatch();
-  // TODOs: Refactor GoalCard to have two distinct components (one for details page, other for home page, as fairly different interactions e.g. year select-wise)
-
-  useEffect(() => {
-    console.log("selectedYear", selectedYear)
-  }, [selectedYear])
 
   const descriptionTypeContent = (() => {
     return <>
@@ -106,12 +107,37 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
       </div>
     </>
   })();
+  
+  return (
+    <GoalCardBase
+      contentSlot={descriptionTypeContent}
+      baseColour={baseColour}
+      goalThreshold={goalThreshold}
+      selectedYear={selectedYear}
+    />
+  )
+}
 
+
+/**
+ * Goal Card Controlled-type: 
+ * With year select, add entry, log today
+ */
+interface GoalCardControlledProps extends GoalCardBaseProps {
+}
+
+const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ baseColour, goalThreshold }) => {
+  const selectedYear = useGoalDetailYear();
+  const selectedYearDispatch = useGoalDetailYearDispatch();
 
   const yearMenuConfig: DropdownMenuCheckboxesItemConfig<number>[] = [
     { label: "2025", value: 2025 },
     { label: "2024", value: 2024 },
   ]
+
+  // useEffect(() => {
+  //   console.log("selectedYear", selectedYear)
+  // }, [selectedYear])
 
   const controlOnlyTypeContent = ((() => {
     return <>
@@ -145,16 +171,16 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
       </div>
     </>
   }))();
-
+  
   return (
-    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
-    <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
-      {/* {descriptionTypeContent} */}
-      {cardType === GoalCardType.ControlOnly ? controlOnlyTypeContent : descriptionTypeContent}
-      <Heatmap baseColour={baseColour} threshold={goalThreshold} year={selectedYear}/>
-    </div>
+    <GoalCardBase
+      contentSlot={controlOnlyTypeContent}
+      baseColour={baseColour}
+      goalThreshold={goalThreshold}
+      selectedYear={selectedYear}
+    />
   )
 }
 
 
-export { GoalCard, type GoalCardProps };
+export { GoalCardDescriptive, GoalCardControlled };

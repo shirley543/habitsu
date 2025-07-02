@@ -1,4 +1,4 @@
-import { GoalCard } from "./components/GoalCard";
+import { GoalCardDescriptive } from "./components/GoalCard";
 import type { IconName } from "lucide-react/dynamic";
 import { TopBarConfig } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
@@ -78,13 +78,14 @@ export const GoalsPage = () => {
       {/* Heatmaps container */}
       <div className="flex flex-col gap-3">
         {DUMMY_GOALS_DATA.map((data) => {
-          return <GoalCard
+          return <GoalCardDescriptive
             goalId={data.id}
             title={data.title}
             description={data.description}
+            iconName={data.iconName}
             baseColour={data.baseColour}
             goalThreshold={data.goalThreshold}
-            iconName={data.iconName}
+            selectedYear={2025}
           />
         })}
       </div>

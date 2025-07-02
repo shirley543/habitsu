@@ -1,4 +1,4 @@
-import { GoalCard, GoalCardType } from "./components/GoalCard";
+import { GoalCardControlled } from "./components/GoalCard";
 import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
@@ -83,14 +83,11 @@ export const GoalDetailsPage = () => {
       </div>
       <GoalDetailYearProvider>
         {/* Heatmap container */}
-        <GoalCard 
-          goalId={data.id}
-          title={data.title}
-          description={data.description}
+        <GoalCardControlled 
+          // goalId={data.id}
           baseColour={data.baseColour}
           goalThreshold={data.goalThreshold}
-          iconName={data.iconName}
-          cardType={GoalCardType.ControlOnly}
+          selectedYear={2025}
         />
         {/* Gridded summary statistics */}
         <div className="grid grid-cols-2 grid-rows-2 gap-3">
