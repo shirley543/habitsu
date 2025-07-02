@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
-import IconButton from "@/components/custom/IconButton";
+import { TopBarClose } from "@/components/custom/TopBar";
 
 // TODOss:
 // - Zod validation
@@ -46,13 +44,8 @@ export function GoalCreatePage() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Topbar container */}
-      <div className="topbar-container flex flex-row justify-between items-center">
-        <h1 className="text-base font-extrabold">Create Goal</h1>
-        <div className="buttons-container flex flex-row gap-1.5">
-          <IconButton iconName="x"/>
-        </div>
-      </div>
+      {/* Topbar config */}
+      <TopBarClose title="Create Goal" closeCallback={() => { console.log("Close create goal clicked") }} />
       {/* Form controls container */}
       <form
         onSubmit={(e) => {

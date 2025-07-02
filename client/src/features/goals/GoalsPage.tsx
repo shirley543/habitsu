@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { CalendarDays, Plus, Settings } from "lucide-react";
-import Heatmap from "./components/Heatmap";
-import { GoalCard, type GoalCardProps } from "./components/GoalCard";
+import { GoalCard } from "./components/GoalCard";
 import type { IconName } from "lucide-react/dynamic";
-import IconButton from "@/components/custom/IconButton";
+import { TopBarConfig } from "@/components/custom/TopBar";
 
 interface DummyGoalData {
   title: string,
@@ -49,15 +46,24 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
 export const GoalsPage = () => {
   return (
     <div className="flex flex-col gap-3">
-      {/* Topbar container */}
-      <div className="topbar-container flex flex-row justify-between items-center">
-        <h1 className="text-base font-extrabold">Goals List</h1>
-        <div className="buttons-container flex flex-row gap-1.5">
-          <IconButton iconName="calendar-days"/>
-          <IconButton iconName="settings"/>
-          <IconButton iconName="plus"/>
-        </div>
-      </div>
+      {/* Topbar config */}
+      <TopBarConfig 
+        title="Goals List"
+        rightConfig={[
+          {
+            iconName: "calendar-days",
+            clickCallback: () => { console.log("calendar clicked") }
+          },
+          {
+            iconName: "settings",
+            clickCallback: () => { console.log("settings clicked") }
+          },
+          {
+            iconName: "plus",
+            clickCallback: () => { console.log("create goal clicked") }
+          },
+        ]}
+      />
       {/* Heatmaps container */}
       <div className="flex flex-col gap-3">
         {DUMMY_GOALS_DATA.map((data) => {

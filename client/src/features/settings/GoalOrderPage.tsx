@@ -6,6 +6,7 @@ import { RadioGroupItem } from "@/components/ui/radio-group";
 import type { IconName } from "lucide-react/dynamic";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
 import IconButton from "@/components/custom/IconButton";
+import { TopBarClose } from "@/components/custom/TopBar";
 
 interface DummyGoalData {
   title: string,
@@ -67,13 +68,8 @@ export function GoalOrderPage() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Topbar container */}
-      <div className="topbar-container flex flex-row justify-between items-center">
-        <h1 className="text-base font-extrabold">Goal Order</h1>
-        <div className="buttons-container flex flex-row gap-1.5">
-          <IconButton iconName="x"/>
-        </div>
-      </div>
+      {/* Topbar config */}
+      <TopBarClose title="Goal Order" closeCallback={() => { console.log("Close from goal order") }} />
       {/* Order controls container */}
       {
         GoalOrderItems.map((item) => {

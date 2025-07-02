@@ -7,6 +7,7 @@ import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
 import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
+import { TopBarBack } from "@/components/custom/TopBar";
 
 interface GoalStats {
   dailyAverage: number,
@@ -65,13 +66,8 @@ export const GoalDetailsPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Topbar container */}
-      <div className="topbar-container flex flex-row items-center">
-        <div className="buttons-container">
-          <IconButton iconName="arrow-left"/>
-        </div>
-        <h1 className="text-base font-extrabold">Goal Details</h1>
-      </div>
+      {/* Topbar config */}
+      <TopBarBack title="Goal Details" backCallback={() => { console.log("Back from goal details clicked") }} />
       {/* Goal description container */}
       <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
         <GoalIconText title={data.title} description={data.description} baseColour={data.baseColour} iconName={data.iconName} />
