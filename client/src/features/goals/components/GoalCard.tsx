@@ -5,6 +5,7 @@ import { CalendarDays, CalendarPlus, Pencil, SquarePlus } from "lucide-react";
 import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
+import { DropdownMenuCheckboxes } from "@/components/custom/DropdownMenuCheckboxes";
 
 export enum GoalCardType {
   Description = 'description',
@@ -104,6 +105,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
         {/* Year and Calendar button */}
         <div className="year-calendar-container flex flex-row gap-1">
           <h2 className="text-xl font-bold">2025</h2>
+          <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
           <IconButton iconName="calendar-days" onClickCallback={() => {
             console.log("Clicked on goal details card > details page year select (menu dropdown)")
           }}/>
