@@ -5,6 +5,7 @@ import { RadioGroup } from "@radix-ui/react-radio-group";
 import { RadioGroupItem } from "@/components/ui/radio-group";
 import type { IconName } from "lucide-react/dynamic";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
+import IconButton from "@/components/custom/IconButton";
 
 interface DummyGoalData {
   title: string,
@@ -70,9 +71,7 @@ export function GoalOrderPage() {
       <div className="topbar-container flex flex-row justify-between items-center">
         <h1 className="text-base font-extrabold">Goal Order</h1>
         <div className="buttons-container flex flex-row gap-1.5">
-          <Button variant="secondary" size="icon">
-            <X />
-          </Button>
+          <IconButton iconName="x"/>
         </div>
       </div>
       {/* Order controls container */}
@@ -84,12 +83,8 @@ export function GoalOrderPage() {
               <div className="titleButtons w-full px-2.5 py-2 flex flex-row gap-2 items-center">
                 <h2 className="title w-full text-sm font-semibold">{item.title}</h2>
                 <div className="buttons flex flex-row gap-1">
-                <Button variant="secondary" size="icon">
-                  <ArrowUp />
-                </Button>
-                <Button variant="secondary" size="icon">
-                  <ArrowDown />
-                </Button>
+                <IconButton iconName="arrow-up"/>
+                <IconButton iconName="arrow-down"/>
                 </div>
               </div>
             </div>

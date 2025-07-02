@@ -6,6 +6,7 @@ import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
 import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
+import IconButton from "@/components/custom/IconButton";
 
 interface GoalStats {
   dailyAverage: number,
@@ -67,9 +68,7 @@ export const GoalDetailsPage = () => {
       {/* Topbar container */}
       <div className="topbar-container flex flex-row items-center">
         <div className="buttons-container">
-          <Button variant="secondary" size="icon">
-            <ArrowLeft className="size-4"/>
-          </Button>
+          <IconButton iconName="arrow-left"/>
         </div>
         <h1 className="text-base font-extrabold">Goal Details</h1>
       </div>
@@ -77,9 +76,7 @@ export const GoalDetailsPage = () => {
       <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
         <GoalIconText title={data.title} description={data.description} baseColour={data.baseColour} iconName={data.iconName} />
         <div className="buttons-container flex flex-row gap-1">
-          <Button variant="secondary" size="icon">
-            <Pencil className="size-4"/>
-          </Button>
+          <IconButton iconName="pencil"/>
         </div>
       </div>
       {/* Heatmap container */}

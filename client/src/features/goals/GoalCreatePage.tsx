@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
+import IconButton from "@/components/custom/IconButton";
 
 // TODOss:
 // - Zod validation
@@ -49,9 +50,7 @@ export function GoalCreatePage() {
       <div className="topbar-container flex flex-row justify-between items-center">
         <h1 className="text-base font-extrabold">Create Goal</h1>
         <div className="buttons-container flex flex-row gap-1.5">
-          <Button variant="secondary" size="icon">
-            <X />
-          </Button>
+          <IconButton iconName="x"/>
         </div>
       </div>
       {/* Form controls container */}

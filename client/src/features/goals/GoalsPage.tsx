@@ -3,6 +3,7 @@ import { CalendarDays, Plus, Settings } from "lucide-react";
 import Heatmap from "./components/Heatmap";
 import { GoalCard, type GoalCardProps } from "./components/GoalCard";
 import type { IconName } from "lucide-react/dynamic";
+import IconButton from "@/components/custom/IconButton";
 
 interface DummyGoalData {
   title: string,
@@ -52,15 +53,9 @@ export const GoalsPage = () => {
       <div className="topbar-container flex flex-row justify-between items-center">
         <h1 className="text-base font-extrabold">Goals List</h1>
         <div className="buttons-container flex flex-row gap-1.5">
-          <Button variant="secondary" size="icon">
-            <CalendarDays />
-          </Button>
-          <Button variant="secondary" size="icon">
-            <Settings />
-          </Button>
-          <Button variant="secondary" size="icon">
-            <Plus />
-          </Button>
+          <IconButton iconName="calendar-days"/>
+          <IconButton iconName="settings"/>
+          <IconButton iconName="plus"/>
         </div>
       </div>
       {/* Heatmaps container */}

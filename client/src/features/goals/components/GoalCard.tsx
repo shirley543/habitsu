@@ -3,6 +3,7 @@ import Heatmap from "./Heatmap";
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
 import { CalendarDays, CalendarPlus, Pencil, SquarePlus } from "lucide-react";
 import GoalIconText from "./GoalIconText";
+import IconButton from "@/components/custom/IconButton";
 
 export enum GoalCardType {
   Description = 'description',
@@ -36,12 +37,8 @@ const GoalCard: React.FC<GoalCardProps> = ({ title, description, baseColour, ico
         <GoalIconText title={title} description={description} baseColour={baseColour} iconName={iconName} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
-          <Button variant="secondary" size="icon">
-            <Pencil className="size-4"/>
-          </Button>
-          <Button variant="secondary" size="icon">
-            <SquarePlus className="size-4"/>
-          </Button>
+          <IconButton iconName="pencil"/>
+          <IconButton iconName="square-plus"/>
         </div>
       </div>
     </>
@@ -53,18 +50,12 @@ const GoalCard: React.FC<GoalCardProps> = ({ title, description, baseColour, ico
         {/* Year and Calendar button */}
         <div className="year-calendar-container flex flex-row gap-1">
           <h2 className="text-xl font-bold">2025</h2>
-          <Button variant="secondary" size="icon">
-            <CalendarDays className="size-4"/>
-          </Button>
+          <IconButton iconName="calendar-days"/>
         </div>
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
-          <Button variant="secondary" size="icon">
-            <CalendarPlus className="size-4"/>
-          </Button>
-          <Button variant="secondary" size="icon">
-            <SquarePlus className="size-4"/>
-          </Button>
+          <IconButton iconName="calendar-plus"/>
+          <IconButton iconName="square-plus"/>
         </div>
       </div>
     </>
