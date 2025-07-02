@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, CalendarDays, Pencil, Plus, Settings } from "lucide-react";
-import Heatmap from "./components/Heatmap";
-import { GoalCard, type GoalCardProps, GoalCardType } from "./components/GoalCard";
+import { GoalCard, GoalCardType } from "./components/GoalCard";
 import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import GoalIconText from "./components/GoalIconText";
 import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarBack } from "@/components/custom/TopBar";
+import { useNavigate } from "@tanstack/react-router";
 
 interface GoalStats {
   dailyAverage: number,
@@ -17,7 +15,10 @@ interface GoalStats {
 }
 
 export const GoalDetailsPage = () => {
+  const navigate = useNavigate()
+
   const initialData = {
+    id: 1,
     title: "Drink water",
     description: "Drink at least 6 cups per day",
     baseColour: "#60A5FA", ///< TODOs: Blue/400
@@ -67,16 +68,21 @@ export const GoalDetailsPage = () => {
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
-      <TopBarBack title="Goal Details" backCallback={() => { console.log("Back from goal details clicked") }} />
+      <TopBarBack title="Goal Details" backCallback={() => { 
+        navigate({ to: '/goals' })
+      }}/>
       {/* Goal description container */}
       <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
         <GoalIconText title={data.title} description={data.description} baseColour={data.baseColour} iconName={data.iconName} />
         <div className="buttons-container flex flex-row gap-1">
-          <IconButton iconName="pencil"/>
+          <IconButton iconName="pencil" onClickCallback={() => {
+            navigate({ to: '/goals/$goalId/edit', params: { goalId: data.id.toString() } })
+          }}/>
         </div>
       </div>
       {/* Heatmap container */}
       <GoalCard 
+        goalId={data.id}
         title={data.title}
         description={data.description}
         baseColour={data.baseColour}

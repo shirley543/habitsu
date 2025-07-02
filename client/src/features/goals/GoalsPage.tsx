@@ -1,8 +1,10 @@
 import { GoalCard } from "./components/GoalCard";
 import type { IconName } from "lucide-react/dynamic";
 import { TopBarConfig } from "@/components/custom/TopBar";
+import { useNavigate } from "@tanstack/react-router";
 
 interface DummyGoalData {
+  id: number,
   title: string,
   description: string,
   baseColour: string,
@@ -14,6 +16,7 @@ interface DummyGoalData {
 // TODOs: Add endpoint for goals being grabbed (including goal entries)
 const DUMMY_GOALS_DATA: DummyGoalData[] = [
   {
+    id: 1,
     title: "Drink water",
     description: "Drink at least 6 cups per day",
     baseColour: "#60A5FA", ///< TODOs: Blue/400
@@ -21,6 +24,7 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
     goalThreshold: 6,
   },
   {
+    id: 2,
     title: "Play piano",
     description: "Play for 15 minutes per day",
     baseColour: "#F472B6", ///< TODOs: Pink/400
@@ -28,6 +32,7 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
     goalThreshold: 15,
   },
   {
+    id: 3,
     title: "Reading",
     description: "Read 10 pages per day",
     baseColour: "#FBBF24", ///< TODOs: Amber/400
@@ -44,6 +49,8 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
 ]
 
 export const GoalsPage = () => {
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
@@ -52,22 +59,27 @@ export const GoalsPage = () => {
         rightConfig={[
           {
             iconName: "calendar-days",
-            clickCallback: () => { console.log("calendar clicked") }
+            clickCallback: () => { console.log("calendar clicked TODOs") }
           },
           {
             iconName: "settings",
-            clickCallback: () => { console.log("settings clicked") }
+            clickCallback: () => { 
+              navigate({ to: '/settings' })
+            }
           },
           {
             iconName: "plus",
-            clickCallback: () => { console.log("create goal clicked") }
+            clickCallback: () => {
+              navigate({ to: '/goals/create' })
+            }
           },
         ]}
       />
       {/* Heatmaps container */}
       <div className="flex flex-col gap-3">
         {DUMMY_GOALS_DATA.map((data) => {
-          return <GoalCard 
+          return <GoalCard
+            goalId={data.id}
             title={data.title}
             description={data.description}
             baseColour={data.baseColour}

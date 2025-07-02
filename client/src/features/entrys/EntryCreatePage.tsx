@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
-import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
+import { useRouterState, getRouteApi } from "@tanstack/react-router";
 
 // TODOss:
 // - Zod validation
@@ -11,9 +9,14 @@ import { TopBarClose } from "@/components/custom/TopBar";
 // - Date not changeable (read only)
 
 export function EntryCreatePage() {
-  const goalUnits = "Hours";
-  const date = new Date(2025, 1, 1);
-  const dateStr = date.toDateString();
+  const route = getRouteApi('/goals_/$goalId_/entrys/create')
+  const { goalId } = route.useParams();
+
+  const state = useRouterState({ select: s => s.location.state });
+  const stateDate = state.date;
+  const stateGoal = state.goal;
+
+  const goalUnits = stateGoal?.units || "Progress"
 
   const form = useAppForm({
     defaultValues: {

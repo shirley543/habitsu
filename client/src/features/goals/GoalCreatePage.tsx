@@ -1,12 +1,15 @@
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
+import { useNavigate } from '@tanstack/react-router';
 
 // TODOss:
 // - Zod validation
 // - Fix bug where boolean goal type selected and values placed, but submit not working
 
 export function GoalCreatePage() {
+  const navigate = useNavigate()
+  
   const form = useAppForm({
     defaultValues: {
       title: '',
@@ -45,7 +48,11 @@ export function GoalCreatePage() {
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
-      <TopBarClose title="Create Goal" closeCallback={() => { console.log("Close create goal clicked") }} />
+      <TopBarClose title="Create Goal" 
+        closeCallback={() => { 
+          navigate({ to: '/goals' })
+        }}
+      />
       {/* Form controls container */}
       <form
         onSubmit={(e) => {
