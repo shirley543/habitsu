@@ -26,7 +26,7 @@ export default function GoalForm() {
       colour: "",
       publicity: GoalPublicityType.Private,
       goalType: GoalQuantifyType.Numerical,
-      numericTarget: 0,
+      numericTarget: null as unknown as number,
       numericUnit: "",
     } as GoalSchemaType,
     validators: {

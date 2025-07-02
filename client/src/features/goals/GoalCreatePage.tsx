@@ -4,22 +4,17 @@ import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 
 // TODOss:
-// - Placeholder text for everything
-//  - Title: e.g. Run a half marathon
-//  - Description: Optional. Add more details if needed
-//  - Target Value: e.g. 30
-//  - Units: e.g. km, hours, sessions
-// - Goal Progress option
-//  - checkbox vs. numeric
+// - Zod validation
+// - Fix bug where boolean goal type selected and values placed, but submit not working
 
 export function GoalCreatePage() {
   const form = useAppForm({
     defaultValues: {
       title: '',
       description: '',
-      goalType: '',
+      goalType: 'numeric',
       target: {
-        targetValue: '',
+        targetValue: null,
         targetUnit: '',
       },
       privacy: '',
@@ -47,8 +42,6 @@ export function GoalCreatePage() {
   })
 
   const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(true);
-  // const goalType = form.getFieldValue("goalType");
-  // console.log(form.getFieldValue("goalType"))
 
   return (
     <div className="flex flex-col gap-3">
@@ -71,11 +64,11 @@ export function GoalCreatePage() {
         className="space-y-6"
       >
         <form.AppField name="title">
-          {(field) => <field.TextField label="Title" />}
+          {(field) => <field.TextField label="Title" placeholder="e.g. Run a half marathon" />}
         </form.AppField>
 
         <form.AppField name="description">
-          {(field) => <field.TextField label="Description" />}
+          {(field) => <field.TextField label="Description" placeholder="Optional. Add more details if needed" />}
         </form.AppField>
 
         <form.AppField
@@ -99,7 +92,6 @@ export function GoalCreatePage() {
                 { label: 'Numeric', value: 'numeric' },
                 { label: 'Boolean', value: 'boolean' },
               ]}
-              // placeholder="Select a goal type"
             />
           )}
         </form.AppField>
@@ -109,14 +101,14 @@ export function GoalCreatePage() {
             name="target.targetValue"
             validators={{
               onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
+                if (!value) {
                   return 'Target value is required'
                 }
                 return undefined
               },
             }}
           >
-            {(field) => <field.TextField label="Daily Target" />}
+            {(field) => <field.NumberField label="Daily Target" placeholder="e.g. 30" />}
           </form.AppField>
           <form.AppField
             name="target.targetUnit"
@@ -129,7 +121,7 @@ export function GoalCreatePage() {
               },
             }}
           >
-            {(field) => <field.TextField label="Units" />}
+            {(field) => <field.TextField label="Units" placeholder="e.g. km, hours, sessions" />}
           </form.AppField>
         </div>}
 
