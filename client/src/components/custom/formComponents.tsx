@@ -145,9 +145,11 @@ export function TextField({
 export function TextArea({
   label,
   rows = 3,
+  placeholder,
 }: {
   label: string
   rows?: number
+  placeholder?: string
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
@@ -163,6 +165,7 @@ export function TextArea({
         onBlur={field.handleBlur}
         rows={rows}
         onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>

@@ -20,6 +20,7 @@ import { Route as SettingsGoalvisibilityRouteImport } from './routes/settings_/g
 import { Route as SettingsGoalorderRouteImport } from './routes/settings_/goalorder'
 import { Route as GoalsCreateRouteImport } from './routes/goals_/create'
 import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
+import { Route as EntrysCreateRouteImport } from './routes/entrys_/create'
 import { Route as EntrysEntryIdRouteImport } from './routes/entrys_/$entryId'
 import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
 import { Route as EntrysEntryIdEditRouteImport } from './routes/entrys_/$entryId_.edit'
@@ -79,6 +80,11 @@ const GoalsGoalIdRoute = GoalsGoalIdRouteImport.update({
   path: '/goals/$goalId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntrysCreateRoute = EntrysCreateRouteImport.update({
+  id: '/entrys_/create',
+  path: '/entrys/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EntrysEntryIdRoute = EntrysEntryIdRouteImport.update({
   id: '/entrys_/$entryId',
   path: '/entrys/$entryId',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/goals': typeof GoalsRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
   '/entrys/$entryId': typeof EntrysEntryIdRoute
+  '/entrys/create': typeof EntrysCreateRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/entrys/$entryId': typeof EntrysEntryIdRoute
+  '/entrys/create': typeof EntrysCreateRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/goals': typeof GoalsRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
   '/entrys_/$entryId': typeof EntrysEntryIdRoute
+  '/entrys_/create': typeof EntrysCreateRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
   '/goals_/create': typeof GoalsCreateRoute
   '/settings_/goalorder': typeof SettingsGoalorderRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/settings'
     | '/entrys/$entryId'
+    | '/entrys/create'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/entrys/$entryId'
+    | '/entrys/create'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/settings'
     | '/entrys_/$entryId'
+    | '/entrys_/create'
     | '/goals_/$goalId'
     | '/goals_/create'
     | '/settings_/goalorder'
@@ -195,6 +207,7 @@ export interface RootRouteChildren {
   GoalsRoute: typeof GoalsRouteWithChildren
   SettingsRoute: typeof SettingsRouteWithChildren
   EntrysEntryIdRoute: typeof EntrysEntryIdRoute
+  EntrysCreateRoute: typeof EntrysCreateRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
   GoalsCreateRoute: typeof GoalsCreateRoute
   SettingsGoalorderRoute: typeof SettingsGoalorderRoute
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoalsGoalIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entrys_/create': {
+      id: '/entrys_/create'
+      path: '/entrys/create'
+      fullPath: '/entrys/create'
+      preLoaderRoute: typeof EntrysCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entrys_/$entryId': {
       id: '/entrys_/$entryId'
       path: '/entrys/$entryId'
@@ -345,6 +365,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoalsRoute: GoalsRouteWithChildren,
   SettingsRoute: SettingsRouteWithChildren,
   EntrysEntryIdRoute: EntrysEntryIdRoute,
+  EntrysCreateRoute: EntrysCreateRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
   GoalsCreateRoute: GoalsCreateRoute,
   SettingsGoalorderRoute: SettingsGoalorderRoute,
