@@ -1,11 +1,9 @@
-import { Button } from "@/components/ui/button";
 import Heatmap from "./Heatmap";
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
+import { type IconName } from 'lucide-react/dynamic';
 import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
-import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
-import { useGoalDetailYear, useGoalDetailYearDispatch, type YearAction } from "../contexts/GoalDetailYearContext";
+import { YearDropdown } from "./YearDropdown";
 
 
 /**
@@ -124,41 +122,16 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title
  * With year select, add entry, log today
  */
 interface GoalCardControlledProps extends GoalCardBaseProps {
+  selectedYear: number,
+  onCalendarSelect: (year: number) => void,
 }
 
-const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ baseColour, goalThreshold }) => {
-  const selectedYear = useGoalDetailYear();
-  const selectedYearDispatch = useGoalDetailYearDispatch();
-
-  const yearMenuConfig: DropdownMenuCheckboxesItemConfig<number>[] = [
-    { label: "2025", value: 2025 },
-    { label: "2024", value: 2024 },
-  ]
-
-  // useEffect(() => {
-  //   console.log("selectedYear", selectedYear)
-  // }, [selectedYear])
-
+const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ baseColour, goalThreshold, selectedYear, onCalendarSelect }) => {
   const controlOnlyTypeContent = ((() => {
     return <>
       <div className="header-container flex flex-row justify-between">
         {/* Year and Calendar button */}
-        <div className="year-calendar-container flex flex-row gap-1">
-          <h2 className="text-xl font-bold">{selectedYear}</h2>
-          <DropdownMenuCheckboxes<number>
-            initialCheckedValue={selectedYear}
-            itemsConfig={yearMenuConfig}
-            selectionChangeCallback={(itemValue) => { 
-              console.log("dropdown year menu selection changed TODOs", itemValue)
-              const changeYearAction: YearAction = { type: 'changed', year: itemValue }
-              selectedYearDispatch(changeYearAction);
-            }}
-          >
-            <Button variant="secondary" size="icon">
-              <DynamicIcon name="calendar-days" />
-            </Button>
-          </DropdownMenuCheckboxes>
-        </div>
+        <YearDropdown selectedYear={selectedYear} onSelect={onCalendarSelect} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
           <IconButton iconName="calendar-plus" onClickCallback={() => {

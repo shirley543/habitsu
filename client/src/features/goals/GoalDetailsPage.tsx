@@ -6,7 +6,6 @@ import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarBack } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
-import { GoalDetailYearProvider } from "./contexts/GoalDetailYearContext";
 
 interface GoalStats {
   dailyAverage: number,
@@ -17,6 +16,7 @@ interface GoalStats {
 
 export const GoalDetailsPage = () => {
   const navigate = useNavigate()
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
 
   const initialData = {
     id: 1,
@@ -81,43 +81,45 @@ export const GoalDetailsPage = () => {
           }}/>
         </div>
       </div>
-      <GoalDetailYearProvider>
-        {/* Heatmap container */}
-        <GoalCardControlled 
-          // goalId={data.id}
-          baseColour={data.baseColour}
-          goalThreshold={data.goalThreshold}
-          selectedYear={2025}
-        />
-        {/* Gridded summary statistics */}
-        <div className="grid grid-cols-2 grid-rows-2 gap-3">
-          {
-            Object.entries(stats).map(([key, value]) => {
-              const display = GOAL_STATS_DISPLAYS[key as GoalStatsKeys];
-              return <>
-                <div className="bg-white rounded-xl p-2.5 shadow-sm">
-                  <div className="flex flex-row gap-3">
-                    <h3 className="w-full text-base font-semibold">{display.title}</h3>
-                    <div className="icon-container w-9 h-9 flex items-center justify-center rounded-md" style={{
-                      backgroundColor:
-                      // TODOs: fix bug where icon container width shorter than w-9
-                      // TODOs: light/ dark mode differing opacities. :dark selector?
-                        `${data.baseColour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
-                      color: data.baseColour,
-                      strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
-                    }}>
-                      <DynamicIcon name={display.icon} />
-                    </div>
+      {/* Heatmap container */}
+      <GoalCardControlled 
+        // goalId={data.id}
+        baseColour={data.baseColour}
+        goalThreshold={data.goalThreshold}
+        selectedYear={selectedYear}
+        onCalendarSelect={(year) => { 
+          console.log("Goal details page > calendar selection made", year) 
+          setSelectedYear(year)
+        }}
+      />
+      {/* Gridded summary statistics */}
+      <div className="grid grid-cols-2 grid-rows-2 gap-3">
+        {
+          Object.entries(stats).map(([key, value]) => {
+            const display = GOAL_STATS_DISPLAYS[key as GoalStatsKeys];
+            return <>
+              <div className="bg-white rounded-xl p-2.5 shadow-sm">
+                <div className="flex flex-row gap-3">
+                  <h3 className="w-full text-base font-semibold">{display.title}</h3>
+                  <div className="icon-container w-9 h-9 flex items-center justify-center rounded-md" style={{
+                    backgroundColor:
+                    // TODOs: fix bug where icon container width shorter than w-9
+                    // TODOs: light/ dark mode differing opacities. :dark selector?
+                      `${data.baseColour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
+                    color: data.baseColour,
+                    strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
+                  }}>
+                    <DynamicIcon name={display.icon} />
                   </div>
-                  <span className="text-4xl font-semibold">{value}</span> <span className="text-xl font-medium">{display.units}</span>
                 </div>
-              </>
-            })
-          }
-        </div>
-        {/* Line graph */}
-        <MonthAreaChart baseColour={data.baseColour} inputChartData={dummyInputChartData} />
-      </GoalDetailYearProvider>
+                <span className="text-4xl font-semibold">{value}</span> <span className="text-xl font-medium">{display.units}</span>
+              </div>
+            </>
+          })
+        }
+      </div>
+      {/* Line graph */}
+      <MonthAreaChart baseColour={data.baseColour} inputChartData={dummyInputChartData} />
     </div>
   );
 };
