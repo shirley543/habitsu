@@ -13,16 +13,16 @@ import {
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 // TODOss: have value type be assigned at creation
-export interface DropdownMenuCheckboxesItemConfig {
+export interface DropdownMenuCheckboxesItemConfig<T> {
   label: string,
-  value: string,
+  value: T,
 }
 
-interface DropdownMenuCheckboxesProps {
+interface DropdownMenuCheckboxesProps<T> {
   title?: string,
-  initialCheckedValue: string,
-  itemsConfig: DropdownMenuCheckboxesItemConfig[],
-  selectionChangeCallback: (itemValue: string) => void;
+  initialCheckedValue: T,
+  itemsConfig: DropdownMenuCheckboxesItemConfig<T>[],
+  selectionChangeCallback: (itemValue: T) => void;
   children: React.ReactNode,
 }
 
@@ -31,8 +31,8 @@ interface DropdownMenuCheckboxesProps {
  * Displays dropdown menu of options, with current selected value checked
  * @returns 
  */
-const DropdownMenuCheckboxes: React.FC<DropdownMenuCheckboxesProps> = ({ title, initialCheckedValue, itemsConfig, selectionChangeCallback, children }) => {
-  const [checkedValue, setCheckedValue] = React.useState<string>(initialCheckedValue)
+const DropdownMenuCheckboxes = <T,>({ title, initialCheckedValue, itemsConfig, selectionChangeCallback, children }: DropdownMenuCheckboxesProps<T>) => {
+  const [checkedValue, setCheckedValue] = React.useState<T>(initialCheckedValue)
 
   return (
     <DropdownMenu>
