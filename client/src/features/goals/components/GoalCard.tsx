@@ -5,7 +5,7 @@ import { CalendarDays, CalendarPlus, Pencil, SquarePlus } from "lucide-react";
 import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
-import { DropdownMenuCheckboxes } from "@/components/custom/DropdownMenuCheckboxes";
+import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
 
 export enum GoalCardType {
   Description = 'description',
@@ -99,16 +99,27 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
     </>
   })();
 
+
+  const yearMenuConfig: DropdownMenuCheckboxesItemConfig[] = [
+    { label: "2025", value: "2025" },
+    { label: "2024", value: "2024" },
+  ]
+
   const controlOnlyTypeContent = ((() => {
     return <>
       <div className="header-container flex flex-row justify-between">
         {/* Year and Calendar button */}
         <div className="year-calendar-container flex flex-row gap-1">
           <h2 className="text-xl font-bold">2025</h2>
-          <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
-          <IconButton iconName="calendar-days" onClickCallback={() => {
-            console.log("Clicked on goal details card > details page year select (menu dropdown)")
-          }}/>
+          <DropdownMenuCheckboxes
+            initialCheckedValue={"2025"}
+            itemsConfig={yearMenuConfig}
+            selectionChangeCallback={() => { console.log("dropdown year menu selection changed TODOs") }}
+          >
+            <Button variant="secondary" size="icon">
+              <DynamicIcon name="calendar-days" />
+            </Button>
+          </DropdownMenuCheckboxes>
         </div>
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
