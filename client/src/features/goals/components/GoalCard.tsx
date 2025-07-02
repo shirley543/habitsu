@@ -5,6 +5,8 @@ import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
 import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
+import { useGoalDetailYear, useGoalDetailYearDispatch, type YearAction } from "../contexts/GoalDetailYearContext";
+import { useEffect } from "react";
 
 export enum GoalCardType {
   Description = 'description',
@@ -33,6 +35,13 @@ interface GoalCardProps {
  */
 const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseColour, iconName, goalThreshold, cardType=GoalCardType.Description }) => {
   const navigate = useNavigate()
+  const selectedYear = useGoalDetailYear();
+  const selectedYearDispatch = useGoalDetailYearDispatch();
+  // TODOs: Refactor GoalCard to have two distinct components (one for details page, other for home page, as fairly different interactions e.g. year select-wise)
+
+  useEffect(() => {
+    console.log("selectedYear", selectedYear)
+  }, [selectedYear])
 
   const descriptionTypeContent = (() => {
     return <>
@@ -109,11 +118,15 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
       <div className="header-container flex flex-row justify-between">
         {/* Year and Calendar button */}
         <div className="year-calendar-container flex flex-row gap-1">
-          <h2 className="text-xl font-bold">2025</h2>
+          <h2 className="text-xl font-bold">{selectedYear}</h2>
           <DropdownMenuCheckboxes<number>
-            initialCheckedValue={2025}
+            initialCheckedValue={selectedYear}
             itemsConfig={yearMenuConfig}
-            selectionChangeCallback={(itemValue) => { console.log("dropdown year menu selection changed TODOs", itemValue) }}
+            selectionChangeCallback={(itemValue) => { 
+              console.log("dropdown year menu selection changed TODOs", itemValue)
+              const changeYearAction: YearAction = { type: 'changed', year: itemValue }
+              selectedYearDispatch(changeYearAction);
+            }}
           >
             <Button variant="secondary" size="icon">
               <DynamicIcon name="calendar-days" />
@@ -134,11 +147,11 @@ const GoalCard: React.FC<GoalCardProps> = ({ goalId, title, description, baseCol
   }))();
 
   return (
-    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?"
+    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
     <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {/* {descriptionTypeContent} */}
       {cardType === GoalCardType.ControlOnly ? controlOnlyTypeContent : descriptionTypeContent}
-      <Heatmap baseColour={baseColour} threshold={goalThreshold}/>
+      <Heatmap baseColour={baseColour} threshold={goalThreshold} year={selectedYear}/>
     </div>
   )
 }

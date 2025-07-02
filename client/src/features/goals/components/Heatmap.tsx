@@ -13,10 +13,11 @@ export enum HeatmapDisplayState {
 interface HeatmapProps {
   baseColour: string,
   threshold: number,
+  year: number,
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold }) => {
-  const selectedYear = 2025;
+const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold, year }) => {
+  const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
   const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
