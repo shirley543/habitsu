@@ -286,7 +286,7 @@ export function ColourSelect({ label }: { label: string }) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.handleChange(event.target.value)
   };
-  
+
   return (
     <div>
       <Label htmlFor={label} className="mb-2 text-xl font-bold">{label}</Label>
@@ -294,7 +294,10 @@ export function ColourSelect({ label }: { label: string }) {
         {Object.values(ColourEnum).map((colourEnum) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
           return <label>
-            <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" onChange={handleChange} readOnly={false}/>
+            <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" 
+              onChange={handleChange} readOnly={false} 
+              checked={field.state.value === colourEnum}
+            />
             <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
               <div className="w-6 h-6 rounded-lg" style={{backgroundColor: `#${colourEnum}`}}></div>
             </div>
@@ -322,7 +325,10 @@ export function IconSelect({ label }: { label: string }) {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
           // TODOs: check for more accessible alternatives to `hidden`/ `display: none`
           return <label>
-            <input type="radio" name="icon" value={standardIcon} className="peer hidden" onChange={handleChange} readOnly={false}/>
+            <input type="radio" name="icon" value={standardIcon} className="peer hidden"
+              onChange={handleChange} readOnly={false}
+              checked={field.state.value === standardIcon}
+            />
             <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
               <DynamicIcon name={standardIcon} />
             </div>

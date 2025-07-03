@@ -14,24 +14,25 @@ export enum GoalQuantifyType {
   Boolean = 'BOOLEAN',
 }
 
-export type GoalSchemaType = NumericalInterface | BooleanInterface;
+// export type GoalSchemaType = NumericalInterface | BooleanInterface;
 
-interface BaseInterface {
-  title: string;
-  description: string;
-  colour: string;
-  publicity: GoalPublicityType,
-}
+// interface BaseInterface {
+//   title: string;
+//   description: string;
+//   colour: string;
+//   publicity: GoalPublicityType,
+//   icon: string;
+// }
 
-interface BooleanInterface extends BaseInterface {
-  goalType: GoalQuantifyType.Boolean;
-}
+// interface BooleanInterface extends BaseInterface {
+//   goalType: GoalQuantifyType.Boolean;
+// }
 
-interface NumericalInterface extends BaseInterface {
-  goalType: GoalQuantifyType.Numerical;
-  numericTarget: number;
-  numericUnit: string;
-}
+// interface NumericalInterface extends BaseInterface {
+//   goalType: GoalQuantifyType.Numerical;
+//   numericTarget: number;
+//   numericUnit: string;
+// }
 
 /**
  * Schemas
@@ -54,6 +55,7 @@ export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
 export const BaseGoalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
+  icon: z.string().min(1, "Icon is required"),
   colour: z.string()
     .min(1, "Colour is required")
     .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),
@@ -61,3 +63,4 @@ export const BaseGoalSchema = z.object({
 });
 
 export const GoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
+export type GoalInterface = z.infer<typeof GoalSchema>;
