@@ -1,7 +1,10 @@
 import { GoalCardDescriptive } from "./components/GoalCard";
 import type { IconName } from "lucide-react/dynamic";
-import { TopBarConfig } from "@/components/custom/TopBar";
+import { TopBarSlotted } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
+import IconButton from "@/components/custom/IconButton";
+import { YearDropdown } from "./components/YearDropdown";
+import { useState } from "react";
 
 interface DummyGoalData {
   id: number,
@@ -40,6 +43,7 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
     goalThreshold: 10,
   },
   {
+    id: 4,
     title: "Exercise",
     description: "Exercise for an hour at least once a week",
     baseColour: "#C084FC", ///< TODOs: Lime/400
@@ -50,30 +54,26 @@ const DUMMY_GOALS_DATA: DummyGoalData[] = [
 
 export const GoalsPage = () => {
   const navigate = useNavigate()
+  const [selectedYear, setSelectedYear] = useState<number>(2025)
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarConfig 
+      {/* Topbar slotted */}
+      <TopBarSlotted
         title="Goals List"
-        rightConfig={[
-          {
-            iconName: "calendar-days",
-            clickCallback: () => { console.log("calendar clicked TODOs") }
-          },
-          {
-            iconName: "settings",
-            clickCallback: () => { 
+        rightSlotItems={
+          <>
+            <YearDropdown selectedYear={selectedYear} onSelect={(year) => {
+              setSelectedYear(year)
+            }} />
+            <IconButton iconName="settings" onClickCallback={() => {
               navigate({ to: '/settings' })
-            }
-          },
-          {
-            iconName: "plus",
-            clickCallback: () => {
+            }} />
+            <IconButton iconName="plus" onClickCallback={() => {
               navigate({ to: '/goals/create' })
-            }
-          },
-        ]}
+            }} />
+          </>
+        }
       />
       {/* Heatmaps container */}
       <div className="flex flex-col gap-3">
@@ -85,7 +85,7 @@ export const GoalsPage = () => {
             iconName={data.iconName}
             baseColour={data.baseColour}
             goalThreshold={data.goalThreshold}
-            selectedYear={2025}
+            selectedYear={selectedYear}
           />
         })}
       </div>

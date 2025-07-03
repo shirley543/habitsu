@@ -1,22 +1,26 @@
 import type { IconName } from "lucide-react/dynamic";
 import IconButton from "./IconButton"
 
-interface TopBarInternalProps {
+interface TopBarSlottedProps {
   title: string,
-  leftSlot?: React.ReactNode,
-  rightSlot?: React.ReactNode,
+  leftSlotItems?: React.ReactNode,
+  rightSlotItems?: React.ReactNode,
 }
 
 /**
- * Top bar: contains title in center, left slot and right slot for nodes (any c)
+ * Top bar: contains title in center, left slot and right slot for nodes
  */
-const TopBarInternal: React.FC<TopBarInternalProps> = ({ title, leftSlot, rightSlot }) => {
+const TopBarSlotted: React.FC<TopBarSlottedProps> = ({ title, leftSlotItems, rightSlotItems }) => {
   return (
     <div className="flex flex-row gap-3">
-      {leftSlot}
+      {leftSlotItems && <div className="flex flex-row gap-1.5">
+        {leftSlotItems}
+      </div>}
       <div className="flex flex-row justify-between items-center w-full">
         <h1 className="text-base font-extrabold w-full">{title}</h1>
-        {rightSlot}
+        {rightSlotItems && <div className="flex flex-row gap-1.5">
+          {rightSlotItems}
+        </div>}
       </div>
     </div>
   )
@@ -31,7 +35,7 @@ interface TopBarCloseProps {
  * Top bar close: contains title and close (x) button on right
  */
 const TopBarClose: React.FC<TopBarCloseProps> = ({ title, closeCallback }) => {
-  const rightSlot = (() => {
+  const rightSlotItems = (() => {
     return <>
       <div className="buttons-container flex flex-row gap-1.5">
         <IconButton iconName="x" onClickCallback={closeCallback}/>
@@ -40,7 +44,7 @@ const TopBarClose: React.FC<TopBarCloseProps> = ({ title, closeCallback }) => {
   })();
   
   return (
-    <TopBarInternal title={title} rightSlot={rightSlot} />
+    <TopBarSlotted title={title} rightSlotItems={rightSlotItems} />
   )
 }
 
@@ -53,7 +57,7 @@ interface TopBarBackProps {
  * Top bar back: contains title and back (<-) button on left
  */
 const TopBarBack: React.FC<TopBarBackProps> = ({ title, backCallback }) => {
-  const leftSlot = (() => {
+  const leftSlotItems = (() => {
     return <>
       <div className="buttons-container flex flex-row gap-1.5">
         <IconButton iconName="arrow-left" onClickCallback={backCallback}/>
@@ -62,7 +66,7 @@ const TopBarBack: React.FC<TopBarBackProps> = ({ title, backCallback }) => {
   })();
   
   return (
-    <TopBarInternal title={title} leftSlot={leftSlot} />
+    <TopBarSlotted title={title} leftSlotItems={leftSlotItems} />
   )
 }
 
@@ -82,21 +86,23 @@ interface TopBarConfigProps {
  */
 const TopBarConfig: React.FC<TopBarConfigProps> = ({ title, leftConfig, rightConfig }) => {
   const createSlotFromConfig = (configArr: TopBarButtonConfig[]) => {
-    return <div className="flex flex-row gap-1.5">
-      {
-        configArr?.map((item) => {
-          return <IconButton iconName={item.iconName} onClickCallback={item.clickCallback}/>
-        })
-      }
-    </div>
+    return (
+      <>
+        {
+          configArr?.map((item) => {
+            return <IconButton iconName={item.iconName} onClickCallback={item.clickCallback}/>
+          })
+        }
+      </>
+    )
   }
   
-  const leftSlot = leftConfig ? createSlotFromConfig(leftConfig) : undefined;
-  const rightSlot = rightConfig ? createSlotFromConfig(rightConfig) : undefined;
+  const leftSlotItems = leftConfig ? createSlotFromConfig(leftConfig) : undefined;
+  const rightSlotItems = rightConfig ? createSlotFromConfig(rightConfig) : undefined;
 
   return (
-    <TopBarInternal title={title} leftSlot={leftSlot} rightSlot={rightSlot} />
+    <TopBarSlotted title={title} leftSlotItems={leftSlotItems} rightSlotItems={rightSlotItems} />
   )
 }
 
-export { TopBarClose, TopBarBack, TopBarConfig }
+export { TopBarClose, TopBarBack, TopBarConfig, TopBarSlotted }
