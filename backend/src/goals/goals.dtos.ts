@@ -16,24 +16,24 @@ export enum GoalQuantifyType {
   Boolean = 'BOOLEAN',
 }
 
-export type GoalSchemaType = NumericalInterface | BooleanInterface;
+// export type GoalSchemaType = NumericalInterface | BooleanInterface;
 
-interface BaseInterface {
-  title: string;
-  description: string;
-  colour: string;
-  publicity: GoalPublicityType,
-}
+// interface BaseInterface {
+//   title: string;
+//   description: string;
+//   colour: string;
+//   publicity: GoalPublicityType,
+// }
 
-interface BooleanInterface extends BaseInterface {
-  goalType: GoalQuantifyType.Boolean;
-}
+// interface BooleanInterface extends BaseInterface {
+//   goalType: GoalQuantifyType.Boolean;
+// }
 
-interface NumericalInterface extends BaseInterface {
-  goalType: GoalQuantifyType.Numerical;
-  numericTarget: number;
-  numericUnit: string;
-}
+// interface NumericalInterface extends BaseInterface {
+//   goalType: GoalQuantifyType.Numerical;
+//   numericTarget: number;
+//   numericUnit: string;
+// }
 
 /**
  * Schemas

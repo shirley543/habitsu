@@ -4,57 +4,21 @@ import { TopBarSlotted } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
 import IconButton from "@/components/custom/IconButton";
 import { YearDropdown } from "./components/YearDropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGoals } from "./GoalApi";
+import { GoalQuantifyType } from "@habit-tracker/shared";
 
-interface DummyGoalData {
-  id: number,
-  title: string,
-  description: string,
-  baseColour: string,
-  iconName: IconName,
-  goalThreshold: number,
-};
-
-
-// TODOs: Add endpoint for goals being grabbed (including goal entries)
-const DUMMY_GOALS_DATA: DummyGoalData[] = [
-  {
-    id: 1,
-    title: "Drink water",
-    description: "Drink at least 6 cups per day",
-    baseColour: "#60A5FA", ///< TODOs: Blue/400
-    iconName: "glass-water",
-    goalThreshold: 6,
-  },
-  {
-    id: 2,
-    title: "Play piano",
-    description: "Play for 15 minutes per day",
-    baseColour: "#F472B6", ///< TODOs: Pink/400
-    iconName: "piano",
-    goalThreshold: 15,
-  },
-  {
-    id: 3,
-    title: "Reading",
-    description: "Read 10 pages per day",
-    baseColour: "#FBBF24", ///< TODOs: Amber/400
-    iconName: "book",
-    goalThreshold: 10,
-  },
-  {
-    id: 4,
-    title: "Exercise",
-    description: "Exercise for an hour at least once a week",
-    baseColour: "#C084FC", ///< TODOs: Lime/400
-    iconName: "biceps-flexed",
-    goalThreshold: 1,
-  },
-]
 
 export const GoalsPage = () => {
   const navigate = useNavigate()
   const [selectedYear, setSelectedYear] = useState<number>(2025)
+
+  const { data, isLoading, error } = useGoals();
+
+  // Scroll into view today's cell
+  useEffect(() => {
+    console.log("data", data)
+  }, [data])
 
   return (
     <div className="flex flex-col gap-3">
@@ -77,14 +41,14 @@ export const GoalsPage = () => {
       />
       {/* Heatmaps container */}
       <div className="flex flex-col gap-3">
-        {DUMMY_GOALS_DATA.map((data) => {
+        {data && data.map((d) => {
           return <GoalCardDescriptive
-            goalId={data.id}
-            title={data.title}
-            description={data.description}
-            iconName={data.iconName}
-            baseColour={data.baseColour}
-            goalThreshold={data.goalThreshold}
+            goalId={d.id}
+            title={d.title}
+            description={d.description}
+            iconName={d.icon as IconName}
+            baseColour={d.colour}
+            goalThreshold={d.goalType === GoalQuantifyType.Numerical ? d.numericTarget : 1}
             selectedYear={selectedYear}
           />
         })}

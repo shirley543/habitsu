@@ -263,7 +263,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
         <div className={cn(cellVariants({ variant, size }))} ref={ref}
           style={{
             backgroundColor:
-              cellColor,
+              `#${cellColor}`,
           }}
           onClick={() => {
             console.log(date);

@@ -75,7 +75,7 @@ export function GoalOrderPage() {
         GoalOrderItems.map((item) => {
           return (
             <div className="orderItem bg-white rounded-md flex flex-row overflow-hidden">
-              <div className="tab w-2" style={{backgroundColor: item.baseColour}}></div>
+              <div className="tab w-2" style={{backgroundColor: `#${item.baseColour}`}}></div>
               <div className="titleButtons w-full px-2.5 py-2 flex flex-row gap-2 items-center">
                 <h2 className="title w-full text-sm font-semibold">{item.title}</h2>
                 <div className="buttons flex flex-row gap-1">

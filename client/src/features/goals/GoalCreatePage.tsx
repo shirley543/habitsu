@@ -3,34 +3,36 @@ import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useMatch, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { GoalPublicityType, type GoalInterface, GoalQuantifyType } from '@habit-tracker/shared';
+import { GoalPublicityType, type GoalResponse, GoalQuantifyType } from '@habit-tracker/shared';
+import { useGoal } from './GoalApi';
 
 // TODOss:
 // - Zod validation
 // - Fix bug where boolean goal type selected and values placed, but submit not working
 
 // TODOs: move this + create new useGoal hook and place in GoalApi file
-const BASE_URL = "http://localhost:8080";
 
 interface GoalFormProps {
   isCreate: boolean;
-  defaultValues?: GoalInterface;
+  defaultValues?: GoalResponse;
 }
 
 const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const navigate = useNavigate();
+  const initialValues = defaultValues || {
+    title: '',
+    description: '',
+    goalType: GoalQuantifyType.Numerical,
+    numericTarget: null as unknown as number,
+    numericUnit: '',
+    publicity: GoalPublicityType.Private,
+    colour: '',
+    icon: '',
+  } as GoalResponse;
+  const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numerical;
 
   const form = useAppForm({
-    defaultValues: defaultValues || {
-      title: '',
-      description: '',
-      goalType: GoalQuantifyType.Numerical,
-      numericTarget: null as unknown as number,
-      numericUnit: '',
-      publicity: GoalPublicityType.Private,
-      colour: '',
-      icon: '',
-    } as GoalInterface,
+    defaultValues: initialValues,
     validators: {
       onBlur: ({ value }) => {
         const errors = {
@@ -51,7 +53,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     },
   })
 
-  const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(true);
+  const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(initialIsDisplayNumerical);
 
   return (
     <div className="flex flex-col gap-3">
@@ -210,22 +212,13 @@ export function GoalCreatePage() {
   )
 }
 
-async function fetchGoalById(goalId: number): Promise<GoalInterface> {
-  const response = await fetch(`${BASE_URL}/goals/${goalId}`);
-  const data = await response.json();
-  return data;
-}
 
 export function GoalEditPage() {
   const route = getRouteApi('/goals_/$goalId_/edit')
   const { goalId: goalIdStr } = route.useParams();
   const goalId = Number.parseInt(goalIdStr);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['goal', goalId],
-    queryFn: () => fetchGoalById(goalId),
-    enabled: !!goalId,
-  });
+  const { data, isLoading, error } = useGoal(goalId);
 
   return (
     <>

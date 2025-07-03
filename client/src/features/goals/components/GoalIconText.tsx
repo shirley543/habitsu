@@ -16,7 +16,7 @@ const GoalIconText: React.FC<GoalIconTextProps> = ({ title, description, baseCol
     <div className="icon-text-container flex flex-row gap-2 items-center">
       <div className="icon-container w-9 h-9 rounded-md flex items-center justify-center text-white opacity-70" style={
         {
-          backgroundColor: baseColour
+          backgroundColor: `#${baseColour}`
         }
       }>
         <DynamicIcon name={iconName} />

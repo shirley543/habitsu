@@ -1,5 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
+// TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
 /**
  * Types
  */
@@ -13,26 +14,6 @@ export enum GoalQuantifyType {
   Numerical = 'NUMERICAL',
   Boolean = 'BOOLEAN',
 }
-
-// export type GoalSchemaType = NumericalInterface | BooleanInterface;
-
-// interface BaseInterface {
-//   title: string;
-//   description: string;
-//   colour: string;
-//   publicity: GoalPublicityType,
-//   icon: string;
-// }
-
-// interface BooleanInterface extends BaseInterface {
-//   goalType: GoalQuantifyType.Boolean;
-// }
-
-// interface NumericalInterface extends BaseInterface {
-//   goalType: GoalQuantifyType.Numerical;
-//   numericTarget: number;
-//   numericUnit: string;
-// }
 
 /**
  * Schemas
@@ -62,5 +43,16 @@ export const BaseGoalSchema = z.object({
   publicity: GoalPublicityTypeSchema,
 });
 
-export const GoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
-export type GoalInterface = z.infer<typeof GoalSchema>;
+// --------------------
+
+export const CreateGoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
+// TODOs: UpdateGoalSchema incorrect currently. To fix; numericTarget and numericUnits fields should be optional, but goal type should be required
+export const UpdateGoalSchema = BaseGoalSchema.partial().and(GoalTypeDiscriminatorSchema);
+export const GoalResponseSchema = (BaseGoalSchema.extend({ id: z.number() }).and(GoalTypeDiscriminatorSchema))
+
+/**
+ * Interfaces
+ */
+export type CreateGoalDto = z.infer<typeof CreateGoalSchema>;
+export type UpdateGoalDto = z.infer<typeof UpdateGoalSchema>;
+export type GoalResponse = z.infer<typeof GoalResponseSchema>;

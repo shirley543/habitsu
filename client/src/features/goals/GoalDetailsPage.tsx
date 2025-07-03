@@ -105,8 +105,8 @@ export const GoalDetailsPage = () => {
                     backgroundColor:
                     // TODOs: fix bug where icon container width shorter than w-9
                     // TODOs: light/ dark mode differing opacities. :dark selector?
-                      `${data.baseColour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
-                    color: data.baseColour,
+                      `#${data.baseColour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
+                    color: `#${data.baseColour}`,
                     strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
                   }}>
                     <DynamicIcon name={display.icon} />
