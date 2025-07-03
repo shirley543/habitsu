@@ -21,6 +21,7 @@ export class GoalsService {
         title: createGoalDto.title,
         description: createGoalDto.description,
         colour: createGoalDto.colour,
+        icon: createGoalDto.icon,
         publicity: createGoalDto.publicity,
         goalType: createGoalDto.goalType as GoalQuantify,
         user: {

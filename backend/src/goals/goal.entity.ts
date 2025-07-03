@@ -18,6 +18,9 @@ export class GoalEntity implements Goal {
   description: string | null;
 
   @ApiProperty()
+  icon: string;
+
+  @ApiProperty()
   colour: string;
 
   @ApiProperty()

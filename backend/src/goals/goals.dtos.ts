@@ -56,6 +56,7 @@ export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
 export const BaseGoalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
+  icon: z.string().min(1, "Icon is required"),
   colour: z.string()
     .min(1, "Colour is required")
     .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),

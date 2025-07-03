@@ -19,6 +19,7 @@ async function main() {
             title: 'Drink water',
             description: 'Drink at least 6 cups per day',
             colour: '38BDF8',
+            icon: 'glass-water',
             publicity: GoalPublicity.PRIVATE,
             goalType: GoalQuantify.NUMERIC,
             numericTarget: 6,
@@ -81,6 +82,7 @@ async function main() {
             title: 'Play piano',
             description: 'Play for 30 minutes per day',
             colour: 'F472B6',
+            icon: 'piano',
             publicity: GoalPublicity.PUBLIC,
             goalType: GoalQuantify.NUMERIC,
             numericTarget: 30,
@@ -143,6 +145,7 @@ async function main() {
             title: 'Screen-free morning',
             description: 'No scrolling on phone early in the morning',
             colour: 'F472B6',
+            icon: 'hourglass',
             publicity: GoalPublicity.PUBLIC,
             goalType: GoalQuantify.BOOLEAN,
             entries: {
