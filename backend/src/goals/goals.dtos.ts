@@ -12,7 +12,7 @@ export enum GoalPublicityType {
 }
 
 export enum GoalQuantifyType {
-  Numerical = 'NUMERICAL',
+  Numeric = 'NUMERICAL',
   Boolean = 'BOOLEAN',
 }
 
@@ -30,7 +30,7 @@ export enum GoalQuantifyType {
 // }
 
 // interface NumericalInterface extends BaseInterface {
-//   goalType: GoalQuantifyType.Numerical;
+//   goalType: GoalQuantifyType.Numeric;
 //   numericTarget: number;
 //   numericUnit: string;
 // }
@@ -41,9 +41,9 @@ export enum GoalQuantifyType {
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
 export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
-  // Numerical goal schema
+  // Numeric goal schema
   z.object({
-    goalType: z.literal(GoalQuantifyType.Numerical),
+    goalType: z.literal(GoalQuantifyType.Numeric),
     numericTarget: z.number({ required_error: "Target is required" }),
     numericUnit: z.string().min(1, "Units are required"),
   }),

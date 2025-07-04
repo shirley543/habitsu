@@ -6,7 +6,7 @@ import { GoalQuantify, Prisma } from '@prisma/client';
 
 // // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
 // enum GoalQuantifyType {
-//   Numerical = 'NUMERICAL',
+//   Numeric = 'NUMERICAL',
 //   Boolean = 'BOOLEAN',
 // }
 
@@ -31,7 +31,7 @@ export class GoalEntriesService {
             ...baseGoalEntry,
             booleanValue: createGoalEntryDto.booleanValue,
           };
-        case GoalQuantifyType.Numerical:
+        case GoalQuantifyType.Numeric:
           return {
             ...baseGoalEntry,
             numericValue: createGoalEntryDto.numericValue,
@@ -78,7 +78,7 @@ export class GoalEntriesService {
             ...baseGoalEntry,
             booleanValue: updateGoalEntryDto.booleanValue,
           };
-        case GoalQuantifyType.Numerical:
+        case GoalQuantifyType.Numeric:
           return {
             ...baseGoalEntry,
             numericValue: updateGoalEntryDto.numericValue,

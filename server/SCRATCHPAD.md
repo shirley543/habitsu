@@ -8,7 +8,7 @@ Working through DB structure:
   - Emoji: hex code, hence string?
   - Private/ Public: whether private (only visible to them), or public (visible to everyone)
   - Type: discrete (count) or continuous (measured value) [number] or checkbox (yes/ no) [boolean] (used by frontend for determining colour intensity)
-    - Numerical goal:
+    - Numeric goal:
       - Unit: string
       - target: number
     - Boolean goal:
@@ -18,7 +18,7 @@ Working through DB structure:
   - Goal ID: goal it's associated with
   - Day/ Date: date it's associated with (better to store as a date, or just year + index?) (storing as date feels more extensible; what if wanting to display in other methods and not just heatmap + filtering entries by date in future?)
   - Value: number or boolean (TODOss how to ensure type matches parent goal? enforceable in DB or by backend?)
-    - if Numerical goal:
+    - if Numeric goal:
       - value: number
     - if Boolean goal:
       - value: boolean

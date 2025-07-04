@@ -22,14 +22,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const initialValues = defaultValues || {
     title: '',
     description: '',
-    goalType: GoalQuantifyType.Numerical,
+    goalType: GoalQuantifyType.Numeric,
     numericTarget: null as unknown as number,
     numericUnit: '',
     publicity: GoalPublicityType.Private,
     colour: '',
     icon: '',
   } as GoalResponse;
-  const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numerical;
+  const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numeric;
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -85,7 +85,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           name="goalType"
           validators={{
             onChange: ({ value }) => {
-              setIsDisplayNumericControls(value === GoalQuantifyType.Numerical);
+              setIsDisplayNumericControls(value === GoalQuantifyType.Numeric);
 
               if (!value || value.trim().length === 0) {
                 return 'Goal type is required'

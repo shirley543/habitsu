@@ -4,7 +4,7 @@ import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
-import type { GoalEntryResponseDto } from '@habit-tracker/shared';
+import { GoalQuantifyType, type GoalEntryResponseDto } from '@habit-tracker/shared';
 
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
@@ -14,12 +14,13 @@ export enum HeatmapDisplayState {
 interface HeatmapProps {
   data: Array<GoalEntryResponseDto>,
   baseColour: string,
-  threshold: number,
-  units: string,
+  goalType: GoalQuantifyType,
+  threshold?: number,
+  units?: string,
   year: number,
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, threshold, units, year }) => {
+const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, goalType, threshold, units, year }) => {
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
@@ -52,12 +53,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, threshold, units, y
       const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
       return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
     });
-    const cellValue = dataForCellDate?.numericValue;
+    const cellValue = goalType === GoalQuantifyType.Numeric ? dataForCellDate?.numericValue : (dataForCellDate ? 1 : 0);
     const cellUnits = units;
     const cellNotes = dataForCellDate?.note || "";
     const isCellForTodaysDate = cellDate.getTime() === today.getTime();
-
-    
 
     return <>
       <Cell key={i} date={cellDate} value={cellValue} baseColour={baseColour} 
@@ -230,8 +229,8 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
     // Using threshold, compute 3 equal "bins"
     // e.g. if threshold is 30, then bin array would be:
     // [ 10, 20, 30 ]
-    const baseColorFullOpacity = `${baseColor}FF`;
-    const baseColorNoOpacity = `${baseColor}00`;
+    const baseColorFullOpacity = `#${baseColor}FF`;
+    const baseColorNoOpacity = `#${baseColor}00`;
     const colorInterpolate = d3.interpolate(baseColorNoOpacity, baseColorFullOpacity);
 
     const BIN_COUNT = 3;
@@ -263,18 +262,30 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
     return colorShade;
   }
 
-  const cellColor = (() => {
+  const cellColor: string = (() => {
     if (typeof value === 'number' && threshold) {
+      
       const color = computeBinnedColour(baseColour, threshold, value);
+      console.log('binnedColour', color)
       return color;
     } else if (typeof value === 'boolean') {
       const color = computeBinnedColour(baseColour, 1, value ? 1 : 0);
       return color;
     } else {
-      const color = 'F5F5F5'; ///< Neutral/100
+      const color = '#F5F5F5'; ///< Neutral/100
       return color;
     }
   })();
+
+  const labelText: string = (() => {
+    if (units && value) {
+      return `${value} ${units}`;
+    } else if (value) {
+      return `${value}`;
+    } else {
+      return "No entry"
+    }
+  })()
 
   return (
     // ${`bg-[rgb(#,#,#)]/{opacity}`}
@@ -283,8 +294,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       {
         <div className={cn(cellVariants({ variant, size }))} ref={ref}
           style={{
-            backgroundColor:
-              `#${cellColor}`,
+            backgroundColor: cellColor,
           }}
           onClick={() => {
             console.log(date);
@@ -297,7 +307,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       // - Add fade in/ out animation to make display less jarring
       contentElem={
         <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px]'}>
-          <h2 className="text-sm font-semibold">{units ? `${value} ${units}` : value}</h2>
+          <h2 className="text-sm font-semibold">{labelText}</h2>
           <p className="text-sm font-normal pt-1">{note}</p>
           <div className="text-zinc-500 flex flex-row gap-2 pt-2">
             <CalendarDays size={16}/>

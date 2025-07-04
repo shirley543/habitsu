@@ -87,6 +87,7 @@ export const GoalDetailsPage = () => {
         baseColour={data.baseColour}
         goalThreshold={data.goalThreshold}
         goalUnits={data.units}
+        goalType={data.goalType}
         selectedYear={selectedYear}
         onCalendarSelect={(year) => { 
           console.log("Goal details page > calendar selection made", year) 
