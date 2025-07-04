@@ -50,24 +50,18 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
       return newDate;
     })();
 
-    const entriesDataForCellDate = entriesData.find((entry) => {
+    const entryDataForCell = entriesData.find((entry) => {
       const entryDate = new Date(entry.entryDate);
       const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
       const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
       return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
     });
-    const cellValue = goalData.goalType === GoalQuantifyType.Numeric ? entriesDataForCellDate?.numericValue : (entriesDataForCellDate ? 1 : undefined);
-    const cellThreshold = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericTarget : 1;
-    const cellUnits = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : undefined
-    const cellNotes = entriesDataForCellDate?.note || undefined;
-    const cellBaseColour = goalData.colour;
     const isCellForTodaysDate = cellDate.getTime() === today.getTime();
 
-    return <Cell key={`cell_${idx}`} date={cellDate} value={cellValue} baseColour={cellBaseColour} 
+    return <Cell key={`cell_${idx}`} date={cellDate} 
             ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-            threshold={cellThreshold} 
-            units={cellUnits}
-            note={cellNotes} 
+            goalData={goalData}
+            entryData={entryDataForCell}
             variant={isCellForTodaysDate ? "outlined" : "default"}
           />
   });
@@ -177,11 +171,8 @@ function getDaysInYear(year: number) {
 
 interface CellProps {
   date: Date,
-  value?: number | boolean,
-  units?: string,
-  baseColour: string,
-  threshold?: number,
-  note?: string,
+  goalData: HeatmapGoalData,
+  entryData: GoalEntryResponse | undefined,
 }
 
 const cellVariants = cva(
@@ -209,16 +200,15 @@ const cellVariants = cva(
 const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVariants>>((
   {
     date,
-    value,
-    units,
-    baseColour,
-    threshold,
-    note,
+    goalData,
+    entryData,
     variant,
     size,
   },
   ref
 ) => {
+
+  const { goalType } = goalData;
 
   /**
    * Function for converting value to a color shade
@@ -266,25 +256,30 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
   }
 
   const cellColor: string = (() => {
-    if (typeof value === 'number' && threshold) {
-      const color = computeBinnedColour(baseColour, threshold, value);
-      return color;
-    } else if (typeof value === 'boolean') {
-      const color = computeBinnedColour(baseColour, 1, value ? 1 : 0);
-      return color;
-    } else {
-      const color = '#F5F5F5'; ///< Neutral/100
-      return color;
+    const NO_ENTRY_COLOUR = '#F5F5F5' ///< Neutral/100
+    switch (goalData.goalType) {
+      case GoalQuantifyType.Numeric: {
+        const color = (goalData?.numericTarget && entryData?.numericValue) ? 
+          computeBinnedColour(goalData.colour, goalData.numericTarget, entryData?.numericValue) 
+          : NO_ENTRY_COLOUR;
+        return color;
+      }
+
+      case GoalQuantifyType.Boolean: {
+        const color = entryData ? computeBinnedColour(goalData.colour, 1, entryData ? 1 : 0)
+          : NO_ENTRY_COLOUR;
+        return color;
+      }
     }
   })();
 
   const labelText: string = (() => {
-    if (units && value) {
-      return `${value} ${units}`;
-    } else if (value) {
-      return `${value}`;
-    } else {
-      return "No entry"
+    const NO_ENTRY_TEXT = "No entry";
+    switch (goalData.goalType) {
+      case GoalQuantifyType.Numeric:
+        return entryData?.numericValue ? `${entryData?.numericValue} ${goalData.numericUnit}` : NO_ENTRY_TEXT;
+      case GoalQuantifyType.Boolean:
+        return entryData ? "Completed" : NO_ENTRY_TEXT
     }
   })()
 
@@ -309,7 +304,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       contentElem={
         <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px]'}>
           <h2 className="text-sm font-semibold">{labelText}</h2>
-          <p className="text-sm font-normal pt-1">{note}</p>
+          <p className="text-sm font-normal pt-1">{entryData?.note}</p>
           <div className="text-zinc-500 flex flex-row gap-2 pt-2">
             <CalendarDays size={16}/>
             <p className="text-xs font-normal">{date.toDateString()}</p>
