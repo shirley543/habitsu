@@ -5,7 +5,9 @@ import GoalIconText from "./components/GoalIconText";
 import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarBack } from "@/components/custom/TopBar";
-import { useNavigate } from "@tanstack/react-router";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { useGoal } from "./GoalApi";
+import { GoalQuantifyType } from "@habit-tracker/shared";
 
 interface GoalStats {
   dailyAverage: number,
@@ -15,10 +17,19 @@ interface GoalStats {
 }
 
 export const GoalDetailsPage = () => {
+  const route = getRouteApi('/goals_/$goalId')
+  const { goalId } = route.useParams();
+
   const navigate = useNavigate()
+
+  const { data, isLoading, error } = useGoal(parseInt(goalId));
+
+  console.log("details data", data, "errors", error)
+  // console.log("errors", error)
+
   const [selectedYear, setSelectedYear] = useState<number>(2025);
 
-  const initialData = {
+  const DUMMY_DATA = {
     id: 1,
     title: "Drink water",
     description: "Drink at least 6 cups per day",
@@ -27,17 +38,17 @@ export const GoalDetailsPage = () => {
     goalThreshold: 6,
     units: "cups",
   }
-  const [data, setData] = useState(initialData)
+  // const [data, setData] = useState(DUMMY_DATA)
 
-  const initialStats: GoalStats = {
+  const DUMMY_STATS: GoalStats = {
     dailyAverage: 5,
     daysTracked: 312,
     currentStreak: 5,
     longestStreak: 5,
   }
-  const [stats, setStats] = useState(initialStats);
+  const [stats, setStats] = useState(DUMMY_STATS);
 
-  const dummyInputChartData: Record<MonthEnum, number> = {
+  const DUMMY_CHART_DATA: Record<MonthEnum, number> = {
     [MonthEnum.January]: 10,
     [MonthEnum.February]: 20,
     [MonthEnum.March]: 6,
@@ -60,7 +71,7 @@ export const GoalDetailsPage = () => {
   }
 
   const GOAL_STATS_DISPLAYS: Record<GoalStatsKeys, GoalStatsDisplay> = {
-    dailyAverage: { title: "Daily Average", units: data.units, icon: "arrow-up-narrow-wide" },
+    dailyAverage: { title: "Daily Average", units: data?.goalType === GoalQuantifyType.Numeric ? data.numericUnit : "", icon: "arrow-up-narrow-wide" },
     daysTracked: { title: "Days Tracked", units: "days", icon: "timer" },
     currentStreak: { title: "Current Streak", units: "days", icon: "flame" },
     longestStreak: { title: "Longest Streak", units: "days", icon: "flame-kindling" },
@@ -72,9 +83,11 @@ export const GoalDetailsPage = () => {
       <TopBarBack title="Goal Details" backCallback={() => { 
         navigate({ to: '/goals' })
       }}/>
+      {(error !== null) && <div>Errorr...</div>}
+      {(data && error === null) && <>
       {/* Goal description container */}
       <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
-        <GoalIconText title={data.title} description={data.description} baseColour={data.baseColour} iconName={data.iconName} />
+        <GoalIconText title={data.title} description={data.description} baseColour={data.colour} iconName={data.icon as IconName} />
         <div className="buttons-container flex flex-row gap-1">
           <IconButton iconName="pencil" onClickCallback={() => {
             navigate({ to: '/goals/$goalId/edit', params: { goalId: data.id.toString() } })
@@ -103,8 +116,8 @@ export const GoalDetailsPage = () => {
                     backgroundColor:
                     // TODOs: fix bug where icon container width shorter than w-9
                     // TODOs: light/ dark mode differing opacities. :dark selector?
-                      `#${data.baseColour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
-                    color: `#${data.baseColour}`,
+                      `#${data.colour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
+                    color: `#${data.colour}`,
                     strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
                   }}>
                     <DynamicIcon name={display.icon} />
@@ -117,7 +130,10 @@ export const GoalDetailsPage = () => {
         }
       </div>
       {/* Line graph */}
-      <MonthAreaChart baseColour={data.baseColour} inputChartData={dummyInputChartData} />
+      <MonthAreaChart baseColour={data.colour} inputChartData={DUMMY_CHART_DATA} />
+      </>
+      }
+
     </div>
   );
 };

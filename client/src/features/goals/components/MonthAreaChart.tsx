@@ -40,7 +40,7 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
   const chartConfig = {
     goalAverage: {
       label: "Average",
-      color: baseColour,
+      color: `#${baseColour}`,
     },
   } satisfies ChartConfig
   

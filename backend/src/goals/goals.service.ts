@@ -49,7 +49,7 @@ export class GoalsService {
   }
 
   findOne(id: number) {
-    return this.prisma.goal.findUnique({ where: { id } });
+    return this.prisma.goal.findUniqueOrThrow({ where: { id } });
   }
 
   update(id: number, updateGoalDto: UpdateGoalDto) {

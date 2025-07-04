@@ -21,6 +21,10 @@ export function useGoals() {
 
 async function fetchGoalById(goalId: number): Promise<GoalResponse> {
   const response = await fetch(`${BACKEND_BASE_URL}/goals/${goalId}`);
+  if (!response.ok) {
+    console.log("response status", response.status);
+    throw new Error('Network response was not ok')
+  }
   const data = await response.json();
   return data;
 }

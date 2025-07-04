@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateGoalDto, CreateGoalSchema, UpdateGoalDto, UpdateGoalSchema } from './goals.dtos';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -35,7 +38,17 @@ export class GoalsController {
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.goalsService.findOne(id);
+    return this.goalsService.findOne(id).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':
+            console.error(error);
+            throw new NotFoundException(error);
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+    });
   }
 
   @Patch(':id')
