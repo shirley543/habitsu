@@ -49,6 +49,7 @@ export const GoalsPage = () => {
             iconName={d.icon as IconName}
             baseColour={d.colour}
             goalThreshold={d.goalType === GoalQuantifyType.Numerical ? d.numericTarget : 1}
+            goalUnits={d.goalType === GoalQuantifyType.Numerical ? d.numericUnit : ''}
             selectedYear={selectedYear}
           />
         })}

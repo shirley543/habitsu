@@ -4,6 +4,8 @@ import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
+import { useGoalEntries } from "../GoalApi";
+import type { SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 
 
 /**
@@ -14,15 +16,23 @@ import { YearDropdown } from "./YearDropdown";
 interface GoalCardBaseProps {
   baseColour: string,
   goalThreshold: number,
+  goalUnits: string,
+  goalId: number,
   selectedYear: number,
 }
 
-const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode }> = ({ contentSlot, baseColour, goalThreshold, selectedYear }) => {
+const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode }> = ({ contentSlot, baseColour, goalThreshold, goalUnits, goalId, selectedYear }) => {
+  const searchParams: SearchParamsGoalEntryDto = {
+    goalId: goalId,
+    year: selectedYear,
+  }
+  const { data, isLoading, error } = useGoalEntries(searchParams);
+  
   return (
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
     <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {contentSlot}
-      <Heatmap baseColour={baseColour} threshold={goalThreshold} year={selectedYear}/>
+      {data && <Heatmap data={data} baseColour={baseColour} threshold={goalThreshold} units={goalUnits} year={selectedYear}/>}
     </div>
   )
 }
@@ -33,13 +43,12 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
  * With description, edit, log today
  */
 interface GoalCardDescriptiveProps extends GoalCardBaseProps {
-  goalId: number,
   title: string,
   description: string,
   iconName: IconName,
 }
 
-const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title, description, iconName, baseColour, goalThreshold, selectedYear }) => {
+const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title, description, iconName, baseColour, goalThreshold, goalUnits, selectedYear }) => {
   const navigate = useNavigate()
 
   const descriptionTypeContent = (() => {
@@ -111,6 +120,8 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title
       contentSlot={descriptionTypeContent}
       baseColour={baseColour}
       goalThreshold={goalThreshold}
+      goalUnits={goalUnits}
+      goalId={goalId}
       selectedYear={selectedYear}
     />
   )
@@ -126,7 +137,7 @@ interface GoalCardControlledProps extends GoalCardBaseProps {
   onCalendarSelect: (year: number) => void,
 }
 
-const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ baseColour, goalThreshold, selectedYear, onCalendarSelect }) => {
+const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalId, goalThreshold, goalUnits, baseColour, selectedYear, onCalendarSelect }) => {
   const controlOnlyTypeContent = ((() => {
     return <>
       <div className="header-container flex flex-row justify-between">
@@ -150,6 +161,8 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ baseColour, goa
       contentSlot={controlOnlyTypeContent}
       baseColour={baseColour}
       goalThreshold={goalThreshold}
+      goalUnits={goalUnits}
+      goalId={goalId}
       selectedYear={selectedYear}
     />
   )

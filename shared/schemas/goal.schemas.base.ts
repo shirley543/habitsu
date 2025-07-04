@@ -16,8 +16,9 @@ export enum GoalQuantifyType {
 }
 
 /**
- * Schemas
+ * Schemas: Goals
  */
+
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
 export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
@@ -51,8 +52,61 @@ export const UpdateGoalSchema = BaseGoalSchema.partial().and(GoalTypeDiscriminat
 export const GoalResponseSchema = (BaseGoalSchema.extend({ id: z.number() }).and(GoalTypeDiscriminatorSchema))
 
 /**
- * Interfaces
+ * Interfaces: Goals
  */
 export type CreateGoalDto = z.infer<typeof CreateGoalSchema>;
 export type UpdateGoalDto = z.infer<typeof UpdateGoalSchema>;
 export type GoalResponse = z.infer<typeof GoalResponseSchema>;
+
+
+/**
+ * Schemas: Goal Entries
+ */
+
+
+// export const GoalEntryTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
+//   // Numerical goal schema
+//   z.object({
+//     goalType: z.literal(GoalQuantifyType.Numerical),
+//     numericValue: z.number({ required_error: "Value is required" }),
+//   }),
+//   // Boolean goal schema
+//   z.object({
+//     goalType: z.literal(GoalQuantifyType.Boolean),
+//     booleanValue: z.boolean({ required_error: "Value is required" }),
+//   }),
+// ]);
+
+export const GoalEntryTypePartialSchema = 
+  z.object({
+    numericValue: z.number(),
+    booleanValue: z.boolean(),
+  }).partial();
+
+
+export const BaseGoalEntrySchema = z.object({
+  entryDate: z.date({ required_error: "Entry date is required" }),
+  note: z.string().nullable(),
+});
+
+export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypePartialSchema);
+
+export const SearchParamsGoalEntrySchema = z.object({
+  goalId: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
+  year: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
+}).partial();
+
+
+const PartialBaseGoalEntrySchema = BaseGoalEntrySchema.partial();
+
+export const CreateGoalEntrySchema = GoalEntrySchema;
+export const UpdateGoalEntrySchema = z.intersection(PartialBaseGoalEntrySchema, GoalEntryTypePartialSchema);
+export const GoalEntryResponseSchema = (BaseGoalEntrySchema.extend({ id: z.number(), goalId: z.number() }).and(GoalEntryTypePartialSchema))
+
+/**
+ * Interfaces: Goal Entries
+ */
+export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
+export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
+export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
+export type GoalEntryResponseDto = z.infer<typeof GoalEntryResponseSchema>;

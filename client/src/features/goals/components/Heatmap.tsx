@@ -4,6 +4,7 @@ import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
+import type { GoalEntryResponseDto } from '@habit-tracker/shared';
 
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
@@ -11,12 +12,14 @@ export enum HeatmapDisplayState {
 }
 
 interface HeatmapProps {
+  data: Array<GoalEntryResponseDto>,
   baseColour: string,
   threshold: number,
+  units: string,
   year: number,
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold, year }) => {
+const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, threshold, units, year }) => {
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
@@ -37,17 +40,34 @@ const Heatmap: React.FC<HeatmapProps> = ({ baseColour, threshold, year }) => {
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
 
   const progressCells = [...Array(daysInYear)].map((_, i) => {
-    const cellDay = (() => {
+    const cellDate = (() => {
       const newDate = new Date(Date.UTC(selectedYear, 0, 1));
       newDate.setUTCDate(newDate.getUTCDate() + i);
       return newDate;
     })();
-    const isCellForTodaysDate = cellDay.getTime() === today.getTime();
 
-    return <Cell key={i} date={cellDay} value={i} baseColour={baseColour} ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-      threshold={threshold} units="minutes" note={`Test note for day ${i}. Piece played today was "Hornet" from Hollow Knight`} 
-      variant={isCellForTodaysDate ? "outlined" : "default"}
-    ></Cell>
+    const dataForCellDate = data.find((entry) => {
+      const entryDate = new Date(entry.entryDate);
+      const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+      const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+      return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
+    });
+    const cellValue = dataForCellDate?.numericValue;
+    const cellUnits = units;
+    const cellNotes = dataForCellDate?.note || "";
+    const isCellForTodaysDate = cellDate.getTime() === today.getTime();
+
+    
+
+    return <>
+      <Cell key={i} date={cellDate} value={cellValue} baseColour={baseColour} 
+        ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
+        threshold={threshold} 
+        units={cellUnits}
+        note={cellNotes} 
+        variant={isCellForTodaysDate ? "outlined" : "default"}
+      />
+    </>
   });
 
   // Holder cells: for gap/ placeholder to align 
@@ -155,7 +175,7 @@ function getDaysInYear(year: number) {
 
 interface CellProps {
   date: Date,
-  value: number | boolean,
+  value?: number | boolean,
   units?: string,
   baseColour: string,
   threshold?: number,
@@ -251,7 +271,8 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       const color = computeBinnedColour(baseColour, 1, value ? 1 : 0);
       return color;
     } else {
-      console.log("Unknown value type: cannot compute cell color");
+      const color = 'F5F5F5'; ///< Neutral/100
+      return color;
     }
   })();
 
