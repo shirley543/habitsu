@@ -58,7 +58,15 @@ export const BaseGoalEntrySchema = z.object({
 
 export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypeDiscriminatorSchema);
 
+// export const SearchParamsGoalEntrySchema = z.object({
+//   goalId: z.number(),
+//   year: z.number(),
+// }).partial()
 
+export const SearchParamsGoalEntrySchema = z.object({
+  goalId: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
+  year: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
+}).partial();
 
 // --------------------
 
@@ -69,3 +77,4 @@ export const UpdateGoalEntrySchema = z.intersection(PartialBaseGoalEntrySchema, 
 
 export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
+export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;

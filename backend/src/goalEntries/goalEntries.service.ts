@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType } from './goalEntries.dtos';
+import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
@@ -44,6 +44,21 @@ export class GoalEntriesService {
 
   findAll() {
     return this.prisma.goalEntry.findMany();
+  }
+
+  findMany(searchParamsGoalEntryDto: SearchParamsGoalEntryDto) {
+    const year = searchParamsGoalEntryDto.year;
+    const goalId = searchParamsGoalEntryDto.goalId;
+
+    return this.prisma.goalEntry.findMany({
+      where: {
+        goalId: goalId,
+        entryDate: {
+          lte: year ? new Date(year, 11, 31) : undefined,
+          gte: year ? new Date(year, 0, 1) : undefined,
+        }
+      }
+    })
   }
 
   findOne(id: number) {

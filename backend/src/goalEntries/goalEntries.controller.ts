@@ -7,9 +7,11 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { GoalEntriesService } from './goalEntries.service';
-import { CreateGoalEntryDto, CreateGoalEntrySchema, UpdateGoalEntryDto, UpdateGoalEntrySchema } from './goalEntries.dtos';
+import { CreateGoalEntryDto, CreateGoalEntrySchema, SearchParamsGoalEntryDto, SearchParamsGoalEntrySchema, UpdateGoalEntryDto, UpdateGoalEntrySchema } from './goalEntries.dtos';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
@@ -26,10 +28,22 @@ export class GoalEntriesController {
     return this.goalEntriesService.create(createGoalEntryDto);
   }
 
+  // @Get()
+  // @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
+  // findAll() {
+  //   return this.goalEntriesService.findAll();
+  // }
+
   @Get()
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
-  findAll() {
-    return this.goalEntriesService.findAll();
+  findMany(@Query() searchParamsGoalEntryDto: SearchParamsGoalEntryDto) {
+    const parsed = SearchParamsGoalEntrySchema.safeParse(searchParamsGoalEntryDto);
+
+    if (!parsed.success) {
+      throw new BadRequestException(parsed.error.flatten());
+    }
+
+    return this.goalEntriesService.findMany(parsed.data);
   }
 
   @Get(':id')
