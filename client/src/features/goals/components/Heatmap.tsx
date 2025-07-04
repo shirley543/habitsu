@@ -4,23 +4,26 @@ import HoverPopover from '@/components/custom/HoverPopup';
 import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
-import { GoalQuantifyType, type GoalEntryResponseDto } from '@habit-tracker/shared';
+import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
 
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
   NO_LABELS = 'no-labels',
 }
 
+export type HeatmapGoalData = Pick<GoalResponse, 'id' | 'colour'> & (
+  | ({ goalType: GoalQuantifyType.Numeric } & Pick<Extract<GoalResponse, { goalType: GoalQuantifyType.Numeric }>, 'numericTarget' | 'numericUnit'>)
+  | ({ goalType: GoalQuantifyType.Boolean })
+);
+
 interface HeatmapProps {
-  data: Array<GoalEntryResponseDto>,
-  baseColour: string,
-  goalType: GoalQuantifyType,
-  threshold?: number,
-  units?: string,
+  goalData: HeatmapGoalData,
+  entriesData: Array<GoalEntryResponse>,
   year: number,
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, goalType, threshold, units, year }) => {
+const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
+
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
@@ -47,21 +50,23 @@ const Heatmap: React.FC<HeatmapProps> = ({ data, baseColour, goalType, threshold
       return newDate;
     })();
 
-    const dataForCellDate = data.find((entry) => {
+    const entriesDataForCellDate = entriesData.find((entry) => {
       const entryDate = new Date(entry.entryDate);
       const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
       const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
       return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
     });
-    const cellValue = goalType === GoalQuantifyType.Numeric ? dataForCellDate?.numericValue : (dataForCellDate ? 1 : 0);
-    const cellUnits = units;
-    const cellNotes = dataForCellDate?.note || "";
+    const cellValue = goalData.goalType === GoalQuantifyType.Numeric ? entriesDataForCellDate?.numericValue : (entriesDataForCellDate ? 1 : 0);
+    const cellThreshold = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericTarget : 1;
+    const cellUnits = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : undefined
+    const cellNotes = entriesDataForCellDate?.note || undefined;
+    const cellBaseColour = goalData.colour;
     const isCellForTodaysDate = cellDate.getTime() === today.getTime();
 
     return <>
-      <Cell key={i} date={cellDate} value={cellValue} baseColour={baseColour} 
+      <Cell key={i} date={cellDate} value={cellValue} baseColour={cellBaseColour} 
         ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-        threshold={threshold} 
+        threshold={cellThreshold} 
         units={cellUnits}
         note={cellNotes} 
         variant={isCellForTodaysDate ? "outlined" : "default"}
@@ -266,7 +271,6 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
     if (typeof value === 'number' && threshold) {
       
       const color = computeBinnedColour(baseColour, threshold, value);
-      console.log('binnedColour', color)
       return color;
     } else if (typeof value === 'boolean') {
       const color = computeBinnedColour(baseColour, 1, value ? 1 : 0);

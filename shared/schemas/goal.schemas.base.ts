@@ -109,4 +109,4 @@ export const GoalEntryResponseSchema = (BaseGoalEntrySchema.extend({ id: z.numbe
 export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
 export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
-export type GoalEntryResponseDto = z.infer<typeof GoalEntryResponseSchema>;
+export type GoalEntryResponse = z.infer<typeof GoalEntryResponseSchema>;

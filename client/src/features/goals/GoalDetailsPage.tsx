@@ -83,11 +83,7 @@ export const GoalDetailsPage = () => {
       </div>
       {/* Heatmap container */}
       <GoalCardControlled 
-        goalId={data.id}
-        baseColour={data.baseColour}
-        goalThreshold={data.goalThreshold}
-        goalUnits={data.units}
-        goalType={data.goalType}
+        goalData={data}
         selectedYear={selectedYear}
         onCalendarSelect={(year) => { 
           console.log("Goal details page > calendar selection made", year) 

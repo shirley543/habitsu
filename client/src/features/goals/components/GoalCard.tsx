@@ -1,4 +1,4 @@
-import Heatmap from "./Heatmap";
+import Heatmap, { type HeatmapGoalData } from "./Heatmap";
 import { type IconName } from 'lucide-react/dynamic';
 import GoalIconText from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
@@ -7,6 +7,7 @@ import { YearDropdown } from "./YearDropdown";
 import { useGoalEntries } from "../GoalApi";
 import type { GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 
+export type GoalCardGoalData = HeatmapGoalData;
 
 /**
  * Goal card base:
@@ -14,26 +15,22 @@ import type { GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/
  * @returns 
  */
 interface GoalCardBaseProps {
-  baseColour: string,
-  goalThreshold: number,
-  goalUnits: string,
-  goalId: number,
-  goalType: GoalQuantifyType,
+  goalData: GoalCardGoalData,
   selectedYear: number,
 }
 
-const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode }> = ({ contentSlot, baseColour, goalThreshold, goalUnits, goalId, goalType, selectedYear }) => {
+const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode }> = ({ contentSlot, goalData, selectedYear }) => {
   const searchParams: SearchParamsGoalEntryDto = {
-    goalId: goalId,
+    goalId: goalData.id,
     year: selectedYear,
   }
-  const { data, isLoading, error } = useGoalEntries(searchParams);
+  const { data: entriesData, isLoading, error } = useGoalEntries(searchParams);
   
   return (
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
     <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {contentSlot}
-      {data && <Heatmap data={data} baseColour={baseColour} threshold={goalThreshold} units={goalUnits} goalType={goalType} year={selectedYear}/>}
+      {entriesData && <Heatmap entriesData={entriesData} goalData={goalData} year={selectedYear}/>}
     </div>
   )
 }
@@ -49,14 +46,17 @@ interface GoalCardDescriptiveProps extends GoalCardBaseProps {
   iconName: IconName,
 }
 
-const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title, description, iconName, baseColour, goalThreshold, goalUnits, goalType, selectedYear }) => {
+const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, description, iconName, goalData, selectedYear }) => {
+
   const navigate = useNavigate()
+
+  const goalId = goalData.id;
 
   const descriptionTypeContent = (() => {
     return <>
       <div className="header-container flex flex-row justify-between">
         {/* Icon and Text */}
-        <GoalIconText title={title} description={description} baseColour={baseColour} iconName={iconName} />
+        <GoalIconText title={title} description={description} baseColour={goalData.colour} iconName={iconName} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
           <IconButton iconName="pencil" onClickCallback={() => {
@@ -119,11 +119,7 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ goalId, title
   return (
     <GoalCardBase
       contentSlot={descriptionTypeContent}
-      baseColour={baseColour}
-      goalThreshold={goalThreshold}
-      goalUnits={goalUnits}
-      goalId={goalId}
-      goalType={goalType}
+      goalData={goalData}
       selectedYear={selectedYear}
     />
   )
@@ -139,7 +135,7 @@ interface GoalCardControlledProps extends GoalCardBaseProps {
   onCalendarSelect: (year: number) => void,
 }
 
-const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalId, goalThreshold, goalUnits, goalType, baseColour, selectedYear, onCalendarSelect }) => {
+const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selectedYear, onCalendarSelect }) => {
   const controlOnlyTypeContent = ((() => {
     return <>
       <div className="header-container flex flex-row justify-between">
@@ -161,11 +157,7 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalId, goalThr
   return (
     <GoalCardBase
       contentSlot={controlOnlyTypeContent}
-      baseColour={baseColour}
-      goalThreshold={goalThreshold}
-      goalUnits={goalUnits}
-      goalId={goalId}
-      goalType={goalType}
+      goalData={goalData}
       selectedYear={selectedYear}
     />
   )

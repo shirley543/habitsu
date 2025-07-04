@@ -1,4 +1,4 @@
-import type { GoalEntryResponseDto, GoalResponse, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
+import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 import { useQuery } from "@tanstack/react-query";
 
 const BACKEND_BASE_URL = "http://localhost:8080";
@@ -37,7 +37,7 @@ export function useGoal(goalId: number) {
 /**
  * /goalEntries
  */
-async function fetchGoalEntriesBySearchParams(searchParams: SearchParamsGoalEntryDto): Promise<Array<GoalEntryResponseDto>> {
+async function fetchGoalEntriesBySearchParams(searchParams: SearchParamsGoalEntryDto): Promise<Array<GoalEntryResponse>> {
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');

@@ -43,14 +43,10 @@ export const GoalsPage = () => {
       <div className="flex flex-col gap-3">
         {data && data.map((d) => {
           return <GoalCardDescriptive
-            goalId={d.id}
             title={d.title}
             description={d.description}
             iconName={d.icon as IconName}
-            baseColour={d.colour}
-            goalThreshold={d.goalType === GoalQuantifyType.Numeric ? d.numericTarget : 1}
-            goalUnits={d.goalType === GoalQuantifyType.Numeric ? d.numericUnit : ''}
-            goalType={d.goalType}
+            goalData={d}
             selectedYear={selectedYear}
           />
         })}
