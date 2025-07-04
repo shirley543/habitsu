@@ -43,10 +43,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
 
-  const progressCells = [...Array(daysInYear)].map((_, i) => {
+  const progressCells = [...Array(daysInYear)].map((_, idx) => {
     const cellDate = (() => {
       const newDate = new Date(Date.UTC(selectedYear, 0, 1));
-      newDate.setUTCDate(newDate.getUTCDate() + i);
+      newDate.setUTCDate(newDate.getUTCDate() + idx);
       return newDate;
     })();
 
@@ -56,22 +56,20 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
       const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
       return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
     });
-    const cellValue = goalData.goalType === GoalQuantifyType.Numeric ? entriesDataForCellDate?.numericValue : (entriesDataForCellDate ? 1 : 0);
+    const cellValue = goalData.goalType === GoalQuantifyType.Numeric ? entriesDataForCellDate?.numericValue : (entriesDataForCellDate ? 1 : undefined);
     const cellThreshold = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericTarget : 1;
     const cellUnits = goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : undefined
     const cellNotes = entriesDataForCellDate?.note || undefined;
     const cellBaseColour = goalData.colour;
     const isCellForTodaysDate = cellDate.getTime() === today.getTime();
 
-    return <>
-      <Cell key={i} date={cellDate} value={cellValue} baseColour={cellBaseColour} 
-        ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-        threshold={cellThreshold} 
-        units={cellUnits}
-        note={cellNotes} 
-        variant={isCellForTodaysDate ? "outlined" : "default"}
-      />
-    </>
+    return <Cell key={`cell_${idx}`} date={cellDate} value={cellValue} baseColour={cellBaseColour} 
+            ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
+            threshold={cellThreshold} 
+            units={cellUnits}
+            note={cellNotes} 
+            variant={isCellForTodaysDate ? "outlined" : "default"}
+          />
   });
 
   // Holder cells: for gap/ placeholder to align 
@@ -79,8 +77,8 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
   const weekStartDay = 1; // 0 for Sunday, 1 for Monday
   const firstDate = new Date(selectedYear, 0, 1);
   const firstDay = firstDate.getDay();
-  const holderCells = [...Array(firstDay - weekStartDay)].map(() => {
-    return <div className="holder-cell"></div>
+  const holderCells = [...Array(firstDay - weekStartDay)].map((_, idx) => {
+    return <div className="holder-cell" key={`holderCell_${idx}`}></div>
   })
 
   // Group holder cells and add column title
@@ -269,7 +267,6 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
 
   const cellColor: string = (() => {
     if (typeof value === 'number' && threshold) {
-      
       const color = computeBinnedColour(baseColour, threshold, value);
       return color;
     } else if (typeof value === 'boolean') {

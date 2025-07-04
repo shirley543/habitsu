@@ -15,11 +15,6 @@ export const GoalsPage = () => {
 
   const { data, isLoading, error } = useGoals();
 
-  // Scroll into view today's cell
-  useEffect(() => {
-    console.log("data", data)
-  }, [data])
-
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar slotted */}
@@ -43,6 +38,7 @@ export const GoalsPage = () => {
       <div className="flex flex-col gap-3">
         {data && data.map((d) => {
           return <GoalCardDescriptive
+            key={`goalCard_${d.id}`}
             title={d.title}
             description={d.description}
             iconName={d.icon as IconName}
