@@ -1,7 +1,7 @@
 import { GoalCardControlled } from "./components/GoalCard";
 import { useState } from "react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import GoalIconText from "./components/GoalIconText";
+import { GoalIconText } from "./components/GoalIconText";
 import MonthAreaChart, { MonthEnum } from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarBack } from "@/components/custom/TopBar";

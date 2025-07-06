@@ -5,7 +5,11 @@ import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
+import { Skeleton } from '@/components/ui/skeleton';
 
+/**
+ * Public types
+ */
 export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
   NO_LABELS = 'no-labels',
@@ -16,129 +20,9 @@ export type HeatmapGoalData = Pick<GoalResponse, 'id' | 'colour'> & (
   | ({ goalType: GoalQuantifyType.Boolean })
 );
 
-interface HeatmapProps {
-  goalData: HeatmapGoalData,
-  entriesData: Array<GoalEntryResponse>,
-  year: number,
-}
-
-const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
-
-  const selectedYear = year;
-  const daysInYear = getDaysInYear(selectedYear);
-  const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
-  const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
-
-  // Scroll into view today's cell
-  useEffect(() => {
-    if (todayCellTargetRef.current) {
-      todayCellTargetRef.current.scrollIntoView({
-        behavior: 'auto',
-        block: 'start',
-      })
-    }
-  }, [])
-
-  // Cells: for displaying progress
-  const now = new Date();
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
-
-  const progressCells = [...Array(daysInYear)].map((_, idx) => {
-    const cellDate = (() => {
-      const newDate = new Date(Date.UTC(selectedYear, 0, 1));
-      newDate.setUTCDate(newDate.getUTCDate() + idx);
-      return newDate;
-    })();
-
-    const entryDataForCell = entriesData.find((entry) => {
-      const entryDate = new Date(entry.entryDate);
-      const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-      const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
-      return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
-    });
-    const isCellForTodaysDate = cellDate.getTime() === today.getTime();
-
-    return <Cell key={`cell_${idx}`} date={cellDate} 
-            ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-            goalData={goalData}
-            entryData={entryDataForCell}
-            variant={isCellForTodaysDate ? "outlined" : "default"}
-          />
-  });
-
-  // Holder cells: for gap/ placeholder to align 
-  // first day of year to week day
-  const weekStartDay = 1; // 0 for Sunday, 1 for Monday
-  const firstDate = new Date(selectedYear, 0, 1);
-  const firstDay = firstDate.getDay();
-  const holderCells = [...Array(firstDay - weekStartDay)].map((_, idx) => {
-    return <div className="holder-cell" key={`holderCell_${idx}`}></div>
-  })
-
-  // Group holder cells and add column title
-  const cells = [...holderCells, ...progressCells];
-  const a = cells.slice();
-  var arrays = [], size = 7;
-    
-  while (a.length > 0) {
-    arrays.push(a.splice(0, size));
-  }
-
-  // Iterate over week-grouped arrays and add month label
-  for (let i = 0; i < arrays.length; i++) {
-    const firstDayOfMonthElem = arrays[i].find((elem) => {
-      if (elem.type === Cell) {
-        const elDate = elem.props.date as Date;
-        return elDate.getDate() === 1;
-      };
-      return false;
-    });
-
-    const monthsOfYear = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    const monthsOfYearShort = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
-    const labelElement = firstDayOfMonthElem ? 
-      <div className='w-8 text-base font-medium flex justify-center items-center'>
-        {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
-      </div> :
-      <div></div>
-    arrays[i].unshift(labelElement)
-  }
-
-  const gridWithMonthLabels = arrays.flat().slice();
-  const gridNoMonthLabels = cells.slice();
-  const finalGridCells = displayState === HeatmapDisplayState.WITH_LABELS ? gridWithMonthLabels : gridNoMonthLabels;
-
-  // Weekday labels
-  const weekdayLabels = [...Array(7)].map((_, i) => {
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const daysOfWeekShort = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
-    const weekdayString = daysOfWeekShort[i];
-    if (['Mon', 'Wed', 'Fri'].includes(weekdayString)) {
-      return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
-    } else {
-      return <div className="weekday-empty"></div>
-    }
-  })
-  const finalWeekdayLabels = displayState === HeatmapDisplayState.WITH_LABELS ? weekdayLabels : undefined;
-
-  return (
-    <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} 
-      grid-flow-col gap-1 w-full overflow-x-auto`
-    }>
-      {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
-      {finalWeekdayLabels}
-      {finalGridCells}
-    </div>
-  )
-}
+/**
+ * Private functions
+ */
 
 /**
  * Function for determining the number of days in a year (standard: 365, leap year: 366)
@@ -167,7 +51,6 @@ function getDaysInYear(year: number) {
 
   return isLeapYear ? 366 : 365;
 }
-
 
 interface CellProps {
   date: Date,
@@ -315,4 +198,138 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
   )
 })
 
-export default Heatmap;
+/**
+ * Public functions
+ */
+
+interface HeatmapProps {
+  goalData: HeatmapGoalData,
+  entriesData: Array<GoalEntryResponse>,
+  year: number,
+}
+
+const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
+
+  const selectedYear = year;
+  const daysInYear = getDaysInYear(selectedYear);
+  const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
+  const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
+
+  // Scroll into view today's cell
+  useEffect(() => {
+    if (todayCellTargetRef.current) {
+      todayCellTargetRef.current.scrollIntoView({
+        behavior: 'auto',
+        block: 'start',
+      })
+    }
+  }, [])
+
+  // Cells: for displaying progress
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
+
+  const progressCells = [...Array(daysInYear)].map((_, idx) => {
+    const cellDate = (() => {
+      const newDate = new Date(Date.UTC(selectedYear, 0, 1));
+      newDate.setUTCDate(newDate.getUTCDate() + idx);
+      return newDate;
+    })();
+
+    const entryDataForCell = entriesData.find((entry) => {
+      const entryDate = new Date(entry.entryDate);
+      const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+      const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
+      return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
+    });
+    const isCellForTodaysDate = cellDate.getTime() === today.getTime();
+
+    return <Cell key={`cell_${idx}`} date={cellDate} 
+            ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
+            goalData={goalData}
+            entryData={entryDataForCell}
+            variant={isCellForTodaysDate ? "outlined" : "default"}
+          />
+  });
+
+  // Holder cells: for gap/ placeholder to align 
+  // first day of year to week day
+  const weekStartDay = 1; // 0 for Sunday, 1 for Monday
+  const firstDate = new Date(selectedYear, 0, 1);
+  const firstDay = firstDate.getDay();
+  const holderCells = [...Array(firstDay - weekStartDay)].map((_, idx) => {
+    return <div className="holder-cell" key={`holderCell_${idx}`}></div>
+  })
+
+  // Group holder cells and add column title
+  const cells = [...holderCells, ...progressCells];
+  const a = cells.slice();
+  var arrays = [], size = 7;
+    
+  while (a.length > 0) {
+    arrays.push(a.splice(0, size));
+  }
+
+  // Iterate over week-grouped arrays and add month label
+  for (let i = 0; i < arrays.length; i++) {
+    const firstDayOfMonthElem = arrays[i].find((elem) => {
+      if (elem.type === Cell) {
+        const elDate = elem.props.date as Date;
+        return elDate.getDate() === 1;
+      };
+      return false;
+    });
+
+    const monthsOfYear = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    const monthsOfYearShort = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    const labelElement = firstDayOfMonthElem ? 
+      <div className='w-8 text-base font-medium flex justify-center items-center'>
+        {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
+      </div> :
+      <div></div>
+    arrays[i].unshift(labelElement)
+  }
+
+  const gridWithMonthLabels = arrays.flat().slice();
+  const gridNoMonthLabels = cells.slice();
+  const finalGridCells = displayState === HeatmapDisplayState.WITH_LABELS ? gridWithMonthLabels : gridNoMonthLabels;
+
+  // Weekday labels
+  const weekdayLabels = [...Array(7)].map((_, i) => {
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const daysOfWeekShort = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
+    const weekdayString = daysOfWeekShort[i];
+    if (['Mon', 'Wed', 'Fri'].includes(weekdayString)) {
+      return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
+    } else {
+      return <div className="weekday-empty"></div>
+    }
+  })
+  const finalWeekdayLabels = displayState === HeatmapDisplayState.WITH_LABELS ? weekdayLabels : undefined;
+
+  return (
+    <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} 
+      grid-flow-col gap-1 w-full overflow-x-auto`
+    }>
+      {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
+      {finalWeekdayLabels}
+      {finalGridCells}
+    </div>
+  )
+}
+
+const SkeletonHeatmap: React.FC = () => {
+  return (
+    <Skeleton className={"w-full h-[180px]"}/>
+  )
+}
+
+export { Heatmap, SkeletonHeatmap };

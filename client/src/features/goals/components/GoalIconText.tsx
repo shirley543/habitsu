@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton"
 import { DynamicIcon, type IconName } from "lucide-react/dynamic"
 
 interface GoalIconTextProps {
@@ -29,4 +30,16 @@ const GoalIconText: React.FC<GoalIconTextProps> = ({ title, description, baseCol
   )
 }
 
-export default GoalIconText;
+const SkeletonGoalIconText: React.FC = () => {
+  return (
+    <div className="icon-text-container flex flex-row gap-2 items-center">
+      <Skeleton className="w-9 h-9 rounded-md" />
+      <div className="header-container flex flex-col gap-0">
+        <Skeleton className="h-4 w-[230px]"/>
+        <Skeleton className="h-4 w-[230px]"/>
+      </div>
+    </div>
+  )
+}
+
+export { GoalIconText, SkeletonGoalIconText };

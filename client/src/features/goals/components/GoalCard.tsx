@@ -1,6 +1,6 @@
-import Heatmap, { type HeatmapGoalData } from "./Heatmap";
+import  { Heatmap, SkeletonHeatmap, type HeatmapGoalData } from "./Heatmap";
 import { type IconName } from 'lucide-react/dynamic';
-import GoalIconText from "./GoalIconText";
+import { GoalIconText, SkeletonGoalIconText } from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
@@ -30,6 +30,7 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
     <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {contentSlot}
+      {isLoading && <SkeletonHeatmap />}
       {entriesData && <Heatmap entriesData={entriesData} goalData={goalData} year={selectedYear}/>}
     </div>
   )
@@ -162,6 +163,15 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
     />
   )
 }
+
+const GoalCardSkeleton: React.FC = () => {  
+  return (
+    <div className="w-full bg-white rounded-md">
+      <SkeletonGoalIconText />
+    </div>
+  )
+}
+
 
 
 export { GoalCardDescriptive, GoalCardControlled };
