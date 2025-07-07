@@ -35,6 +35,16 @@ export class GoalEntriesController {
     return this.goalEntriesService.getStatistics(goalId, year);
   }
 
+  @Get('monthly-averages')
+  @ApiOkResponse({ type: GoalStatisticsEntity })
+  getMonthlyAverages(
+    @Query('goalId', ParseIntPipe) goalId: number,
+    @Query('year', ParseIntPipe) year: number
+  ) {
+    return this.goalEntriesService.getMonthlyAverages(goalId, year);
+  }
+
+
   /**
    * General
    */

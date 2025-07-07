@@ -87,3 +87,12 @@ export const GoalStatisticsSchema = z.object({
   maxStreakLen: z.number().nullable(),
 })
 export type GoalStatisticsReponse = z.infer<typeof GoalStatisticsSchema>;
+
+export const GoalMonthlyAverageSchema = z.object({
+  year: z.number(),
+  month: z.number(),
+  average: z.number(),
+});
+export const GoalMonthlyAveragesSchema = z.array(GoalMonthlyAverageSchema);
+
+export type GoalMonthlyAveragesResponse = z.infer<typeof GoalMonthlyAveragesSchema>;

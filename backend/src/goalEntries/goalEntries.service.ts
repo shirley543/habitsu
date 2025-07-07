@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse } from './goalEntries.dtos';
+import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
@@ -105,5 +105,10 @@ export class GoalEntriesService {
     // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
     const [row] = await this.prisma.$queryRaw<GoalStatisticsReponse[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
     return row;
+  }
+
+  async getMonthlyAverages(goalId: number, year: number) {
+    // TODOs: as above for changing $queryRaw call
+    return this.prisma.$queryRaw<GoalMonthlyAveragesResponse[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
   }
 }
