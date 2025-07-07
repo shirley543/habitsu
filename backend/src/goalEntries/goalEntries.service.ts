@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalMonthlyAveragesResponse, GoalStatisticsSchema, GoalMonthlyAveragesSchema } from './goalEntries.dtos';
+import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalStatisticsSchema, GoalMonthlyAveragesSchema } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
 // // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
@@ -97,6 +98,14 @@ export class GoalEntriesService {
   }
 
   /**
+   * Private functions
+   */
+
+  private convertDecimalToNumber = (value: any) => {
+    return value instanceof Decimal ? value.toNumber() : value;
+  }
+
+  /**
    * Statistics-specific
    */
   async getStatistics(goalId: number, year: number) {
@@ -104,15 +113,33 @@ export class GoalEntriesService {
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
     // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
     const [rawResult] = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
-    console.log(rawResult)
-    const stats = GoalStatisticsSchema.parse(rawResult);
+
+    // Convert Prisma Decimal fields to JS numbers
+    const numberResult: GoalStatisticsReponse = {
+      yearAvg: this.convertDecimalToNumber(rawResult.yearAvg),
+      yearCount: this.convertDecimalToNumber(rawResult.yearCount),
+      currentStreakLen: this.convertDecimalToNumber(rawResult.currentStreakLen),
+      maxStreakLen: this.convertDecimalToNumber(rawResult.maxStreakLen),
+    };
+
+    const stats = GoalStatisticsSchema.parse(numberResult);
     return stats;
   }
 
   async getMonthlyAverages(goalId: number, year: number) {
     // TODOs: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
-    const monthlyAverages = GoalMonthlyAveragesSchema.parse(rawResults);
-    return monthlyAverages;
+
+    // Convert Prisma Decimal fields to JS numbers
+    const numberResults: GoalMonthlyAveragesResponse = rawResults.map((item) => {
+      return {
+        year: this.convertDecimalToNumber(item.year),
+        month: this.convertDecimalToNumber(item.month),
+        average: this.convertDecimalToNumber(item.average),
+      }
+    })
+
+    const stats = GoalMonthlyAveragesSchema.parse(numberResults);
+    return stats;
   }
 }

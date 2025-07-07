@@ -80,27 +80,27 @@ export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
 export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
 
-/**
- * Zod union which converts Prisma decimal object (from SQL NUMERIC type)
- * to primitive number, or keeps number as-is
- */
-const DecimalOrNumber = z.union([
-  z.number(),
-  z.instanceof(Decimal)
-]).transform((val) => (val instanceof Decimal ? val.toNumber() : val));
+// /**
+//  * Zod union which converts Prisma decimal object (from SQL NUMERIC type)
+//  * to primitive number, or keeps number as-is
+//  */
+// const DecimalOrNumber = z.union([
+//   z.number(),
+//   z.instanceof(Decimal)
+// ]).transform((val) => (val instanceof Decimal ? val.toNumber() : val));
 
 export const GoalStatisticsSchema = z.object({
-  yearAvg: DecimalOrNumber.nullable(),
-  yearCount: DecimalOrNumber.nullable(),
-  currentStreakLen: DecimalOrNumber.nullable(),
-  maxStreakLen: DecimalOrNumber.nullable(),
+  yearAvg: z.number().nullable(),
+  yearCount: z.number().nullable(),
+  currentStreakLen: z.number().nullable(),
+  maxStreakLen: z.number().nullable(),
 })
 export type GoalStatisticsReponse = z.infer<typeof GoalStatisticsSchema>;
 
 export const GoalMonthlyAverageSchema = z.object({
-  year: DecimalOrNumber,
-  month: DecimalOrNumber,
-  average: DecimalOrNumber,
+  year: z.number(),
+  month: z.number(),
+  average: z.number(),
 });
 export const GoalMonthlyAveragesSchema = z.array(GoalMonthlyAverageSchema);
 

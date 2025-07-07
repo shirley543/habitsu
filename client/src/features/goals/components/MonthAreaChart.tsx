@@ -11,10 +11,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import type { GoalMonthlyAveragesResponse } from "@habit-tracker/shared"
 
 interface MonthAreaChartProps {
   baseColour: string,
-  inputChartData: Record<MonthEnum, number>,
+  inputChartData: GoalMonthlyAveragesResponse
 }
 
 export enum MonthEnum {
@@ -33,12 +34,13 @@ export enum MonthEnum {
 };
 
 const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartData }) => {
-  const chartData = Object.values(MonthEnum).map((monthEnum) => {
-    return { month: monthEnum, goalAverage: inputChartData[monthEnum] }
+  const chartData = Object.values(MonthEnum).map((monthEnum, idx) => {
+    const foundInputChartData = inputChartData.find((data) => data.month === (idx + 1));
+    return { month: monthEnum, average: foundInputChartData?.average || 0 };
   })
 
   const chartConfig = {
-    goalAverage: {
+    average: {
       label: "Average",
       color: `#${baseColour}`,
     },
@@ -72,11 +74,11 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
               content={<ChartTooltipContent indicator="line" />}
             />
             <Area
-              dataKey="goalAverage"
-              type="natural"
-              fill="var(--color-goalAverage)"
+              dataKey="average"
+              type="linear"
+              fill="var(--color-average)"
               fillOpacity={0.2}
-              stroke="var(--color-goalAverage)"
+              stroke="var(--color-average)"
             />
           </AreaChart>
         </ChartContainer>
