@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalStatisticsSchema, GoalMonthlyAveragesSchema } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { GoalsService } from 'src/goals/goals.service';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
 // // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
@@ -13,7 +14,9 @@ import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class GoalEntriesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+    private goalsService: GoalsService,
+  ) {}
 
   create(createGoalEntryDto: CreateGoalEntryDto) {
     const goalId = 1; //< TODOs: Address this hack, goal ID should be provided by DTO or endpoint design/ param
@@ -127,6 +130,11 @@ export class GoalEntriesService {
   }
 
   async getMonthlyAverages(goalId: number, year: number) {
+    const goal = await this.goalsService.findOne(goalId);
+    if (goal.goalType !== GoalQuantify.NUMERIC) {
+      throw new BadRequestException("Goal type must be NUMERIC")
+    }
+    
     // TODOs: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
 
