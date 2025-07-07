@@ -127,7 +127,7 @@ CREATE FUNCTION get_goal_year_count(p_goal_id INT, p_year INT)
 RETURNS NUMERIC AS $$
 BEGIN
   RETURN (
-    SELECT COUNT("numericValue")
+    SELECT COUNT(*)
     FROM (
 		SELECT * FROM get_goal_entries_for_year(p_goal_id, p_year)
 	)
@@ -137,6 +137,7 @@ $$ LANGUAGE plpgsql;
 
 -- Examples
 SELECT get_goal_year_count(11, 2025) AS "yearCount";
+SELECT get_goal_year_count(10, 2025) AS "yearCount";
 SELECT get_goal_year_count(9, 2025) AS "yearCount";
 
 
@@ -312,7 +313,48 @@ SELECT * FROM get_goal_year_monthly_avgs(9, 2025);
 
 
 
-DROP FUNCTION IF EXISTS get_numeric_stats(INT, INT);
+DROP FUNCTION IF EXISTS get_goal_year_monthly_counts(INT, INT);
+
+/*
+	Returns table of monthly counts, filtered by given goal ID and year
+
+	@param p_goal_id: ID of the goal to filter by
+	@param p_year: year to filter by
+	@returns A table of rows with columns:
+		- year: year associated with the monthly average
+		- month: month associated with the monthly average
+		- counts: monthly counts value
+*/
+CREATE FUNCTION get_goal_year_monthly_counts(p_goal_id INT, p_year INT)
+RETURNS TABLE (
+	"year" NUMERIC,
+	"month" NUMERIC,
+	"count" NUMERIC
+) AS $$
+BEGIN
+  RETURN QUERY
+	WITH yearsMonths AS (
+		SELECT * FROM get_goal_entries_with_year_month(p_goal_id)
+	)
+	SELECT
+		ym."year",
+		ym."month",
+		COUNT(*)::NUMERIC AS "count"
+	FROM yearsMonths ym
+	WHERE ym."year" = p_year
+	GROUP BY ym."year", ym."month"
+	ORDER BY ym."year", ym."month";
+END;
+$$ LANGUAGE plpgsql;
+
+-- Examples
+SELECT * FROM get_goal_year_monthly_counts(11, 2025);
+SELECT * FROM get_goal_year_monthly_counts(10, 2025);
+SELECT * FROM get_goal_year_monthly_counts(9, 2025);
+
+
+
+DROP FUNCTION IF EXISTS get_summary_stats(INT, INT);
 
 /*
 	Returns consolidated numeric statistics, filtered by given goal ID and year
@@ -325,7 +367,7 @@ DROP FUNCTION IF EXISTS get_numeric_stats(INT, INT);
 		- currentStreakLen: length of current entry streak for the year ("current" being current date i.e. today)
 		- maxStreakLen: length of maximum entry streak for the year
 */
-CREATE FUNCTION get_numeric_stats(p_goal_id INT, p_year INT)
+CREATE FUNCTION get_summary_stats(p_goal_id INT, p_year INT)
 RETURNS TABLE (
 	"yearAvg" NUMERIC,
 	"yearCount" NUMERIC,
@@ -343,5 +385,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Examples
-SELECT * FROM get_numeric_stats(11, 2025);
-SELECT * FROM get_numeric_stats(9, 2025);
+SELECT * FROM get_summary_stats(11, 2025);
+SELECT * FROM get_summary_stats(10, 2025);
+SELECT * FROM get_summary_stats(9, 2025);

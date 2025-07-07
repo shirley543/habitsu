@@ -135,5 +135,12 @@ export const GoalMonthlyAverageSchema = z.object({
   average: z.number(),
 });
 export const GoalMonthlyAveragesSchema = z.array(GoalMonthlyAverageSchema);
-
 export type GoalMonthlyAveragesResponse = z.infer<typeof GoalMonthlyAveragesSchema>;
+
+export const GoalMonthlyCountSchema = z.object({
+  year: z.number(),
+  month: z.number(),
+  count: z.number(),
+});
+export const GoalMonthlyCountsSchema = z.array(GoalMonthlyCountSchema);
+export type GoalMonthlyCountsResponse = z.infer<typeof GoalMonthlyCountsSchema>;

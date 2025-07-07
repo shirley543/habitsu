@@ -1,4 +1,4 @@
-import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse } from "@habit-tracker/shared";
+import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse } from "@habit-tracker/shared";
 import { useQuery } from "@tanstack/react-query";
 
 const BACKEND_BASE_URL = "http://localhost:8080";
@@ -91,10 +91,31 @@ async function fetchGoalMonthlyAvgsBySearchParams(searchParams: SearchParamsGoal
   return data;
 }
 
-export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto) {
+export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
   return useQuery({
     queryKey: ['goalMonthlyAvgs', searchParams],
     queryFn: () => fetchGoalMonthlyAvgsBySearchParams(searchParams),
+    enabled: enabled,
   })
 }
 
+async function fetchGoalMonthlyCountsBySearchParams(searchParams: SearchParamsGoalEntryDto): Promise<GoalMonthlyCountsResponse> {
+  const searchSegment = Object.entries(searchParams).map(([key, value]) => {
+    return `${key}=${value}`
+  }).join('&');
+  const response = await fetch(`${BACKEND_BASE_URL}/goalEntries/monthly-counts?${searchSegment}`);
+  if (!response.ok) {
+    console.log("response status", response.status);
+    throw new Error('Network response was not ok')
+  }
+  const data = await response.json();
+  return data;
+}
+
+export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
+  return useQuery({
+    queryKey: ['goalMonthlyCounts', searchParams],
+    queryFn: () => fetchGoalMonthlyCountsBySearchParams(searchParams),
+    enabled: enabled,
+  })
+}

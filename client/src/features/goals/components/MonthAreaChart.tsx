@@ -11,14 +11,20 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import type { GoalMonthlyAveragesResponse } from "@habit-tracker/shared"
+
+interface MonthAreaChartData {
+  year: number,
+  month: number,
+  value: number,
+}
 
 interface MonthAreaChartProps {
   baseColour: string,
-  inputChartData: GoalMonthlyAveragesResponse
+  inputChartData: MonthAreaChartData[],
+  valueLabel: string,
 }
 
-export enum MonthEnum {
+enum MonthEnum {
   January = "January",
   February = "February",
   March = "March",
@@ -33,23 +39,27 @@ export enum MonthEnum {
   December = "December"
 };
 
-const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartData }) => {
+const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartData, valueLabel }) => {
   const chartData = Object.values(MonthEnum).map((monthEnum, idx) => {
     const foundInputChartData = inputChartData.find((data) => data.month === (idx + 1));
-    return { month: monthEnum, average: foundInputChartData?.average || 0 };
+    return { month: monthEnum, value: foundInputChartData?.value || 0 };
   })
 
   const chartConfig = {
-    average: {
-      label: "Average",
+    value: {
+      label: valueLabel,
       color: `#${baseColour}`,
     },
-  } satisfies ChartConfig
-  
+  } satisfies ChartConfig;
+
+  const capitalizeFirstLetter = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Average over Months</CardTitle>
+        <CardTitle>{capitalizeFirstLetter(valueLabel)} over Months</CardTitle>
       </CardHeader>
       <CardContent className="h-[20vh] min-h-[200px]">
         <ChartContainer config={chartConfig} className="h-full w-full">
@@ -74,11 +84,11 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
               content={<ChartTooltipContent indicator="line" />}
             />
             <Area
-              dataKey="average"
+              dataKey="value"
               type="linear"
-              fill="var(--color-average)"
+              fill="var(--color-value)"
               fillOpacity={0.2}
-              stroke="var(--color-average)"
+              stroke="var(--color-value)"
             />
           </AreaChart>
         </ChartContainer>

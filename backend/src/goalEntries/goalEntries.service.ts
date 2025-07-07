@@ -1,6 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalStatisticsSchema, GoalMonthlyAveragesSchema } from './goalEntries.dtos';
+import {
+  CreateGoalEntryDto,
+  UpdateGoalEntryDto,
+  GoalQuantifyType,
+  SearchParamsGoalEntryDto,
+  GoalStatisticsReponse,
+  GoalMonthlyAveragesResponse,
+  GoalMonthlyCountsResponse,
+  GoalStatisticsSchema,
+  GoalMonthlyAveragesSchema,
+  GoalMonthlyCountsSchema,
+} from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from 'src/goals/goals.service';
@@ -115,7 +126,7 @@ export class GoalEntriesService {
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
     // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
-    const [rawResult] = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
+    const [rawResult] = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_summary_stats(${goalId}::INT, ${year}::INT);`;
 
     // Convert Prisma Decimal fields to JS numbers
     const numberResult: GoalStatisticsReponse = {
@@ -148,6 +159,23 @@ export class GoalEntriesService {
     })
 
     const stats = GoalMonthlyAveragesSchema.parse(numberResults);
+    return stats;
+  }
+
+  async getMonthlyCounts(goalId: number, year: number) {
+    // TODOs: as above for changing $queryRaw call
+    const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_counts(${goalId}::INT, ${year}::INT);`;
+
+    // Convert Prisma Decimal fields to JS numbers
+    const numberResults: GoalMonthlyCountsResponse = rawResults.map((item) => {
+      return {
+        year: this.convertDecimalToNumber(item.year),
+        month: this.convertDecimalToNumber(item.month),
+        count: this.convertDecimalToNumber(item.count),
+      }
+    })
+
+    const stats = GoalMonthlyCountsSchema.parse(numberResults);
     return stats;
   }
 }
