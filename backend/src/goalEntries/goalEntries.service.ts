@@ -99,9 +99,11 @@ export class GoalEntriesService {
   /**
    * Statistics-specific
    */
-  getStatistics(goalId: number, year: number) {
+  async getStatistics(goalId: number, year: number) {
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
-    return this.prisma.$queryRaw<GoalStatisticsReponse>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
+    // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
+    const [row] = await this.prisma.$queryRaw<GoalStatisticsReponse[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
+    return row;
   }
 }
