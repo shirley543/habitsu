@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse } from './goalEntries.dtos';
+import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalMonthlyAveragesResponse, GoalStatisticsSchema, GoalMonthlyAveragesSchema } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
@@ -103,12 +103,16 @@ export class GoalEntriesService {
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
     // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
-    const [row] = await this.prisma.$queryRaw<GoalStatisticsReponse[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
-    return row;
+    const [rawResult] = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
+    console.log(rawResult)
+    const stats = GoalStatisticsSchema.parse(rawResult);
+    return stats;
   }
 
   async getMonthlyAverages(goalId: number, year: number) {
     // TODOs: as above for changing $queryRaw call
-    return this.prisma.$queryRaw<GoalMonthlyAveragesResponse[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
+    const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
+    const monthlyAverages = GoalMonthlyAveragesSchema.parse(rawResults);
+    return monthlyAverages;
   }
 }
