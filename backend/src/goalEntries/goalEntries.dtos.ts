@@ -78,3 +78,12 @@ export const UpdateGoalEntrySchema = z.intersection(PartialBaseGoalEntrySchema, 
 export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
 export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
+
+
+export const GoalStatisticsSchema = z.object({
+  yearAvg: z.number().nullable(),
+  yearCount: z.number().nullable(),
+  currentStreakLen: z.number().nullable(),
+  maxStreakLen: z.number().nullable(),
+})
+export type GoalStatisticsReponse = z.infer<typeof GoalStatisticsSchema>;

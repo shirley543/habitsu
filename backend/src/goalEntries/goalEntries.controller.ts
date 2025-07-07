@@ -11,15 +11,33 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { GoalEntriesService } from './goalEntries.service';
-import { CreateGoalEntryDto, CreateGoalEntrySchema, SearchParamsGoalEntryDto, SearchParamsGoalEntrySchema, UpdateGoalEntryDto, UpdateGoalEntrySchema } from './goalEntries.dtos';
+import { CreateGoalEntryDto, CreateGoalEntrySchema, SearchParamsGoalEntryDto, SearchParamsGoalEntrySchema, UpdateGoalEntryDto, UpdateGoalEntrySchema, GoalStatisticsReponse } from './goalEntries.dtos';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
+import { GoalStatisticsEntity } from './goalStatistics.entity';
 
 @Controller('goalEntries')
 @ApiTags('goalEntries')
 export class GoalEntriesController {
   constructor(private readonly goalEntriesService: GoalEntriesService) {}
+
+  /**
+   * Statistics-specific
+   */
+
+  @Get('statistics')
+  @ApiOkResponse({ type: GoalStatisticsEntity })
+  getStatistics(
+    @Query('goalId', ParseIntPipe) goalId: number,
+    @Query('year', ParseIntPipe) year: number
+  ) {
+    return this.goalEntriesService.getStatistics(goalId, year);
+  }
+
+  /**
+   * General
+   */
 
   @Post()
   @ApiCreatedResponse({ type: GoalEntryEntity })

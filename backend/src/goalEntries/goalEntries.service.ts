@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto } from './goalEntries.dtos';
+import { CreateGoalEntryDto, UpdateGoalEntryDto, GoalQuantifyType, SearchParamsGoalEntryDto, GoalStatisticsReponse } from './goalEntries.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
@@ -94,5 +94,14 @@ export class GoalEntriesService {
 
   remove(id: number) {
     return this.prisma.goalEntry.delete({ where: { id } });
+  }
+
+  /**
+   * Statistics-specific
+   */
+  getStatistics(goalId: number, year: number) {
+    // Note: casting to INT as default without is BIGINT
+    // To determine if worth updating types of SQL function params to BIGINT instead of INT
+    return this.prisma.$queryRaw<GoalStatisticsReponse>`SELECT * FROM get_numeric_stats(${goalId}::INT, ${year}::INT);`;
   }
 }
