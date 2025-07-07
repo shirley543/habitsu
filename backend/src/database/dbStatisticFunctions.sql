@@ -1,4 +1,19 @@
-DROP FUNCTION IF EXISTS get_goal_entries_with_year_month(INT)
+/*
+	Database Statistic Functions:
+	SQL functions for deriving statistics information from tables (GoalEntry)
+
+	Note: to be used with $queryRaw call provided by Prisma.
+	Not using Prisma client API as while it can support:
+	- Simple filters
+	- Simple aggregates
+	It does not support the following as of 7-July-2025:
+	- Complex CTEs (WITH clause) and subqueries (https://github.com/prisma/prisma/issues/5617)
+	- Window functions (OVER clauses) (https://github.com/prisma/prisma/issues/7039)
+	- SQL functions with params (https://github.com/prisma/prisma/issues/19030)
+	- Date parts extraction (https://github.com/prisma/prisma/discussions/24169)
+*/
+
+DROP FUNCTION IF EXISTS get_goal_entries_with_year_month(INT);
 
 /*
 	Returns table of goal entries, filtered by given goal ID,
@@ -36,7 +51,7 @@ SELECT * FROM get_goal_entries_with_year_month(11);
 
 
 
-DROP FUNCTION IF EXISTS get_goal_entries_for_year(INT, INT)
+DROP FUNCTION IF EXISTS get_goal_entries_for_year(INT, INT);
 
 /*
 	Returns table of goal entries, filtered by given goal ID and given year,
@@ -72,7 +87,7 @@ SELECT * FROM get_goal_entries_for_year(11, 2025);
 
 
 
-DROP FUNCTION IF EXISTS get_goal_year_avg(INT, INT)
+DROP FUNCTION IF EXISTS get_goal_year_avg(INT, INT);
 
 /*
 	Returns yearly average for the given goal ID and year
@@ -295,3 +310,38 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM get_goal_year_monthly_avgs(11, 2025);
 SELECT * FROM get_goal_year_monthly_avgs(9, 2025);
 
+
+
+DROP FUNCTION IF EXISTS get_numeric_stats(INT, INT);
+
+/*
+	Returns consolidated numeric statistics, filtered by given goal ID and year
+
+	@param p_goal_id: ID of the goal to filter by
+	@param p_year: year to filter by
+	@returns A table of rows with columns:
+		- yearAvg: entries average for the year
+		- yearCount: entries count for the year
+		- currentStreakLen: length of current entry streak for the year ("current" being current date i.e. today)
+		- maxStreakLen: length of maximum entry streak for the year
+*/
+CREATE FUNCTION get_numeric_stats(p_goal_id INT, p_year INT)
+RETURNS TABLE (
+	"yearAvg" NUMERIC,
+	"yearCount" NUMERIC,
+	"currentStreakLen" NUMERIC,
+	"maxStreakLen" NUMERIC
+) AS $$
+BEGIN
+  RETURN QUERY
+	SELECT
+		get_goal_year_avg(p_goal_id, p_year) AS "yearAvg",
+		get_goal_year_count(p_goal_id, p_year) AS "yearCount",
+		get_current_streak_len(p_goal_id, p_year) AS "currentStreakLen",
+		get_max_streak_len(p_goal_id, p_year) AS "maxStreakLen";
+END;
+$$ LANGUAGE plpgsql;
+
+-- Examples
+SELECT * FROM get_numeric_stats(11, 2025);
+SELECT * FROM get_numeric_stats(9, 2025);
