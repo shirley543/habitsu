@@ -9,7 +9,7 @@ import { useGoals } from "./GoalApi";
 import { GoalQuantifyType } from "@habit-tracker/shared";
 import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ErrorBodyComponent from "@/components/custom/ErrorComponents";
+import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
 // TODOss: lazy loading/ infinite scroll results

@@ -8,7 +8,7 @@ import { TopBarBack } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useGoal, useGoalMonthlyAvgs, useGoalMonthlyCounts, useGoalStatistics } from "./GoalApi";
 import { GoalQuantifyType, type GoalResponse, type GoalStatisticsReponse } from "@habit-tracker/shared";
-import ErrorBodyComponent from "@/components/custom/ErrorComponents";
+import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 
 export const GoalDetailsPage = () => {
   const navigate = useNavigate()

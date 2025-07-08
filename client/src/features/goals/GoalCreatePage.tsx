@@ -1,10 +1,12 @@
 import { useAppForm } from '../../hooks/form'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useMatch, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { GoalPublicityType, type GoalResponse, GoalQuantifyType } from '@habit-tracker/shared';
 import { useGoal } from './GoalApi';
+import { Button } from '@/components/ui/button';
+import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 
 // TODOss:
 // - Zod validation
@@ -30,6 +32,16 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     icon: '',
   } as GoalResponse;
   const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numeric;
+
+  const formSubmitError: Error | undefined = new Error("Form Submit Error");
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+
+  // Scroll into view today's cell
+  useEffect(() => {
+    if (formSubmitError && !isErrorDialogOpen) {
+      setIsErrorDialogOpen(true);
+    }
+  }, [formSubmitError])
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -202,6 +214,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           </form.AppForm>
         </div>
       </form>
+      <ErrorDialogComponent
+        error={formSubmitError}
+        category={ErrorDialogCategory.FormSubmissionFailed}
+        isShow={isErrorDialogOpen}
+        onClose={() => { 
+          setIsErrorDialogOpen(false) 
+        }}
+      />
     </div>
   )
 }

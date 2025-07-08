@@ -1,9 +1,15 @@
 import { CircleAlert } from "lucide-react";
-import { Button } from "../ui/button";
-import { HTTPError } from "ky";
+import { Button } from "@/components/ui/button"
 
-interface ErrorBodyComponentProps {
+
+import { HTTPError } from "ky";
+import { Dialog, DialogTriggerSubtype, type DialogTriggerConfig } from "./DialogComponents";
+
+interface ErrorBaseProps {
   error: Error | HTTPError,
+}
+
+interface ErrorBodyComponentProps extends ErrorBaseProps {
   onRefreshClick: () => void,
   onBackClick?: () => void,
 }
@@ -33,4 +39,39 @@ function ErrorBodyComponent({ error, onRefreshClick, onBackClick }: ErrorBodyCom
   );
 };
 
-export default ErrorBodyComponent;
+export enum ErrorDialogCategory {
+  FormSubmissionFailed = 'form-submission-failed',
+  SettingChangeFailed = 'setting-change-failed',
+}
+
+interface ErrorDialogComponentProps extends ErrorBaseProps {
+  category: ErrorDialogCategory,
+  isShow: boolean,
+  onClose: () => void,
+}
+
+function ErrorDialogComponent({ error, category, isShow, onClose }: ErrorDialogComponentProps) {
+  const descriptionText = (() => {
+    if (error instanceof HTTPError) {
+      return `Please try again later. (${error.response.status})`;
+    }
+    else {
+      return `${error.message}. Please try again later.`;
+    }
+  })();
+
+  const ERROR_DIALOG_STRINGS: Record<ErrorDialogCategory, { title: string, description: string }> = {
+    [ErrorDialogCategory.FormSubmissionFailed]: { title: "Form Submission Failed", description: descriptionText },
+    [ErrorDialogCategory.SettingChangeFailed]: { title: "Setting Change Failed", description: descriptionText }
+  }
+
+  return (
+    <Dialog title={ERROR_DIALOG_STRINGS[category].title} description={ERROR_DIALOG_STRINGS[category].description} config={{
+      subtype: DialogTriggerSubtype.Flag,
+      triggerFlag: isShow,
+      onClose: onClose,
+    }}/>
+  )
+}
+
+export { ErrorBodyComponent, ErrorDialogComponent };
