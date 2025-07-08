@@ -1,33 +1,29 @@
 import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse } from "@habit-tracker/shared";
 import { useQuery } from "@tanstack/react-query";
+import ky from 'ky';
 
 const BACKEND_BASE_URL = "http://localhost:8080";
+
+const KY_FETCH_RETRY_NUM = 0;
+const REACT_QUERY_RETRY_NUM = 0;
 
 /**
  * /goals
  */
 async function fetchGoals(): Promise<Array<GoalResponse>> {
-  const response = await fetch(`${BACKEND_BASE_URL}/goals`);
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goals`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoals() {
   return useQuery({
     queryKey: ['goal'],
     queryFn: () => fetchGoals(),
+    retry: REACT_QUERY_RETRY_NUM,
   });
 }
 
 async function fetchGoalById(goalId: number): Promise<GoalResponse> {
-  // TODOss: wrap all fetch calls with throw new Error
-  const response = await fetch(`${BACKEND_BASE_URL}/goals/${goalId}`);
-  if (!response.ok) {
-    console.log("response status", response.status);
-    throw new Error('Network response was not ok')
-  }
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoal(goalId: number) {
@@ -35,6 +31,7 @@ export function useGoal(goalId: number) {
     queryKey: ['goal', goalId],
     queryFn: () => fetchGoalById(goalId),
     enabled: !!goalId,
+    retry: REACT_QUERY_RETRY_NUM,
   });
 }
 
@@ -46,15 +43,14 @@ async function fetchGoalEntriesBySearchParams(searchParams: SearchParamsGoalEntr
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  const response = await fetch(`${BACKEND_BASE_URL}/goalEntries?${searchSegment}`);
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goalEntries?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoalEntries(searchParams: SearchParamsGoalEntryDto) {
   return useQuery({
     queryKey: ['goalEntries', searchParams],
     queryFn: () => fetchGoalEntriesBySearchParams(searchParams),
+    retry: REACT_QUERY_RETRY_NUM,
   })
 }
 
@@ -62,19 +58,14 @@ async function fetchGoalStatisticsBySearchParams(searchParams: SearchParamsGoalE
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  const response = await fetch(`${BACKEND_BASE_URL}/goalEntries/statistics?${searchSegment}`);
-  if (!response.ok) {
-    console.log("response status", response.status);
-    throw new Error('Network response was not ok')
-  }
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goalEntries/statistics?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoalStatistics(searchParams: SearchParamsGoalEntryDto) {
   return useQuery({
     queryKey: ['goalStatistics', searchParams],
     queryFn: () => fetchGoalStatisticsBySearchParams(searchParams),
+    retry: REACT_QUERY_RETRY_NUM,
   })
 }
 
@@ -82,13 +73,7 @@ async function fetchGoalMonthlyAvgsBySearchParams(searchParams: SearchParamsGoal
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  const response = await fetch(`${BACKEND_BASE_URL}/goalEntries/monthly-averages?${searchSegment}`);
-  if (!response.ok) {
-    console.log("response status", response.status);
-    throw new Error('Network response was not ok')
-  }
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goalEntries/monthly-averages?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
@@ -96,6 +81,7 @@ export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto, enabl
     queryKey: ['goalMonthlyAvgs', searchParams],
     queryFn: () => fetchGoalMonthlyAvgsBySearchParams(searchParams),
     enabled: enabled,
+    retry: REACT_QUERY_RETRY_NUM,
   })
 }
 
@@ -103,13 +89,7 @@ async function fetchGoalMonthlyCountsBySearchParams(searchParams: SearchParamsGo
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  const response = await fetch(`${BACKEND_BASE_URL}/goalEntries/monthly-counts?${searchSegment}`);
-  if (!response.ok) {
-    console.log("response status", response.status);
-    throw new Error('Network response was not ok')
-  }
-  const data = await response.json();
-  return data;
+  return ky.get(`${BACKEND_BASE_URL}/goalEntries/monthly-counts?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
 export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
@@ -117,5 +97,6 @@ export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, ena
     queryKey: ['goalMonthlyCounts', searchParams],
     queryFn: () => fetchGoalMonthlyCountsBySearchParams(searchParams),
     enabled: enabled,
+    retry: REACT_QUERY_RETRY_NUM,
   })
 }

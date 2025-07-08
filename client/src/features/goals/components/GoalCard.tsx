@@ -164,14 +164,15 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
   )
 }
 
-const GoalCardSkeleton: React.FC = () => {  
+const SkeletonGoalCard: React.FC = () => {  
   return (
-    <div className="w-full bg-white rounded-md">
+    <div className="w-full goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       <SkeletonGoalIconText />
+      <SkeletonHeatmap />
     </div>
   )
 }
 
 
 
-export { GoalCardDescriptive, GoalCardControlled };
+export { GoalCardDescriptive, GoalCardControlled, SkeletonGoalCard };
