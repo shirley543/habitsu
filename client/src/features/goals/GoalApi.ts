@@ -1,6 +1,6 @@
 import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse } from "@habit-tracker/shared";
 import { useQuery } from "@tanstack/react-query";
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 
 const BACKEND_BASE_URL = "http://localhost:8080";
 
@@ -15,7 +15,7 @@ async function fetchGoals(): Promise<Array<GoalResponse>> {
 }
 
 export function useGoals() {
-  return useQuery({
+  return useQuery<Array<GoalResponse>, HTTPError>({
     queryKey: ['goal'],
     queryFn: () => fetchGoals(),
     retry: REACT_QUERY_RETRY_NUM,
@@ -27,7 +27,7 @@ async function fetchGoalById(goalId: number): Promise<GoalResponse> {
 }
 
 export function useGoal(goalId: number) {
-  return useQuery({
+  return useQuery<GoalResponse, HTTPError>({
     queryKey: ['goal', goalId],
     queryFn: () => fetchGoalById(goalId),
     enabled: !!goalId,
@@ -47,7 +47,7 @@ async function fetchGoalEntriesBySearchParams(searchParams: SearchParamsGoalEntr
 }
 
 export function useGoalEntries(searchParams: SearchParamsGoalEntryDto) {
-  return useQuery({
+  return useQuery<Array<GoalEntryResponse>, HTTPError>({
     queryKey: ['goalEntries', searchParams],
     queryFn: () => fetchGoalEntriesBySearchParams(searchParams),
     retry: REACT_QUERY_RETRY_NUM,
@@ -62,7 +62,7 @@ async function fetchGoalStatisticsBySearchParams(searchParams: SearchParamsGoalE
 }
 
 export function useGoalStatistics(searchParams: SearchParamsGoalEntryDto) {
-  return useQuery({
+  return useQuery<GoalStatisticsReponse, HTTPError>({
     queryKey: ['goalStatistics', searchParams],
     queryFn: () => fetchGoalStatisticsBySearchParams(searchParams),
     retry: REACT_QUERY_RETRY_NUM,
@@ -77,7 +77,7 @@ async function fetchGoalMonthlyAvgsBySearchParams(searchParams: SearchParamsGoal
 }
 
 export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
-  return useQuery({
+  return useQuery<GoalMonthlyAveragesResponse, HTTPError>({
     queryKey: ['goalMonthlyAvgs', searchParams],
     queryFn: () => fetchGoalMonthlyAvgsBySearchParams(searchParams),
     enabled: enabled,
@@ -93,7 +93,7 @@ async function fetchGoalMonthlyCountsBySearchParams(searchParams: SearchParamsGo
 }
 
 export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
-  return useQuery({
+  return useQuery<GoalMonthlyCountsResponse, HTTPError>({
     queryKey: ['goalMonthlyCounts', searchParams],
     queryFn: () => fetchGoalMonthlyCountsBySearchParams(searchParams),
     enabled: enabled,

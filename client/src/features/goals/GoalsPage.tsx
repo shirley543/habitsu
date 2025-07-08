@@ -9,6 +9,7 @@ import { useGoals } from "./GoalApi";
 import { GoalQuantifyType } from "@habit-tracker/shared";
 import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ErrorBodyComponent from "@/components/custom/ErrorComponents";
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
 // TODOss: lazy loading/ infinite scroll results
@@ -54,14 +55,10 @@ export const GoalsPage = () => {
         })}
       </div>}
       {/* Error component */}
-      {(error) && <div className="flex flex-col gap-4 pt-18 items-center">
-          <CircleAlert size={`64px`} strokeWidth={2.5} />
-          <div>
-            <h2 className="text-base font-black">Oops! Something went wrong</h2>
-            <p className="text-sm font-normal text-center">{error.message}.<br/> Refresh the page and try again.</p>
-          </div>
-          <Button onClick={() => { console.log("Refresh button clicked") }}>Refresh</Button>
-      </div>}
+      {(error) && <ErrorBodyComponent
+        error={error}
+        onRefreshClick={() => { console.log("TODOsss have refresh do something") }}
+      />}
     </div>
   );
 };

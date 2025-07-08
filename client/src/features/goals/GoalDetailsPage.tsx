@@ -8,6 +8,7 @@ import { TopBarBack } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useGoal, useGoalMonthlyAvgs, useGoalMonthlyCounts, useGoalStatistics } from "./GoalApi";
 import { GoalQuantifyType, type GoalResponse, type GoalStatisticsReponse } from "@habit-tracker/shared";
+import ErrorBodyComponent from "@/components/custom/ErrorComponents";
 
 export const GoalDetailsPage = () => {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ export const GoalDetailsPage = () => {
   // TODOs: loading state + error handling on frontend
   const { goalId } = route.useParams();
   const [selectedYear, setSelectedYear] = useState<number>(2025);
-  const { data: goalData, isLoading: goalIsLoading, error: goalLoading } = useGoal(parseInt(goalId));
+  const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(parseInt(goalId));
   const { data: statsData, isLoading: statsIsLoading, error: statsError } = useGoalStatistics({ goalId: parseInt(goalId), year: selectedYear});
   const { data: monthlyAvgsData, isLoading: monthlyAvgsIsLoading, error: monthlyAvgsError } = useGoalMonthlyAvgs({ goalId: parseInt(goalId), year: selectedYear}, goalData?.goalType === GoalQuantifyType.Numeric);
   const { data: monthlyCountsData, isLoading: monthlyCountsIsLoading, error: monthlyCountsError } = useGoalMonthlyCounts({ goalId: parseInt(goalId), year: selectedYear}, goalData?.goalType === GoalQuantifyType.Boolean);
@@ -50,8 +51,15 @@ export const GoalDetailsPage = () => {
       <TopBarBack title="Goal Details" backCallback={() => { 
         navigate({ to: '/goals' })
       }}/>
-      {(goalLoading !== null) && <div>Goal Error...</div>}
-      {(goalData && goalLoading === null) && <>
+      {(goalIsLoading) && <div>Goal Loading...</div>}
+      {(goalError) && <ErrorBodyComponent
+        error={goalError}
+        onRefreshClick={() => { console.log("TODOsss have refresh do something") }}
+        onBackClick={() => {
+          navigate({ to: '/goals' })
+        }}
+      />}
+      {(goalData) && <>
         {/* Goal description container */}
         <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
           <GoalIconText title={goalData.title} description={goalData.description} baseColour={goalData.colour} iconName={goalData.icon as IconName} />
@@ -128,7 +136,6 @@ export const GoalDetailsPage = () => {
             })
           }
         />}
-
       </>}
     </div>
   );
