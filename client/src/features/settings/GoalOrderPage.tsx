@@ -3,7 +3,7 @@ import { TopBarClose } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
 import { useGoals } from "../goals/GoalApi";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
-import { SortableExample } from "./SortableExample";
+import { SortableList } from "./SortableList";
 
 export function GoalOrderPage() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export function GoalOrderPage() {
           )
         })
       }
-      <SortableExample />
+      <SortableList node={<div>Hello</div>}/>
     </div>
   )
 }

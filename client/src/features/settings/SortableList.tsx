@@ -17,7 +17,14 @@ import {
 
 import {SortableItem} from './SortableItem';
 
-export function SortableExample() {
+// TODOsss need to generalize this...
+// items passed in could be anything... goals, etc. Pass in set and item arrays?
+// rendered item could also be anything... pass in as React Node?
+interface SortableListProps {
+  node: React.ReactNode,
+}
+
+export const SortableList: React.FC<SortableListProps> = ({ node }) => {
   const [items, setItems] = useState([1, 2, 3]);
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -36,11 +43,15 @@ export function SortableExample() {
         items={items}
         strategy={verticalListSortingStrategy}
       >
-        {items.map(id => <SortableItem key={id} id={id} />)}
+        {items.map(id => <SortableItem key={id} id={id} children={node}/>)}
       </SortableContext>
     </DndContext>
   );
   
+  /**
+   * Update item order upon end of drag event
+   * @param event 
+   */
   function handleDragEnd(event: DragEndEvent) {
     const {active, over} = event;
     
