@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -46,7 +46,13 @@ export function GoalOrderPage() {
   const navigate = useNavigate();
   const { data: goalsRaw, isLoading, error } = useGoals();
 
-  const [goals, setGoals] = useState<GoalResponse[] | undefined>(goalsRaw);
+  const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined);
+
+  // Update displayed goals data from goals raw 
+  // (from backend) data once available
+  useEffect(() => {
+    setGoals(goalsRaw)
+  }, [goalsRaw])
 
   const goalsIds = useMemo(() => {
     return goals?.map((goal) => goal.id);
