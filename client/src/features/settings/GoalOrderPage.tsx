@@ -12,16 +12,21 @@ import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 
 interface GoalOrderCardProps {
   goal: GoalResponse,
+  onUpClick: () => void,
+  onDownClick: () => void,
 }
 
-export function GoalOrderCard({ goal }: GoalOrderCardProps) {  
+export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardProps) {  
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-  } = useSortable({id: goal.id});
+  } = useSortable({
+    id: goal.id,
+    animateLayoutChanges: ({ wasDragging }) => !wasDragging,
+  });
     
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -29,13 +34,13 @@ export function GoalOrderCard({ goal }: GoalOrderCardProps) {
   };
   
   return (
-    <div className="orderItem bg-white rounded-md flex flex-row overflow-hidden" ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div className="orderItem bg-white rounded-md flex flex-row overflow-hidden shadow-sm" ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div className="tab w-2" style={{backgroundColor: `#${goal.colour}`}}></div>
       <div className="titleButtons w-full px-2.5 py-2 flex flex-row gap-2 items-center">
         <h2 className="title w-full text-sm font-semibold">{goal.title}</h2>
         <div className="buttons flex flex-row gap-1">
-        <IconButton iconName="arrow-up" onClickCallback={() => { console.log("clicked up") }}/>
-        <IconButton iconName="arrow-down" onClickCallback={() => { console.log("clicked down") }}/>
+        <IconButton iconName="arrow-up" onClickCallback={onUpClick}/>
+        <IconButton iconName="arrow-down" onClickCallback={onDownClick}/>
         </div>
       </div>
     </div>
@@ -59,9 +64,13 @@ export function GoalOrderPage() {
   }, [goals])
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
+    useSensor(PointerSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
+      activationConstraint: {
+        distance: 8,
+      }
+    }),
+    useSensor(KeyboardSensor, {
     })
   );
 
@@ -84,6 +93,38 @@ export function GoalOrderPage() {
     }
   }
 
+  function handleUpClick(goalId: number): void {
+    setGoals((items) => {
+      if (items === undefined) {
+        return;
+      }
+
+      const oldIndex = items.findIndex((item) => item.id === goalId);
+      const newIndex = oldIndex === 0 ? (items.length - 1) : oldIndex - 1;
+      const newArray = arrayMove(items, oldIndex, newIndex);
+      return newArray;
+    })
+  }
+
+
+  function handleDownClick(goalId: number): void {
+    setGoals((items) => {
+      if (items === undefined) {
+        return;
+      }
+
+      const oldIndex = items.findIndex((item) => item.id === goalId);
+      const newIndex = oldIndex === (items.length - 1) ? 0 : oldIndex + 1;
+      const newArray = arrayMove(items, oldIndex, newIndex);
+      return newArray;
+    })
+  }
+
+
+  // TODOsss DND:
+  // - Fix bug where goal order card can be dragged out of bounds and resizes entire window
+  // - Add drag-item styling to show which item is currently being dragged (darker bg)
+
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
@@ -101,7 +142,7 @@ export function GoalOrderPage() {
             strategy={verticalListSortingStrategy}
           >
             {goals.map((goal) => (
-              <GoalOrderCard key={goal.id} goal={goal}/>
+              <GoalOrderCard key={goal.id} goal={goal} onUpClick={() => handleUpClick(goal.id)} onDownClick={() => handleDownClick(goal.id)}/>
             ))}
           </SortableContext>
         </DndContext>
