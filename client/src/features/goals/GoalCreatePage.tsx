@@ -1,11 +1,9 @@
 import { useAppForm } from '../../hooks/form'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
-import { getRouteApi, useMatch, useNavigate, useParams } from '@tanstack/react-router';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchema, type CreateGoalDto } from '@habit-tracker/shared';
 import { useCreateGoalMutation, useGoal } from './GoalApi';
-import { Button } from '@/components/ui/button';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 
 // TODOss:
@@ -32,27 +30,8 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   } as CreateGoalDto;
   const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numeric;
 
-  // const formSubmitError: Error | undefined = new Error("Form Submit Error");
-  const formSubmitError: Error | undefined = undefined;
-
-  const { data, error, isSuccess, isError, isPending, mutate: createGoalMutateFn } = useCreateGoalMutation();
+  const { error, mutate: createGoalMutateFn } = useCreateGoalMutation();
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
-
-
-
-  // Scroll into view today's cell
-  useEffect(() => {
-    if (error && !isErrorDialogOpen) {
-      setIsErrorDialogOpen(true);
-    }
-  }, [error])
-
-  // Redirect to goals list upon successful submission
-  useEffect(() => {
-    if (isSuccess) {
-      navigate({ to: "/goals"});
-    }
-  }, [isSuccess])
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -60,9 +39,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       onChange: CreateGoalSchema,
     },
     onSubmit: ({ value }) => {
-      createGoalMutateFn(value);
+      createGoalMutateFn(value, {
+        onSuccess: () => navigate({ to: "/goals"}),
+        onError: () => setIsErrorDialogOpen(true),
+      });
     },
-  })
+  });
+
+  // const fieldValue = form.getFieldValue("goalType") === GoalQuantifyType.Numeric
 
   const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(initialIsDisplayNumerical);
 
@@ -106,7 +90,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           )}
         </form.AppField>}
 
-        {isDisplayNumericControls && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {(form.getFieldValue("goalType") === GoalQuantifyType.Numeric) && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <form.AppField
             name="numericTarget"
           >
