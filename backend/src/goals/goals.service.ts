@@ -60,6 +60,7 @@ export class GoalsService {
         title: updateGoalDto.title,
         description: updateGoalDto.description,
         colour: updateGoalDto.colour,
+        icon: updateGoalDto.icon,
         publicity: updateGoalDto.publicity,
         goalType: updateGoalDto.goalType as GoalQuantify,
       }
