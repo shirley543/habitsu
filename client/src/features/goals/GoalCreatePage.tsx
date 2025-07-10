@@ -28,7 +28,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     colour: '',
     icon: '',
   } as CreateGoalDto;
-  const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numeric;
 
   const { error, mutate: createGoalMutateFn } = useCreateGoalMutation();
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
@@ -45,10 +44,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       });
     },
   });
-
-  // const fieldValue = form.getFieldValue("goalType") === GoalQuantifyType.Numeric
-
-  const [isDisplayNumericControls, setIsDisplayNumericControls] = useState<boolean>(initialIsDisplayNumerical);
 
   return (
     <div className="flex flex-col gap-3">
@@ -90,18 +85,28 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           )}
         </form.AppField>}
 
-        {(form.getFieldValue("goalType") === GoalQuantifyType.Numeric) && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <form.AppField
-            name="numericTarget"
-          >
-            {(field) => <field.NumberField label="Daily Target" placeholder="e.g. 30" />}
-          </form.AppField>
-          <form.AppField
-            name="numericUnit"
-          >
-            {(field) => <field.TextField label="Units" placeholder="e.g. km, hours, sessions" />}
-          </form.AppField>
-        </div>}
+        <form.Subscribe selector={(state) => state.values.goalType}>
+          {
+            (goalType) => {
+              if (goalType === GoalQuantifyType.Numeric){
+                return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <form.AppField
+                    name="numericTarget"
+                  >
+                    {(field) => <field.NumberField label="Daily Target" placeholder="e.g. 30" />}
+                  </form.AppField>
+                  <form.AppField
+                    name="numericUnit"
+                  >
+                    {(field) => <field.TextField label="Units" placeholder="e.g. km, hours, sessions" />}
+                  </form.AppField>
+              </div>
+              } else {
+                return null
+              }
+            }
+          }
+        </form.Subscribe>
 
         <form.AppField
           name="publicity"
