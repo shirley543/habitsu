@@ -2,9 +2,9 @@ import { useAppForm } from '../../hooks/form'
 import { useEffect, useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useMatch, useNavigate, useParams } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { GoalPublicityType, type GoalResponse, GoalQuantifyType } from '@habit-tracker/shared';
-import { useGoal } from './GoalApi';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchema, type CreateGoalDto } from '@habit-tracker/shared';
+import { useCreateGoalMutation, useGoal } from './GoalApi';
 import { Button } from '@/components/ui/button';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 
@@ -29,38 +29,38 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     publicity: GoalPublicityType.Private,
     colour: '',
     icon: '',
-  } as GoalResponse;
+  } as CreateGoalDto;
   const initialIsDisplayNumerical = initialValues.goalType === GoalQuantifyType.Numeric;
 
-  const formSubmitError: Error | undefined = new Error("Form Submit Error");
+  // const formSubmitError: Error | undefined = new Error("Form Submit Error");
+  const formSubmitError: Error | undefined = undefined;
+
+  const { data, error, isSuccess, isError, isPending, mutate: createGoalMutateFn } = useCreateGoalMutation();
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+
+
 
   // Scroll into view today's cell
   useEffect(() => {
-    if (formSubmitError && !isErrorDialogOpen) {
+    if (error && !isErrorDialogOpen) {
       setIsErrorDialogOpen(true);
     }
-  }, [formSubmitError])
+  }, [error])
+
+  // Redirect to goals list upon successful submission
+  useEffect(() => {
+    if (isSuccess) {
+      navigate({ to: "/goals"});
+    }
+  }, [isSuccess])
 
   const form = useAppForm({
     defaultValues: initialValues,
     validators: {
-      onBlur: ({ value }) => {
-        const errors = {
-          fields: {},
-        } as {
-          fields: Record<string, string>
-        }
-        if (value.title.trim().length === 0) {
-          errors.fields.title = 'Title is required'
-        }
-        return errors
-      },
+      onChange: CreateGoalSchema,
     },
     onSubmit: ({ value }) => {
-      console.log(value)
-      // Show success message
-      alert('Form submitted successfully!')
+      createGoalMutateFn(value);
     },
   })
 
@@ -94,24 +94,13 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
         {isCreate && <form.AppField
           name="goalType"
-          validators={{
-            onChange: ({ value }) => {
-              setIsDisplayNumericControls(value === GoalQuantifyType.Numeric);
-
-              if (!value || value.trim().length === 0) {
-                return 'Goal type is required'
-              }
-              
-              return undefined
-            },
-          }}
         >
           {(field) => (
             <field.RadioGroup
               label="Goal Type"
               values={[
-                { label: 'Numeric', value: 'numeric' },
-                { label: 'Boolean', value: 'boolean' },
+                { label: 'Numeric', value: GoalQuantifyType.Numeric },
+                { label: 'Boolean', value: GoalQuantifyType.Boolean },
               ]}
             />
           )}
@@ -120,27 +109,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         {isDisplayNumericControls && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <form.AppField
             name="numericTarget"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value) {
-                  return 'Target value is required'
-                }
-                return undefined
-              },
-            }}
           >
             {(field) => <field.NumberField label="Daily Target" placeholder="e.g. 30" />}
           </form.AppField>
           <form.AppField
             name="numericUnit"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return 'Units are required'
-                }
-                return undefined
-              },
-            }}
           >
             {(field) => <field.TextField label="Units" placeholder="e.g. km, hours, sessions" />}
           </form.AppField>
@@ -148,14 +121,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
 
         <form.AppField
           name="publicity"
-          validators={{
-            onChange: ({ value }) => {
-              if (!value || value.trim().length === 0) {
-                return 'Privacy type is required'
-              }
-              return undefined
-            },
-          }}
         >
           {(field) => (
             <field.Select
@@ -172,14 +137,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         {/* Color selection */}
         <form.AppField
           name="colour"
-          validators={{
-            onChange: ({ value }) => {
-              if (!value || value.trim().length === 0) {
-                return 'Colour is required'
-              }
-              return undefined
-            },
-          }}
         >
           {(field) => (
             <field.ColourSelect
@@ -191,14 +148,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         {/* Icon selection */}
         <form.AppField
           name="icon"
-          validators={{
-            onChange: ({ value }) => {
-              if (!value || value.trim().length === 0) {
-                return 'Icon is required'
-              }
-              return undefined
-            },
-          }}
         >
           {(field) => (
             <field.IconSelect
@@ -213,14 +162,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           </form.AppForm>
         </div>
       </form>
-      <ErrorDialogComponent
-        error={formSubmitError}
+      {error && <ErrorDialogComponent
+        error={error}
         category={ErrorDialogCategory.FormSubmissionFailed}
         isShow={isErrorDialogOpen}
         onClose={() => { 
           setIsErrorDialogOpen(false) 
         }}
-      />
+      />}
     </div>
   )
 }

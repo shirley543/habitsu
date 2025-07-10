@@ -1,5 +1,5 @@
-import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse } from "@habit-tracker/shared";
-import { useQuery } from "@tanstack/react-query";
+import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto } from "@habit-tracker/shared";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
 const BACKEND_BASE_URL = "http://localhost:8080";
@@ -99,5 +99,15 @@ export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, ena
     queryFn: () => fetchGoalMonthlyCountsBySearchParams(searchParams),
     enabled: enabled,
     retry: REACT_QUERY_RETRY_NUM,
+  })
+}
+
+async function postCreateGoal(newGoal: CreateGoalDto): Promise<GoalResponse> {
+  return ky.post(`${BACKEND_BASE_URL}/goals`, { retry: KY_FETCH_RETRY_NUM, json: newGoal }).json();
+}
+
+export function useCreateGoalMutation() {
+  return useMutation({
+    mutationFn: (newGoal: CreateGoalDto) => { return postCreateGoal(newGoal) },
   })
 }

@@ -6,7 +6,7 @@ import { GoalQuantify, Prisma } from '@prisma/client';
 
 // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
 enum GoalQuantifyType {
-  Numeric = 'NUMERICAL',
+  Numeric = 'NUMERIC',
   Boolean = 'BOOLEAN',
 }
 
@@ -15,7 +15,9 @@ export class GoalsService {
   constructor(private prisma: PrismaService) {}
 
   create(createGoalDto: CreateGoalDto) {
-    const userId = 1; //< TODOs: Address this hack, user ID should derived from JWT/ session
+    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
+    // TODOss error handling when user ID is not valid/ not found.
+
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalCreateInput = {
         title: createGoalDto.title,

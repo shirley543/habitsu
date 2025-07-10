@@ -7,13 +7,15 @@ import { z } from 'zod';
  * Types
  */
 
+// TODOss: how to enforce check between Prisma enums and Zod enums (Prisma enums not available at shared)
+
 export enum GoalPublicityType {
   Public = 'PUBLIC',
   Private = 'PRIVATE',
 }
 
 export enum GoalQuantifyType {
-  Numeric = 'NUMERICAL',
+  Numeric = 'NUMERIC',
   Boolean = 'BOOLEAN',
 }
 

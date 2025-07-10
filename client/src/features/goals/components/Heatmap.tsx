@@ -220,7 +220,8 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
     if (todayCellTargetRef.current) {
       todayCellTargetRef.current.scrollIntoView({
         behavior: 'auto',
-        block: 'start',
+        block: 'end',
+        inline: 'nearest'
       })
     }
   }, [])

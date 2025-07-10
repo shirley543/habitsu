@@ -95,7 +95,7 @@ export function NumberField({
   label: string
   placeholder?: string
 }) {
-  const field = useFieldContext<string>()
+  const field = useFieldContext<number>()
   const errors = useStore(field.store, (state) => state.meta.errors)
 
   return (
@@ -109,7 +109,7 @@ export function NumberField({
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) => field.handleChange(e.target.valueAsNumber)}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -266,7 +266,7 @@ export function RadioGroup({ label, values }: {
       </Label>
       <ShadcnRadioGroup defaultValue={values[0].value} className="grid-cols-2" onValueChange={(value) => field.handleChange(value)}>
         {values.map((value) => (
-          <div className="flex items-center space-x-2">
+          <div key={value.value} className="flex items-center space-x-2">
             <ShadcnRadioGroupItem key={value.value} value={value.value} />
             <Label htmlFor={value.value}>{value.label}</Label>
           </div>
@@ -293,8 +293,8 @@ export function ColourSelect({ label }: { label: string }) {
       <div className="flex flex-row flex-wrap gap-1.5">
         {Object.values(ColourEnum).map((colourEnum) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
-          return <label>
-            <input type="radio" name="color" value={`#${colourEnum}`} className="peer hidden" 
+          return <label key={colourEnum}>
+            <input type="radio" name="color" value={colourEnum} className="peer hidden" 
               onChange={handleChange} readOnly={false} 
               checked={field.state.value === colourEnum}
             />
@@ -324,7 +324,7 @@ export function IconSelect({ label }: { label: string }) {
         {StandardIcons.map((standardIcon) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
           // TODOs: check for more accessible alternatives to `hidden`/ `display: none`
-          return <label>
+          return <label key={standardIcon}>
             <input type="radio" name="icon" value={standardIcon} className="peer hidden"
               onChange={handleChange} readOnly={false}
               checked={field.state.value === standardIcon}

@@ -9,7 +9,7 @@ import {
   SubscribeButton,
   TextArea,
   TextField,
-} from '../components/custom/formComponents'
+} from '../components/custom/FormComponents'
 import { fieldContext, formContext } from './form-context'
 
 export const { useAppForm } = createFormHook({

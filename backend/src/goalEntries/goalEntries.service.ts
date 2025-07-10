@@ -19,7 +19,7 @@ import { GoalsService } from 'src/goals/goals.service';
 
 // // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
 // enum GoalQuantifyType {
-//   Numeric = 'NUMERICAL',
+//   Numeric = 'NUMERIC',
 //   Boolean = 'BOOLEAN',
 // }
 

@@ -12,7 +12,7 @@ export enum GoalPublicityType {
 }
 
 export enum GoalQuantifyType {
-  Numeric = 'NUMERICAL',
+  Numeric = 'NUMERIC',
   Boolean = 'BOOLEAN',
 }
 
@@ -59,7 +59,7 @@ export const BaseGoalSchema = z.object({
   icon: z.string().min(1, "Icon is required"),
   colour: z.string()
     .min(1, "Colour is required")
-    .regex(/^#[a-fA-F0-9]+$/, "Colour must be a valid hex string"),
+    .regex(/^[a-fA-F0-9]{6}$/, "Colour must be a valid 6-digit hex string"),
   publicity: GoalPublicityTypeSchema,
 });
 
