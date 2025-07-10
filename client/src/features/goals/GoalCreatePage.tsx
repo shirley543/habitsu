@@ -7,9 +7,7 @@ import { useCreateGoalMutation, useGoal } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 
 // TODOss:
-// - Zod validation
-// - Fix bug where boolean goal type selected and values placed, but submit not working
-
+// - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface GoalFormProps {
   isCreate: boolean;
