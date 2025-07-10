@@ -3,7 +3,7 @@ import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchema, type CreateGoalDto } from '@habit-tracker/shared';
-import { useCreateGoalMutation, useGoal } from './GoalApi';
+import { useCreateGoalMutation, useGoal, useUpdateGoalMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 
 // TODOss:
@@ -27,8 +27,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     icon: '',
   } as CreateGoalDto;
 
-  const { error, mutate: createGoalMutateFn } = useCreateGoalMutation();
-  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+  const { error: createError, mutate: createGoalMutateFn } = useCreateGoalMutation();
+  const { error: editError, mutate: updateGoalMutateFn } = useUpdateGoalMutation();
+
+  const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -36,10 +38,21 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       onChange: CreateGoalSchema,
     },
     onSubmit: ({ value }) => {
-      createGoalMutateFn(value, {
-        onSuccess: () => navigate({ to: "/goals"}),
-        onError: () => setIsErrorDialogOpen(true),
-      });
+      if (isCreate) {
+        createGoalMutateFn(value, 
+          {
+            onSuccess: () => navigate({ to: "/goals"}),
+            onError: (error) => setDisplayedError(error),
+          }
+        );
+      } else {
+        if (defaultValues?.id) {
+          updateGoalMutateFn({ id: defaultValues?.id, update: value }, {
+            onSuccess: () => navigate({ to: "/goals"}),
+            onError: (error) => setDisplayedError(error),
+          })
+        }
+      }
     },
   });
 
@@ -149,12 +162,12 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           </form.AppForm>
         </div>
       </form>
-      {error && <ErrorDialogComponent
-        error={error}
+      {(displayedError) && <ErrorDialogComponent
+        error={displayedError}
         category={ErrorDialogCategory.FormSubmissionFailed}
-        isShow={isErrorDialogOpen}
+        isShow={displayedError !== undefined}
         onClose={() => { 
-          setIsErrorDialogOpen(false) 
+          setDisplayedError(undefined) 
         }}
       />}
     </div>

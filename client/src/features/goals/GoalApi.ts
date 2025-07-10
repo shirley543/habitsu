@@ -1,4 +1,4 @@
-import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto } from "@habit-tracker/shared";
+import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto, UpdateGoalDto } from "@habit-tracker/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
@@ -109,5 +109,16 @@ async function postCreateGoal(newGoal: CreateGoalDto): Promise<GoalResponse> {
 export function useCreateGoalMutation() {
   return useMutation({
     mutationFn: (newGoal: CreateGoalDto) => { return postCreateGoal(newGoal) },
+  })
+}
+
+
+async function patchUpdateGoal(goalId: number, updateGoal: UpdateGoalDto): Promise<GoalResponse> {
+  return ky.patch(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM, json: updateGoal }).json();
+}
+
+export function useUpdateGoalMutation() {
+  return useMutation({
+    mutationFn: ({ id, update }: { id: number, update: UpdateGoalDto }) => { return patchUpdateGoal(id, update) },
   })
 }
