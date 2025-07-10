@@ -17,7 +17,8 @@ export const GoalDetailsPage = () => {
   // TODOs: loading state + error handling on frontend
   const { goalId } = route.useParams();
   const [selectedYear, setSelectedYear] = useState<number>(2025);
-  const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(parseInt(goalId));
+
+  const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(goalId);
   const { data: statsData, isLoading: statsIsLoading, error: statsError } = useGoalStatistics({ goalId: parseInt(goalId), year: selectedYear});
   const { data: monthlyAvgsData, isLoading: monthlyAvgsIsLoading, error: monthlyAvgsError } = useGoalMonthlyAvgs({ goalId: parseInt(goalId), year: selectedYear}, goalData?.goalType === GoalQuantifyType.Numeric);
   const { data: monthlyCountsData, isLoading: monthlyCountsIsLoading, error: monthlyCountsError } = useGoalMonthlyCounts({ goalId: parseInt(goalId), year: selectedYear}, goalData?.goalType === GoalQuantifyType.Boolean);

@@ -26,11 +26,11 @@ async function fetchGoalById(goalId: number): Promise<GoalResponse> {
   return ky.get(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM }).json();
 }
 
-export function useGoal(goalId: number) {
+export function useGoal(goalId: string) {
   return useQuery<GoalResponse, HTTPError>({
     queryKey: ['goal', goalId],
-    queryFn: () => fetchGoalById(goalId),
-    enabled: !!goalId,
+    queryFn: () => fetchGoalById(Number(goalId)),
+    enabled: Number.isInteger(Number(goalId)),
     retry: REACT_QUERY_RETRY_NUM,
   });
 }
@@ -65,6 +65,7 @@ export function useGoalStatistics(searchParams: SearchParamsGoalEntryDto) {
   return useQuery<GoalStatisticsReponse, HTTPError>({
     queryKey: ['goalStatistics', searchParams],
     queryFn: () => fetchGoalStatisticsBySearchParams(searchParams),
+    enabled: !!searchParams.goalId,
     retry: REACT_QUERY_RETRY_NUM,
   })
 }

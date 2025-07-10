@@ -12,7 +12,6 @@ import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/E
 // - Zod validation
 // - Fix bug where boolean goal type selected and values placed, but submit not working
 
-// TODOs: move this + create new useGoal hook and place in GoalApi file
 
 interface GoalFormProps {
   isCreate: boolean;
@@ -235,9 +234,7 @@ export function GoalCreatePage() {
 
 export function GoalEditPage() {
   const route = getRouteApi('/goals_/$goalId_/edit')
-  const { goalId: goalIdStr } = route.useParams();
-  const goalId = Number.parseInt(goalIdStr);
-
+  const { goalId: goalId } = route.useParams();
   const { data, isLoading, error } = useGoal(goalId);
 
   return (
