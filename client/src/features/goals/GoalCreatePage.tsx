@@ -1,7 +1,7 @@
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { getRouteApi, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchema, type CreateGoalDto } from '@habit-tracker/shared';
 import { useCreateGoalMutation, useGoal, useUpdateGoalMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
@@ -16,6 +16,9 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const navigate = useNavigate();
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+
   const initialValues = defaultValues || {
     title: '',
     description: '',
@@ -32,6 +35,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
 
   const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
 
+  const navigateBack = () => {
+    if (canGoBack) {
+      router.history.back();
+    } else {
+      navigate({ to: "/goals"});
+    }
+  }
+
   const form = useAppForm({
     defaultValues: initialValues,
     validators: {
@@ -41,14 +52,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       if (isCreate) {
         createGoalMutateFn(value, 
           {
-            onSuccess: () => navigate({ to: "/goals"}),
+            onSuccess: navigateBack,
             onError: (error) => setDisplayedError(error),
           }
         );
       } else {
         if (defaultValues?.id) {
           updateGoalMutateFn({ id: defaultValues?.id, update: value }, {
-            onSuccess: () => navigate({ to: "/goals"}),
+            onSuccess: navigateBack,
             onError: (error) => setDisplayedError(error),
           })
         }
@@ -60,9 +71,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
       <TopBarClose title={isCreate ? "Create Goal" : "Edit Goal"} 
-        closeCallback={() => { 
-          navigate({ to: '/goals' })
-        }}
+        closeCallback={navigateBack}
       />
       {/* Form controls container */}
       <form
