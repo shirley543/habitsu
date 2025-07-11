@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGoalEntryDto,
@@ -29,8 +29,7 @@ export class GoalEntriesService {
     private goalsService: GoalsService,
   ) {}
 
-  create(createGoalEntryDto: CreateGoalEntryDto) {
-    const goalId = 1; //< TODOs: Address this hack, goal ID should be provided by DTO or endpoint design/ param
+  create(goalId: number, createGoalEntryDto: CreateGoalEntryDto) {
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryCreateInput = {
         entryDate: createGoalEntryDto.entryDate,
@@ -80,7 +79,17 @@ export class GoalEntriesService {
     return this.prisma.goalEntry.findUnique({ where: { id } });
   }
 
-  update(id: number, updateGoalEntryDto: UpdateGoalEntryDto) {
+  async update(goalId: number, entryId: number, updateGoalEntryDto: UpdateGoalEntryDto) {
+    const entry = await this.prisma.goalEntry.findUnique({
+      where: {
+        goalId: goalId,
+        id: entryId,
+      }
+    });
+    if (!entry) {
+      throw new NotFoundException("Entry not found for this goal");
+    }
+
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryUpdateInput = {
         entryDate: updateGoalEntryDto.entryDate,
@@ -102,13 +111,29 @@ export class GoalEntriesService {
     })();
 
     return this.prisma.goalEntry.update({
-      where: { id },
+      where: { 
+        id: entryId,
+       },
       data: prismaInput,
     });
   }
 
-  remove(id: number) {
-    return this.prisma.goalEntry.delete({ where: { id } });
+  async remove(goalId: number, entryId: number) {
+    const entry = await this.prisma.goalEntry.findUnique({
+      where: {
+        goalId: goalId,
+        id: entryId,
+      }
+    });
+    if (!entry) {
+      throw new NotFoundException("Entry not found for this goal");
+    }
+
+    return this.prisma.goalEntry.delete({ 
+      where: { 
+        id: entryId
+      }
+    });
   }
 
   /**
