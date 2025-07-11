@@ -47,14 +47,16 @@ const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
 export const GoalEntryTypePartialSchema = 
   z.object({
-    numericValue: z.number(),
-  }).partial();
+    numericValue: z.number().nullable()
+  })
+
 
 export const BaseGoalEntrySchema = z.object({
   entryDate: z.string()
     .transform((val) => new Date(val))
     .refine((date) => !(isNaN(date.getTime()))),
   note: z.string().nullable(),
+  // numericValue: z.number().nullable()
 });
 
 export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypePartialSchema);

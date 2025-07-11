@@ -23,13 +23,12 @@ const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalU
     ...defaultValues,
     entryDate: (new Date(defaultValues.entryDate)).toISOString().split('T')[0]
   } : {
-    entryDate: '',
+    entryDate: (new Date()).toISOString().split('T')[0],
     note: '',
-    numericValue: 0,
   } as {
     entryDate: string,
     note: string | null,
-    numericValue?: number | undefined
+    numericValue?: number | null
   }
 
   const { error: createError, mutate: createGoalEntryMutateFn } = useCreateGoalEntryMutation();
@@ -43,8 +42,6 @@ const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalU
       onChange: CreateGoalEntrySchema,
     },
     onSubmit: ({ value }) => {
-      // TODOsss: fix bug where this onSubmit isn't being called
-      console.log("onSubmit", value)
       const result = CreateGoalEntrySchema.safeParse(value);
       if (!result.success) {
         console.error(result.error)

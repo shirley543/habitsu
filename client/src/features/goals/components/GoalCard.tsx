@@ -58,18 +58,11 @@ const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryResponse
         goalId: goalId.toString(),
         entryId: existingEntry.id.toString()
       },
-      // state: { date: existingEntry.entryDate.toISOString(),
-      //   goal: { id: goalId, units: "kms TODOss" }
-      // }
     })
   } else {
-    // const todayDate = new Date();
     navigate({
       to: '/goals/$goalId/entries/create', 
       params: { goalId: goalId.toString() },
-      // state: {
-      //   date: todayDate.toISOString(),
-      // }
     })
   }
 }

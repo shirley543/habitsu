@@ -136,7 +136,7 @@ export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, ena
 }
 
 async function postCreateGoalEntry(goalId: number, createDto: CreateGoalEntryDto): Promise<GoalEntryResponse> {
-  return ky.post(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM, json: createDto }).json();
+  return ky.post(`${BACKEND_BASE_URL}/goals/${goalId}/entries`, { retry: KY_FETCH_RETRY_NUM, json: createDto }).json();
 }
 
 export function useCreateGoalEntryMutation() {
