@@ -6,6 +6,7 @@ import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
 import { Skeleton } from '@/components/ui/skeleton';
+import { daysOfWeekShort, getPartialDaysOfWeekShort, monthsOfYearShort } from '@/lib/dateUtils';
 
 /**
  * Public types
@@ -90,9 +91,6 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
   },
   ref
 ) => {
-
-  const { goalType } = goalData;
-
   /**
    * Function for converting value to a color shade
    * 
@@ -121,8 +119,6 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
     // e.g. if base color is rgb(255, 0, 0), then color array would be:
     // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)', 
     //  'rgba(255, 0, 0, 0.75)', 'rgb(255, 0, 0)']
-
-    // TODOs: change opacity bins to be hardcoded? 20%, 40%, 65%, 100% for manually-tweaked visibility/ design?
     const COLOR_COUNT = BIN_COUNT + 1;
     const colorArray: string[] = [];
     for (let i = 1; i <= COLOR_COUNT; i++) {
@@ -167,7 +163,6 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
   })()
 
   return (
-    // ${`bg-[rgb(#,#,#)]/{opacity}`}
     <HoverPopover 
       triggerElem=
       {
@@ -181,11 +176,9 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
         />
       }
       // TODOs:
-      // - Fix bug where hover popup content is underneath header icon for e.g. Drink water
-      // - Test on small screen e.g. phone (width sufficient)
       // - Add fade in/ out animation to make display less jarring
       contentElem={
-        <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px]'}>
+        <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px] z-10'}>
           <h2 className="text-sm font-semibold">{labelText}</h2>
           <p className="text-sm font-normal pt-1">{entryData?.note}</p>
           <div className="text-zinc-500 flex flex-row gap-2 pt-2">
@@ -206,13 +199,12 @@ interface HeatmapProps {
   goalData: HeatmapGoalData,
   entriesData: Array<GoalEntryResponse>,
   year: number,
+  displayState?: HeatmapDisplayState
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
-
+const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayState=HeatmapDisplayState.NO_LABELS }) => {
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
-  const displayState: HeatmapDisplayState = HeatmapDisplayState.NO_LABELS;
   const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
 
   // Scroll into view today's cell
@@ -281,16 +273,6 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
       return false;
     });
 
-    const monthsOfYear = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    const monthsOfYearShort = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
     const labelElement = firstDayOfMonthElem ? 
       <div className='w-8 text-base font-medium flex justify-center items-center'>
         {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
@@ -304,11 +286,9 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year }) => {
   const finalGridCells = displayState === HeatmapDisplayState.WITH_LABELS ? gridWithMonthLabels : gridNoMonthLabels;
 
   // Weekday labels
-  const weekdayLabels = [...Array(7)].map((_, i) => {
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const daysOfWeekShort = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'];
-    const weekdayString = daysOfWeekShort[i];
-    if (['Mon', 'Wed', 'Fri'].includes(weekdayString)) {
+  const weekdayLabels = daysOfWeekShort.map((shortLabel) => {
+    const weekdayString = shortLabel;
+    if (getPartialDaysOfWeekShort([0, 2, 4]).includes(weekdayString)) {
       return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
     } else {
       return <div className="weekday-empty"></div>

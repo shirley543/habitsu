@@ -12,6 +12,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { capitalizeFirstLetter } from "@/lib/stringManips"
+import { monthsOfYear } from "@/lib/dateUtils"
 
 interface MonthAreaChartData {
   year: number,
@@ -25,23 +26,8 @@ interface MonthAreaChartProps {
   valueLabel: string,
 }
 
-enum MonthEnum {
-  January = "January",
-  February = "February",
-  March = "March",
-  April = "April",
-  May = "May",
-  June = "June",
-  July = "July",
-  August = "August",
-  September = "September",
-  October = "October",
-  November = "November",
-  December = "December"
-};
-
 const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartData, valueLabel }) => {
-  const chartData = Object.values(MonthEnum).map((monthEnum, idx) => {
+  const chartData = monthsOfYear.map((monthEnum, idx) => {
     const foundInputChartData = inputChartData.find((data) => data.month === (idx + 1));
     return { month: monthEnum, value: foundInputChartData?.value || 0 };
   })
