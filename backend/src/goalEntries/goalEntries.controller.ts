@@ -79,6 +79,17 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto 
    * @returns 
    */
+  @Get('entries/:entryId')
+  @ApiOkResponse({ type: GoalEntryEntity })
+  findOne(@Param('entryId', ParseIntPipe) entryId: number,) {
+    return this.goalEntriesService.findOne(entryId);
+  }
+
+  /**
+   * Get entries from goal ID (year undefined)
+   * @param searchParamsGoalEntryDto 
+   * @returns 
+   */
   @Get('goals/:goalId/entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyByGoalId(@Param('goalId', ParseIntPipe) goalId: number,) {

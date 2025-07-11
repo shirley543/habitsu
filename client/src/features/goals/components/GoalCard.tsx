@@ -2,10 +2,10 @@ import  { Heatmap, SkeletonHeatmap, type HeatmapGoalData } from "./Heatmap";
 import { type IconName } from 'lucide-react/dynamic';
 import { GoalIconText, SkeletonGoalIconText } from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, type UseNavigateResult } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
 import { useGoalEntries } from "../GoalApi";
-import type { GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
+import type { GoalEntryResponse, GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 
 export type GoalCardGoalData = HeatmapGoalData;
 
@@ -47,11 +47,43 @@ interface GoalCardDescriptiveProps extends GoalCardBaseProps {
   iconName: IconName,
 }
 
+const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryResponse | undefined, navigate: UseNavigateResult<string>) => {
+  // Check for an existing entry for today.
+  // If there isn't one for today, navigate to create entry,
+  // otherwise navigate to edit entry
+  if (existingEntry) {
+    navigate({
+      to: '/goals/$goalId/entries/$entryId/edit', 
+      params: {
+        goalId: goalId.toString(),
+        entryId: existingEntry.id.toString()
+      },
+      // state: { date: existingEntry.entryDate.toISOString(),
+      //   goal: { id: goalId, units: "kms TODOss" }
+      // }
+    })
+  } else {
+    // const todayDate = new Date();
+    navigate({
+      to: '/goals/$goalId/entries/create', 
+      params: { goalId: goalId.toString() },
+      // state: {
+      //   date: todayDate.toISOString(),
+      // }
+    })
+  }
+}
+
 const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, description, iconName, goalData, selectedYear }) => {
-
   const navigate = useNavigate()
-
   const goalId = goalData.id;
+  const { data: goalEntries } = useGoalEntries({ goalId: goalId, year: selectedYear });
+
+  const existingEntryToday = goalEntries && goalEntries?.find((entry) => {
+    const entryDateStr = (new Date(entry.entryDate)).toDateString();
+    const todayDateStr = (new Date()).toDateString();
+    return entryDateStr === todayDateStr
+  });
 
   const descriptionTypeContent = (() => {
     return <>
@@ -68,41 +100,8 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, descri
             }
           }}/>
           <IconButton iconName="square-plus" onClickCallback={() => {
-            interface Entry {
-              id: number,
-              date: Date,
-              notes?: string,
-              progress?: number,
-            }
-
-            const existingEntry: Entry | undefined = {
-              id: 1,
-              date: new Date(),
-              notes: "Test notes existing entry",
-              progress: 10,
-            }
-
-            // Check for an existing entry for today.
-            // If there isn't one for today, navigate to create entry,
-            // otherwise navigate to edit entry
-            if (existingEntry) {
-              navigate({
-                to: '/entrys/$entryId/edit', 
-                params: { entryId: existingEntry.id.toString() },
-                state: { date: existingEntry.date.toISOString(),
-                  goal: { id: goalId, units: "kms TODOss" }
-                 }
-              })
-            } else {
-              const todayDate = new Date();
-              navigate({
-                to: '/goals/$goalId/entrys/create', 
-                params: { goalId: goalId.toString() },
-                state: {
-                  date: todayDate.toISOString(),
-                }
-              })
-            }
+            // Log today: check whether today's date has an entry or not
+            navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
           }}/>
           <IconButton iconName="square-chevron-right" onClickCallback={() => {
             navigate(
@@ -137,6 +136,16 @@ interface GoalCardControlledProps extends GoalCardBaseProps {
 }
 
 const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selectedYear, onCalendarSelect }) => {
+  const navigate = useNavigate()
+  const goalId = goalData.id;
+  const { data: goalEntries } = useGoalEntries({ goalId: goalId, year: selectedYear });
+
+  const existingEntryToday = goalEntries && goalEntries?.find((entry) => {
+    const entryDateStr = (new Date(entry.entryDate)).toDateString();
+    const todayDateStr = (new Date()).toDateString();
+    return entryDateStr === todayDateStr
+  });
+
   const controlOnlyTypeContent = ((() => {
     return <>
       <div className="header-container flex flex-row justify-between">
@@ -146,9 +155,10 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
         <div className="buttons-container flex flex-row gap-1">
           <IconButton iconName="calendar-plus" onClickCallback={() => {
             console.log("Clicked on goal details card > calendar select for choosing which day to modify")
+            // TODOsss: open calendar to choose which day to get stuff. Need entries data to populate data...
           }}/>
           <IconButton iconName="square-plus" onClickCallback={() => {
-            console.log("Clicked on goal details card > log today")
+            navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
           }}/>
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { capitalizeFirstLetter } from "@/lib/stringManips"
 
 interface MonthAreaChartData {
   year: number,
@@ -51,10 +52,6 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
       color: `#${baseColour}`,
     },
   } satisfies ChartConfig;
-
-  const capitalizeFirstLetter = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
 
   return (
     <Card>

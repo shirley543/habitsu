@@ -1,0 +1,152 @@
+import { useAppForm } from '../../hooks/form'
+import { useState } from "react";
+import { TopBarClose } from "@/components/custom/TopBar";
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { GoalQuantifyType, type GoalEntryResponse, CreateGoalEntrySchema } from '@habit-tracker/shared';
+import { useCreateGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
+import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
+import { capitalizeFirstLetter } from '@/lib/stringManips';
+
+
+interface EntryFormProps {
+  isCreate: boolean;
+  goalId: number;
+  goalType: GoalQuantifyType;
+  goalUnit: string;
+  defaultValues?: GoalEntryResponse;
+}
+
+const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalUnit, defaultValues }) => {
+  const navigate = useNavigate();
+
+  const initialValues = defaultValues ? {
+    ...defaultValues,
+    entryDate: (new Date(defaultValues.entryDate)).toISOString().split('T')[0]
+  } : {
+    entryDate: '',
+    note: '',
+    numericValue: 0,
+  } as {
+    entryDate: string,
+    note: string | null,
+    numericValue?: number | undefined
+  }
+
+  const { error: createError, mutate: createGoalEntryMutateFn } = useCreateGoalEntryMutation();
+  const { error: editError, mutate: updateGoalEntryMutateFn } = useUpdateGoalEntryMutation();
+
+  const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
+
+  const form = useAppForm({
+    defaultValues: initialValues,
+    validators: {
+      onChange: CreateGoalEntrySchema,
+    },
+    onSubmit: ({ value }) => {
+      // TODOsss: fix bug where this onSubmit isn't being called
+      console.log("onSubmit", value)
+      const result = CreateGoalEntrySchema.safeParse(value);
+      if (!result.success) {
+        console.error(result.error)
+        return;
+      }
+      const parsed = result.data;
+      if (isCreate) {
+        createGoalEntryMutateFn({ goalId: goalId, createDto: parsed }, 
+          {
+            onSuccess: () => navigate({ to: "/goals"}),
+            onError: (error) => setDisplayedError(error),
+          }
+        );
+      } else {
+        if (defaultValues?.id) {
+          updateGoalEntryMutateFn({ goalId: goalId, entryId: defaultValues?.id, updateDto: parsed }, {
+            onSuccess: () => navigate({ to: "/goals"}),
+            onError: (error) => setDisplayedError(error),
+          })
+        }
+      }
+    },
+  });
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Topbar config */}
+      <TopBarClose title={isCreate ? "Create Entry" : "Edit Entry"} 
+        closeCallback={() => { 
+          navigate({ to: '/goals' })
+        }}
+      />
+      {/* Form controls container */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+        className="space-y-6"
+      >
+        <form.AppField name="entryDate">
+          {(field) => <field.DateField label="Date" placeholder="e.g. 11 July 2025" />}
+        </form.AppField>
+
+        <form.AppField name="note">
+          {(field) => <field.TextField label="Notes" placeholder="Optional. Add more details if needed" />}
+        </form.AppField>
+
+        {(goalType === GoalQuantifyType.Numeric) && <form.AppField
+          name="numericValue"
+        >
+          {(field) => <field.NumberField label={capitalizeFirstLetter(goalUnit)} placeholder="e.g. 30" />}
+        </form.AppField>}
+
+        <div className="flex justify-end">
+          <form.AppForm>
+            <form.SubscribeButton label={isCreate ? "Create" : "Save"} />
+          </form.AppForm>
+        </div>
+      </form>
+      {(displayedError) && <ErrorDialogComponent
+        error={displayedError}
+        category={ErrorDialogCategory.FormSubmissionFailed}
+        isShow={displayedError !== undefined}
+        onClose={() => { 
+          setDisplayedError(undefined) 
+        }}
+      />}
+    </div>
+  )
+}
+
+export function EntryCreatePage() {
+  const route = getRouteApi('/goals_/$goalId_/entries/create');
+  const { goalId: goalId } = route.useParams();
+
+  const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(goalId);
+
+  return (
+    <>
+      {!goalIsLoading && goalData && <EntryForm isCreate={true} goalId={goalData.id} goalType={goalData.goalType} goalUnit={goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : ''} />}
+    </>
+  )
+}
+
+
+export function EntryEditPage() {
+  const route = getRouteApi('/goals_/$goalId_/entries_/$entryId/edit');
+
+  const { goalId: goalId, entryId: entryId } = route.useParams();
+  const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(goalId);
+  const { data: entryData, isLoading: entryIsLoading, error: entryError } = useGoalEntry(entryId);
+
+  const displayEntryForm = (!goalIsLoading && !goalError && goalData) 
+                        && (!entryIsLoading && !entryError && entryData);
+
+  return (
+    <>
+      {goalIsLoading && <div>Loading...</div>}
+      {goalError && <div>{goalError.message}</div>}
+      {displayEntryForm && <EntryForm isCreate={false} goalId={Number(goalId)} goalType={goalData.goalType} goalUnit={goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : ''} defaultValues={entryData}/>}
+    </>
+  )
+}

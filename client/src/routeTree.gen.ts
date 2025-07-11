@@ -20,11 +20,9 @@ import { Route as SettingsGoalvisibilityRouteImport } from './routes/settings_/g
 import { Route as SettingsGoalorderRouteImport } from './routes/settings_/goalorder'
 import { Route as GoalsCreateRouteImport } from './routes/goals_/create'
 import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
-import { Route as EntrysCreateRouteImport } from './routes/entrys_/create'
-import { Route as EntrysEntryIdRouteImport } from './routes/entrys_/$entryId'
 import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
-import { Route as EntrysEntryIdEditRouteImport } from './routes/entrys_/$entryId_.edit'
-import { Route as GoalsGoalIdEntrysCreateRouteImport } from './routes/goals_/$goalId_.entrys.create'
+import { Route as GoalsGoalIdEntriesCreateRouteImport } from './routes/goals_/$goalId_.entries.create'
+import { Route as GoalsGoalIdEntriesEntryIdEditRouteImport } from './routes/goals_/$goalId_.entries_.$entryId.edit'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -81,39 +79,29 @@ const GoalsGoalIdRoute = GoalsGoalIdRouteImport.update({
   path: '/goals/$goalId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EntrysCreateRoute = EntrysCreateRouteImport.update({
-  id: '/entrys_/create',
-  path: '/entrys/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EntrysEntryIdRoute = EntrysEntryIdRouteImport.update({
-  id: '/entrys_/$entryId',
-  path: '/entrys/$entryId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GoalsGoalIdEditRoute = GoalsGoalIdEditRouteImport.update({
   id: '/goals_/$goalId_/edit',
   path: '/goals/$goalId/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EntrysEntryIdEditRoute = EntrysEntryIdEditRouteImport.update({
-  id: '/entrys_/$entryId_/edit',
-  path: '/entrys/$entryId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GoalsGoalIdEntrysCreateRoute = GoalsGoalIdEntrysCreateRouteImport.update({
-  id: '/goals_/$goalId_/entrys/create',
-  path: '/goals/$goalId/entrys/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const GoalsGoalIdEntriesCreateRoute =
+  GoalsGoalIdEntriesCreateRouteImport.update({
+    id: '/goals_/$goalId_/entries/create',
+    path: '/goals/$goalId/entries/create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GoalsGoalIdEntriesEntryIdEditRoute =
+  GoalsGoalIdEntriesEntryIdEditRouteImport.update({
+    id: '/goals_/$goalId_/entries_/$entryId/edit',
+    path: '/goals/$goalId/entries/$entryId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/entrys': typeof EntrysRouteWithChildren
   '/goals': typeof GoalsRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
-  '/entrys/$entryId': typeof EntrysEntryIdRoute
-  '/entrys/create': typeof EntrysCreateRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -121,14 +109,12 @@ export interface FileRoutesByFullPath {
   '/entrys/': typeof EntrysIndexRoute
   '/goals/': typeof GoalsIndexRoute
   '/settings/': typeof SettingsIndexRoute
-  '/entrys/$entryId/edit': typeof EntrysEntryIdEditRoute
   '/goals/$goalId/edit': typeof GoalsGoalIdEditRoute
-  '/goals/$goalId/entrys/create': typeof GoalsGoalIdEntrysCreateRoute
+  '/goals/$goalId/entries/create': typeof GoalsGoalIdEntriesCreateRoute
+  '/goals/$goalId/entries/$entryId/edit': typeof GoalsGoalIdEntriesEntryIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/entrys/$entryId': typeof EntrysEntryIdRoute
-  '/entrys/create': typeof EntrysCreateRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -136,9 +122,9 @@ export interface FileRoutesByTo {
   '/entrys': typeof EntrysIndexRoute
   '/goals': typeof GoalsIndexRoute
   '/settings': typeof SettingsIndexRoute
-  '/entrys/$entryId/edit': typeof EntrysEntryIdEditRoute
   '/goals/$goalId/edit': typeof GoalsGoalIdEditRoute
-  '/goals/$goalId/entrys/create': typeof GoalsGoalIdEntrysCreateRoute
+  '/goals/$goalId/entries/create': typeof GoalsGoalIdEntriesCreateRoute
+  '/goals/$goalId/entries/$entryId/edit': typeof GoalsGoalIdEntriesEntryIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -146,8 +132,6 @@ export interface FileRoutesById {
   '/entrys': typeof EntrysRouteWithChildren
   '/goals': typeof GoalsRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
-  '/entrys_/$entryId': typeof EntrysEntryIdRoute
-  '/entrys_/create': typeof EntrysCreateRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
   '/goals_/create': typeof GoalsCreateRoute
   '/settings_/goalorder': typeof SettingsGoalorderRoute
@@ -155,9 +139,9 @@ export interface FileRoutesById {
   '/entrys/': typeof EntrysIndexRoute
   '/goals/': typeof GoalsIndexRoute
   '/settings/': typeof SettingsIndexRoute
-  '/entrys_/$entryId_/edit': typeof EntrysEntryIdEditRoute
   '/goals_/$goalId_/edit': typeof GoalsGoalIdEditRoute
-  '/goals_/$goalId_/entrys/create': typeof GoalsGoalIdEntrysCreateRoute
+  '/goals_/$goalId_/entries/create': typeof GoalsGoalIdEntriesCreateRoute
+  '/goals_/$goalId_/entries_/$entryId/edit': typeof GoalsGoalIdEntriesEntryIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,8 +150,6 @@ export interface FileRouteTypes {
     | '/entrys'
     | '/goals'
     | '/settings'
-    | '/entrys/$entryId'
-    | '/entrys/create'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -175,14 +157,12 @@ export interface FileRouteTypes {
     | '/entrys/'
     | '/goals/'
     | '/settings/'
-    | '/entrys/$entryId/edit'
     | '/goals/$goalId/edit'
-    | '/goals/$goalId/entrys/create'
+    | '/goals/$goalId/entries/create'
+    | '/goals/$goalId/entries/$entryId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/entrys/$entryId'
-    | '/entrys/create'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -190,17 +170,15 @@ export interface FileRouteTypes {
     | '/entrys'
     | '/goals'
     | '/settings'
-    | '/entrys/$entryId/edit'
     | '/goals/$goalId/edit'
-    | '/goals/$goalId/entrys/create'
+    | '/goals/$goalId/entries/create'
+    | '/goals/$goalId/entries/$entryId/edit'
   id:
     | '__root__'
     | '/'
     | '/entrys'
     | '/goals'
     | '/settings'
-    | '/entrys_/$entryId'
-    | '/entrys_/create'
     | '/goals_/$goalId'
     | '/goals_/create'
     | '/settings_/goalorder'
@@ -208,9 +186,9 @@ export interface FileRouteTypes {
     | '/entrys/'
     | '/goals/'
     | '/settings/'
-    | '/entrys_/$entryId_/edit'
     | '/goals_/$goalId_/edit'
-    | '/goals_/$goalId_/entrys/create'
+    | '/goals_/$goalId_/entries/create'
+    | '/goals_/$goalId_/entries_/$entryId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,15 +196,13 @@ export interface RootRouteChildren {
   EntrysRoute: typeof EntrysRouteWithChildren
   GoalsRoute: typeof GoalsRouteWithChildren
   SettingsRoute: typeof SettingsRouteWithChildren
-  EntrysEntryIdRoute: typeof EntrysEntryIdRoute
-  EntrysCreateRoute: typeof EntrysCreateRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
   GoalsCreateRoute: typeof GoalsCreateRoute
   SettingsGoalorderRoute: typeof SettingsGoalorderRoute
   SettingsGoalvisibilityRoute: typeof SettingsGoalvisibilityRoute
-  EntrysEntryIdEditRoute: typeof EntrysEntryIdEditRoute
   GoalsGoalIdEditRoute: typeof GoalsGoalIdEditRoute
-  GoalsGoalIdEntrysCreateRoute: typeof GoalsGoalIdEntrysCreateRoute
+  GoalsGoalIdEntriesCreateRoute: typeof GoalsGoalIdEntriesCreateRoute
+  GoalsGoalIdEntriesEntryIdEditRoute: typeof GoalsGoalIdEntriesEntryIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -308,20 +284,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoalsGoalIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/entrys_/create': {
-      id: '/entrys_/create'
-      path: '/entrys/create'
-      fullPath: '/entrys/create'
-      preLoaderRoute: typeof EntrysCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/entrys_/$entryId': {
-      id: '/entrys_/$entryId'
-      path: '/entrys/$entryId'
-      fullPath: '/entrys/$entryId'
-      preLoaderRoute: typeof EntrysEntryIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/goals_/$goalId_/edit': {
       id: '/goals_/$goalId_/edit'
       path: '/goals/$goalId/edit'
@@ -329,18 +291,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoalsGoalIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/entrys_/$entryId_/edit': {
-      id: '/entrys_/$entryId_/edit'
-      path: '/entrys/$entryId/edit'
-      fullPath: '/entrys/$entryId/edit'
-      preLoaderRoute: typeof EntrysEntryIdEditRouteImport
+    '/goals_/$goalId_/entries/create': {
+      id: '/goals_/$goalId_/entries/create'
+      path: '/goals/$goalId/entries/create'
+      fullPath: '/goals/$goalId/entries/create'
+      preLoaderRoute: typeof GoalsGoalIdEntriesCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/goals_/$goalId_/entrys/create': {
-      id: '/goals_/$goalId_/entrys/create'
-      path: '/goals/$goalId/entrys/create'
-      fullPath: '/goals/$goalId/entrys/create'
-      preLoaderRoute: typeof GoalsGoalIdEntrysCreateRouteImport
+    '/goals_/$goalId_/entries_/$entryId/edit': {
+      id: '/goals_/$goalId_/entries_/$entryId/edit'
+      path: '/goals/$goalId/entries/$entryId/edit'
+      fullPath: '/goals/$goalId/entries/$entryId/edit'
+      preLoaderRoute: typeof GoalsGoalIdEntriesEntryIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -384,15 +346,13 @@ const rootRouteChildren: RootRouteChildren = {
   EntrysRoute: EntrysRouteWithChildren,
   GoalsRoute: GoalsRouteWithChildren,
   SettingsRoute: SettingsRouteWithChildren,
-  EntrysEntryIdRoute: EntrysEntryIdRoute,
-  EntrysCreateRoute: EntrysCreateRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
   GoalsCreateRoute: GoalsCreateRoute,
   SettingsGoalorderRoute: SettingsGoalorderRoute,
   SettingsGoalvisibilityRoute: SettingsGoalvisibilityRoute,
-  EntrysEntryIdEditRoute: EntrysEntryIdEditRoute,
   GoalsGoalIdEditRoute: GoalsGoalIdEditRoute,
-  GoalsGoalIdEntrysCreateRoute: GoalsGoalIdEntrysCreateRoute,
+  GoalsGoalIdEntriesCreateRoute: GoalsGoalIdEntriesCreateRoute,
+  GoalsGoalIdEntriesEntryIdEditRoute: GoalsGoalIdEntriesEntryIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

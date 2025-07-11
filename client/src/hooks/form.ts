@@ -2,6 +2,7 @@ import { createFormHook } from '@tanstack/react-form'
 
 import {
   ColourSelect,
+  DateField,
   IconSelect,
   NumberField,
   RadioGroup,
@@ -16,6 +17,7 @@ export const { useAppForm } = createFormHook({
   fieldComponents: {
     TextField,
     NumberField,
+    DateField,
     Select,
     TextArea,
     RadioGroup,

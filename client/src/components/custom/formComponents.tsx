@@ -172,6 +172,34 @@ export function TextArea({
   )
 }
 
+export function DateField({
+  label,
+  placeholder,
+}: {
+  label: string
+  placeholder?: string
+}) {
+  const field = useFieldContext<string>()
+  const errors = useStore(field.store, (state) => state.meta.errors)
+
+  return (
+    <div>
+      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+        {label}
+      </Label>
+      <Input
+        type="date"
+        value={field.state.value}
+        placeholder={placeholder}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        readOnly={true}
+      />
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  )
+}
+
 export function Select({
   label,
   values,

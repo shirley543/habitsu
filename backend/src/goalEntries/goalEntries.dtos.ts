@@ -55,7 +55,9 @@ export const GoalEntryTypeDiscriminatorSchema = z.discriminatedUnion("goalType",
 ]);
 
 export const BaseGoalEntrySchema = z.object({
-  entryDate: z.date({ required_error: "Entry date is required" }),
+  entryDate: z.string()
+    .transform((val) => new Date(val))
+    .refine((date) => !(isNaN(date.getTime()))),
   note: z.string().nullable(),
 });
 

@@ -74,6 +74,19 @@ export function useGoalEntries(searchParams: SearchParamsGoalEntryDto) {
   })
 }
 
+async function fetchGoalEntryById(entryId: number): Promise<GoalEntryResponse> {
+  return ky.get(`${BACKEND_BASE_URL}/entries/${entryId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+}
+
+export function useGoalEntry(entryId: string) {
+  return useQuery<GoalEntryResponse, HTTPError>({
+    queryKey: ['entries', entryId],
+    queryFn: () => fetchGoalEntryById(Number(entryId)),
+    enabled: Number.isInteger(Number(entryId)),
+    retry: REACT_QUERY_RETRY_NUM,
+  });
+}
+
 async function fetchGoalStatisticsBySearchParams(searchParams: SearchParamsGoalEntryDto): Promise<GoalStatisticsReponse> {
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
@@ -128,8 +141,8 @@ async function postCreateGoalEntry(goalId: number, createDto: CreateGoalEntryDto
 
 export function useCreateGoalEntryMutation() {
   return useMutation({
-    mutationFn: ({ goalId, newGoalEntry }: { goalId: number, newGoalEntry: CreateGoalEntryDto }) => { 
-      return postCreateGoalEntry(goalId, newGoalEntry)
+    mutationFn: ({ goalId, createDto }: { goalId: number, createDto: CreateGoalEntryDto }) => { 
+      return postCreateGoalEntry(goalId, createDto)
     },
   })
 }
