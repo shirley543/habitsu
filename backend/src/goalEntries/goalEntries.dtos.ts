@@ -41,18 +41,14 @@ interface NumericalInterface extends BaseInterface {
  */
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
-export const GoalEntryTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
-  // Numeric goal schema
+/**
+ * Schemas: Goal Entries
+ */
+
+export const GoalEntryTypePartialSchema = 
   z.object({
-    goalType: z.literal(GoalQuantifyType.Numeric),
-    numericValue: z.number({ required_error: "Value is required" }),
-  }),
-  // Boolean goal schema
-  z.object({
-    goalType: z.literal(GoalQuantifyType.Boolean),
-    booleanValue: z.boolean({ required_error: "Value is required" }),
-  }),
-]);
+    numericValue: z.number(),
+  }).partial();
 
 export const BaseGoalEntrySchema = z.object({
   entryDate: z.string()
@@ -61,28 +57,28 @@ export const BaseGoalEntrySchema = z.object({
   note: z.string().nullable(),
 });
 
-export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypeDiscriminatorSchema);
-
-// export const SearchParamsGoalEntrySchema = z.object({
-//   goalId: z.number(),
-//   year: z.number(),
-// }).partial()
+export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypePartialSchema);
 
 export const SearchParamsGoalEntrySchema = z.object({
   goalId: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
   year: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
 }).partial();
 
-// --------------------
 
 const PartialBaseGoalEntrySchema = BaseGoalEntrySchema.partial();
 
 export const CreateGoalEntrySchema = GoalEntrySchema;
-export const UpdateGoalEntrySchema = z.intersection(PartialBaseGoalEntrySchema, GoalEntryTypeDiscriminatorSchema);
+export const UpdateGoalEntrySchema = z.intersection(PartialBaseGoalEntrySchema, GoalEntryTypePartialSchema);
+export const GoalEntryResponseSchema = (BaseGoalEntrySchema.extend({ id: z.number(), goalId: z.number() }).and(GoalEntryTypePartialSchema))
 
+/**
+ * Interfaces: Goal Entries
+ */
 export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
 export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
+export type GoalEntryResponse = z.infer<typeof GoalEntryResponseSchema>;
+
 
 // /**
 //  * Zod union which converts Prisma decimal object (from SQL NUMERIC type)

@@ -29,7 +29,12 @@ export class GoalEntriesService {
     private goalsService: GoalsService,
   ) {}
 
-  create(goalId: number, createGoalEntryDto: CreateGoalEntryDto) {
+  async create(goalId: number, createGoalEntryDto: CreateGoalEntryDto) {
+    const goal = await this.goalsService.findOne(goalId);
+    if (!goal) {
+      throw new NotFoundException("Goal not found for the given goal ID");
+    }
+
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryCreateInput = {
         entryDate: createGoalEntryDto.entryDate,
@@ -38,12 +43,11 @@ export class GoalEntriesService {
           connect: { id: goalId }
         }
       }
-      switch (createGoalEntryDto.goalType) {
+      switch (goal.goalType) {
         case GoalQuantifyType.Boolean:
         default:
           return {
             ...baseGoalEntry,
-            booleanValue: createGoalEntryDto.booleanValue,
           };
         case GoalQuantifyType.Numeric:
           return {
@@ -80,6 +84,11 @@ export class GoalEntriesService {
   }
 
   async update(goalId: number, entryId: number, updateGoalEntryDto: UpdateGoalEntryDto) {
+    const goal = await this.goalsService.findOne(goalId);
+    if (!goal) {
+      throw new NotFoundException("Goal not found for the given goal ID");
+    }
+
     const entry = await this.prisma.goalEntry.findUnique({
       where: {
         goalId: goalId,
@@ -95,12 +104,11 @@ export class GoalEntriesService {
         entryDate: updateGoalEntryDto.entryDate,
         note: updateGoalEntryDto.note,
       }
-      switch (updateGoalEntryDto.goalType) {
+      switch (goal.goalType) {
         case GoalQuantifyType.Boolean:
         default:
           return {
             ...baseGoalEntry,
-            booleanValue: updateGoalEntryDto.booleanValue,
           };
         case GoalQuantifyType.Numeric:
           return {

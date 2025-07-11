@@ -63,24 +63,9 @@ export type GoalResponse = z.infer<typeof GoalResponseSchema>;
  * Schemas: Goal Entries
  */
 
-
-// export const GoalEntryTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
-//   // Numeric goal schema
-//   z.object({
-//     goalType: z.literal(GoalQuantifyType.Numeric),
-//     numericValue: z.number({ required_error: "Value is required" }),
-//   }),
-//   // Boolean goal schema
-//   z.object({
-//     goalType: z.literal(GoalQuantifyType.Boolean),
-//     booleanValue: z.boolean({ required_error: "Value is required" }),
-//   }),
-// ]);
-
 export const GoalEntryTypePartialSchema = 
   z.object({
     numericValue: z.number(),
-    booleanValue: z.boolean(),
   }).partial();
 
 export const BaseGoalEntrySchema = z.object({
