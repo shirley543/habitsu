@@ -55,6 +55,16 @@ export function useUpdateGoalMutation() {
   })
 }
 
+async function deleteGoal(goalId: number): Promise<{}> {
+  return ky.delete(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+}
+
+export function useDeleteGoalMutation() {
+  return useMutation({
+    mutationFn: (goalId: number) => { return deleteGoal(goalId) },
+  })
+}
+
 
 /**
  * /goalEntries

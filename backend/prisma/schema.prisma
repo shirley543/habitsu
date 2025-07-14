@@ -47,11 +47,10 @@ model GoalEntry {
   updatedAt    DateTime @updatedAt
   entryDate    DateTime
   goalId       Int
-  goal         Goal     @relation(fields: [goalId], references: [id])
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
   numericValue Int?
   booleanValue Boolean?
   note         String?
-  // TODOs: Figure out onDelete action and onUpdate action (NoAction?)
 
   @@unique([goalId, entryDate])
 }

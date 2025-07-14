@@ -34,9 +34,6 @@ export default function GoalForm() {
     },
   })
 
-  // const formErrors = useStore(form.store, (formState) => formState.errors)
-
-
   return (
     <div>
       <h1>Standard Schema Form Example</h1>

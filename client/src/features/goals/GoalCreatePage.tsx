@@ -3,8 +3,9 @@ import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchema, type CreateGoalDto } from '@habit-tracker/shared';
-import { useCreateGoalMutation, useGoal, useUpdateGoalMutation } from './GoalApi';
+import { useCreateGoalMutation, useDeleteGoalMutation, useGoal, useUpdateGoalMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
+import { Button } from '@/components/ui/button';
 
 // TODOss:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -32,6 +33,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
 
   const { error: createError, mutate: createGoalMutateFn } = useCreateGoalMutation();
   const { error: editError, mutate: updateGoalMutateFn } = useUpdateGoalMutation();
+  const { error: deleteError, mutate: deleteGoalMutateFn } = useDeleteGoalMutation();
 
   const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
 
@@ -66,6 +68,15 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       }
     },
   });
+
+  const handleDelete = () => {
+    if (defaultValues?.id) {
+      deleteGoalMutateFn(defaultValues.id, {
+        onSuccess: navigateBack,
+        onError: (error) => setDisplayedError(error),
+      })
+    }
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -165,8 +176,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           )}
         </form.AppField>
 
-        <div className="flex justify-end">
+        <div className="flex flex-row justify-end">
           <form.AppForm>
+            <Button type="button" variant={'ghostDestructive'} onClick={handleDelete}>
+              Delete
+            </Button>
             <form.SubscribeButton label={isCreate ? "Create" : "Save"} />
           </form.AppForm>
         </div>
