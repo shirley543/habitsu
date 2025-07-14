@@ -6,6 +6,7 @@ import { useNavigate, type UseNavigateResult } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
 import { useGoalEntries } from "../GoalApi";
 import type { GoalEntryResponse, GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
+import { navigateToCreateOrEdit } from "./NavigateUtils";
 
 export type GoalCardGoalData = HeatmapGoalData;
 
@@ -45,26 +46,6 @@ interface GoalCardDescriptiveProps extends GoalCardBaseProps {
   title: string,
   description: string,
   iconName: IconName,
-}
-
-const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryResponse | undefined, navigate: UseNavigateResult<string>) => {
-  // Check for an existing entry for today.
-  // If there isn't one for today, navigate to create entry,
-  // otherwise navigate to edit entry
-  if (existingEntry) {
-    navigate({
-      to: '/goals/$goalId/entries/$entryId/edit', 
-      params: {
-        goalId: goalId.toString(),
-        entryId: existingEntry.id.toString()
-      },
-    })
-  } else {
-    navigate({
-      to: '/goals/$goalId/entries/create', 
-      params: { goalId: goalId.toString() },
-    })
-  }
 }
 
 const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, description, iconName, goalData, selectedYear }) => {

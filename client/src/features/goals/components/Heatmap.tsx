@@ -7,6 +7,8 @@ import { CalendarDays } from 'lucide-react';
 import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
 import { Skeleton } from '@/components/ui/skeleton';
 import { daysOfWeekShort, getPartialDaysOfWeekShort, monthsOfYearShort } from '@/lib/dateUtils';
+import { useNavigate } from '@tanstack/react-router';
+import { navigateToCreateOrEdit } from './NavigateUtils';
 
 /**
  * Public types
@@ -91,6 +93,8 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
   },
   ref
 ) => {
+  const navigate = useNavigate();
+
   /**
    * Function for converting value to a color shade
    * 
@@ -171,7 +175,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
             backgroundColor: cellColor,
           }}
           onClick={() => {
-            console.log(date);
+            navigateToCreateOrEdit(goalData.id, entryData, navigate);
           }}
         />
       }
