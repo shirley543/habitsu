@@ -6,6 +6,7 @@ import { GoalPublicityType, type GoalResponse, GoalQuantifyType, CreateGoalSchem
 import { useCreateGoalMutation, useDeleteGoalMutation, useGoal, useUpdateGoalMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { Button } from '@/components/ui/button';
+import { DeleteDialog } from '@/components/custom/DialogComponents';
 
 // TODOss:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -185,11 +186,18 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           )}
         </form.AppField>
 
-        <div className="flex flex-row justify-end">
+        <div className="flex flex-row gap-1.5 justify-end">
           <form.AppForm>
-            {!isCreate && <Button type="button" variant={'ghostDestructive'} onClick={handleDelete}>
-              Delete
-            </Button>}
+            {!isCreate && 
+              <DeleteDialog
+                title="Delete Goal"
+                description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
+                onDelete={handleDelete}>
+                <Button type="button" variant={'ghostDestructive'}>
+                  Delete
+                </Button>
+              </DeleteDialog>
+            }
             <form.SubscribeButton label={isCreate ? "Create" : "Save"} />
           </form.AppForm>
         </div>
