@@ -38,7 +38,7 @@ const TopBarClose: React.FC<TopBarCloseProps> = ({ title, closeCallback }) => {
   const rightSlotItems = (() => {
     return <>
       <div className="buttons-container flex flex-row gap-1.5">
-        <IconButton iconName="x" onClickCallback={closeCallback}/>
+        <IconButton iconName="x" onClickCallback={closeCallback} tooltip="Close"/>
       </div>
     </>
   })();
@@ -60,7 +60,7 @@ const TopBarBack: React.FC<TopBarBackProps> = ({ title, backCallback }) => {
   const leftSlotItems = (() => {
     return <>
       <div className="buttons-container flex flex-row gap-1.5">
-        <IconButton iconName="arrow-left" onClickCallback={backCallback}/>
+        <IconButton iconName="arrow-left" onClickCallback={backCallback} tooltip="Back"/>
       </div>
     </>
   })();
@@ -72,6 +72,7 @@ const TopBarBack: React.FC<TopBarBackProps> = ({ title, backCallback }) => {
 
 interface TopBarButtonConfig {
   iconName: IconName,
+  tooltip?: string,
   clickCallback: () => void;
 }
 
@@ -90,7 +91,7 @@ const TopBarConfig: React.FC<TopBarConfigProps> = ({ title, leftConfig, rightCon
       <>
         {
           configArr?.map((item) => {
-            return <IconButton iconName={item.iconName} onClickCallback={item.clickCallback}/>
+            return <IconButton iconName={item.iconName} onClickCallback={item.clickCallback} tooltip={item.tooltip}/>
           })
         }
       </>

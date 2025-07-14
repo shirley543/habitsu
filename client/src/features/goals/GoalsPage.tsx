@@ -29,10 +29,10 @@ export const GoalsPage = () => {
             <YearDropdown selectedYear={selectedYear} onSelect={(year) => {
               setSelectedYear(year)
             }} />
-            <IconButton iconName="settings" onClickCallback={() => {
+            <IconButton iconName="settings" tooltip="Settings" onClickCallback={() => {
               navigate({ to: '/settings' })
             }} />
-            <IconButton iconName="plus" onClickCallback={() => {
+            <IconButton iconName="plus" tooltip="Create Goal" onClickCallback={() => {
               navigate({ to: '/goals/create' })
             }} />
           </>

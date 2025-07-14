@@ -27,7 +27,7 @@ export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {
         <div className="circle w-[12px] h-[12px] shrink-0 rounded-4xl" style={{backgroundColor: `#${goal.colour}`}}></div>
         <h2 className="title w-full text-sm font-semibold">{goal.title}</h2>
         <div className="buttons flex flex-row gap-1">
-          <IconButton iconName={true ? "eye" : "eye-off" } onClickCallback={onEyeButtonClick}/>
+          <IconButton iconName={true ? "eye" : "eye-off" } tooltip={true ? "Show" : "Hide"} onClickCallback={onEyeButtonClick}/>
         </div>
       </div>
     </div>

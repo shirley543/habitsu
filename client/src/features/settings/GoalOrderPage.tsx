@@ -39,8 +39,8 @@ export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardPro
       <div className="titleButtons w-full px-2.5 py-2 flex flex-row gap-2 items-center">
         <h2 className="title w-full text-sm font-semibold">{goal.title}</h2>
         <div className="buttons flex flex-row gap-1">
-        <IconButton iconName="arrow-up" onClickCallback={onUpClick}/>
-        <IconButton iconName="arrow-down" onClickCallback={onDownClick}/>
+        <IconButton iconName="arrow-up" tooltip="Move Up" onClickCallback={onUpClick}/>
+        <IconButton iconName="arrow-down" tooltip="Move Down" onClickCallback={onDownClick}/>
         </div>
       </div>
     </div>

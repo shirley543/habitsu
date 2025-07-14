@@ -1,4 +1,5 @@
 import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
+import IconButton from "@/components/custom/IconButton";
 import { Button } from "@/components/ui/button";
 import { CalendarDays } from "lucide-react";
 
@@ -24,9 +25,10 @@ const YearDropdown: React.FC<YearDropdownProps> = ({ selectedYear, onSelect }) =
           onSelect(itemValue); 
         }}
       >
-        <Button variant="secondary" size="icon">
+        <IconButton iconName="calendar-days" tooltip="Select Year"  onClickCallback={() => {}}/>
+        {/* <Button variant="secondary" size="icon">
           <CalendarDays />
-        </Button>
+        </Button> */}
       </DropdownMenuCheckboxes>
     </div>
   )

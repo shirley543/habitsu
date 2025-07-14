@@ -66,18 +66,18 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, descri
         <GoalIconText title={title} description={description} baseColour={goalData.colour} iconName={iconName} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
-          <IconButton iconName="pencil" onClickCallback={() => {
+          <IconButton iconName="pencil" tooltip="Edit Goal" onClickCallback={() => {
             if (goalId) {
               navigate({ to: '/goals/$goalId/edit', params: { goalId: goalId.toString() } })
             } else {
               console.log("Undefined goal ID")
             }
           }}/>
-          <IconButton iconName="square-plus" onClickCallback={() => {
+          <IconButton iconName="square-plus" tooltip="Log Today" onClickCallback={() => {
             // Log today: check whether today's date has an entry or not
             navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
           }}/>
-          <IconButton iconName="square-chevron-right" onClickCallback={() => {
+          <IconButton iconName="square-chevron-right" tooltip="Goal Details" onClickCallback={() => {
             navigate(
               {
                 to: '/goals/$goalId', 
@@ -127,11 +127,11 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
         <YearDropdown selectedYear={selectedYear} onSelect={onCalendarSelect} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
-          <IconButton iconName="calendar-plus" onClickCallback={() => {
+          <IconButton iconName="calendar-plus" tooltip="Log Date" onClickCallback={() => {
             console.log("Clicked on goal details card > calendar select for choosing which day to modify")
             // TODOsss: open calendar to choose which day to get stuff. Need entries data to populate data...
           }}/>
-          <IconButton iconName="square-plus" onClickCallback={() => {
+          <IconButton iconName="square-plus" tooltip="Log Today" onClickCallback={() => {
             navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
           }}/>
         </div>
