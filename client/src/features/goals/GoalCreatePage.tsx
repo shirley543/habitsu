@@ -35,7 +35,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const { error: editError, mutate: updateGoalMutateFn } = useUpdateGoalMutation();
   const { error: deleteError, mutate: deleteGoalMutateFn } = useDeleteGoalMutation();
 
-  const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
+  const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
 
   const navigateBack = () => {
     if (canGoBack) {
@@ -55,14 +55,20 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         createGoalMutateFn(value, 
           {
             onSuccess: navigateBack,
-            onError: (error) => setDisplayedError(error),
+            onError: (error) => setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.FormSubmissionFailed
+            }),
           }
         );
       } else {
         if (defaultValues?.id) {
           updateGoalMutateFn({ id: defaultValues?.id, update: value }, {
             onSuccess: navigateBack,
-            onError: (error) => setDisplayedError(error),
+            onError: (error) => setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.FormSubmissionFailed
+            }),
           })
         }
       }
@@ -73,7 +79,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     if (defaultValues?.id) {
       deleteGoalMutateFn(defaultValues.id, {
         onSuccess: navigateBack,
-        onError: (error) => setDisplayedError(error),
+        onError: (error) => setDisplayedError({
+          error: error,
+          category: ErrorDialogCategory.FormSubmissionFailed
+        }),
       })
     }
   }
@@ -178,16 +187,16 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
 
         <div className="flex flex-row justify-end">
           <form.AppForm>
-            <Button type="button" variant={'ghostDestructive'} onClick={handleDelete}>
+            {!isCreate && <Button type="button" variant={'ghostDestructive'} onClick={handleDelete}>
               Delete
-            </Button>
+            </Button>}
             <form.SubscribeButton label={isCreate ? "Create" : "Save"} />
           </form.AppForm>
         </div>
       </form>
       {(displayedError) && <ErrorDialogComponent
-        error={displayedError}
-        category={ErrorDialogCategory.FormSubmissionFailed}
+        error={displayedError.error}
+        category={displayedError.category}
         isShow={displayedError !== undefined}
         onClose={() => { 
           setDisplayedError(undefined) 

@@ -42,6 +42,7 @@ function ErrorBodyComponent({ error, onRefreshClick, onBackClick }: ErrorBodyCom
 export enum ErrorDialogCategory {
   FormSubmissionFailed = 'form-submission-failed',
   SettingChangeFailed = 'setting-change-failed',
+  DeleteFailed = 'delete-failed',
 }
 
 interface ErrorDialogComponentProps extends ErrorBaseProps {
@@ -62,7 +63,8 @@ function ErrorDialogComponent({ error, category, isShow, onClose }: ErrorDialogC
 
   const ERROR_DIALOG_STRINGS: Record<ErrorDialogCategory, { title: string, description: string }> = {
     [ErrorDialogCategory.FormSubmissionFailed]: { title: "Form Submission Failed", description: descriptionText },
-    [ErrorDialogCategory.SettingChangeFailed]: { title: "Setting Change Failed", description: descriptionText }
+    [ErrorDialogCategory.SettingChangeFailed]: { title: "Setting Change Failed", description: descriptionText },
+    [ErrorDialogCategory.DeleteFailed]: { title: "Item Deletion Failed", description: descriptionText }
   }
 
   return (
