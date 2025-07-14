@@ -1,6 +1,7 @@
 import { Button } from "../ui/button"
 import { DynamicIcon, type IconName } from "lucide-react/dynamic"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import React from "react";
 
 interface IconButtonProps {
   iconName: IconName,
@@ -37,4 +38,4 @@ const IconButton: React.ForwardRefRenderFunction<HTMLButtonElement, IconButtonPr
   )
 }
 
-export default IconButton;
+export default React.forwardRef(IconButton);
