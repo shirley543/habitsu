@@ -175,7 +175,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
             backgroundColor: cellColor,
           }}
           onClick={() => {
-            navigateToCreateOrEdit(goalData.id, entryData, navigate);
+            navigateToCreateOrEdit(goalData.id, entryData, date, navigate);
           }}
         />
       }

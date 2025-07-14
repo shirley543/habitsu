@@ -1,7 +1,7 @@
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { getRouteApi, useNavigate, useRouterState } from '@tanstack/react-router';
 import { GoalQuantifyType, type GoalEntryResponse, CreateGoalEntrySchema } from '@habit-tracker/shared';
 import { useCreateGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
@@ -13,17 +13,18 @@ interface EntryFormProps {
   goalId: number;
   goalType: GoalQuantifyType;
   goalUnit: string;
+  entryDate?: Date;
   defaultValues?: GoalEntryResponse;
 }
 
-const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalUnit, defaultValues }) => {
+const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalUnit, entryDate, defaultValues }) => {
   const navigate = useNavigate();
 
   const initialValues = defaultValues ? {
     ...defaultValues,
     entryDate: (new Date(defaultValues.entryDate)).toISOString().split('T')[0]
   } : {
-    entryDate: (new Date()).toISOString().split('T')[0],
+    entryDate: (entryDate || new Date()).toISOString().split('T')[0],
     note: '',
   } as {
     entryDate: string,
@@ -119,11 +120,21 @@ export function EntryCreatePage() {
   const route = getRouteApi('/goals_/$goalId_/entries/create');
   const { goalId: goalId } = route.useParams();
 
+  const locationState = useRouterState({ select: (s) => s.location.state });
+  const dateStr = locationState?.date;
+  const date = dateStr ? new Date(dateStr) : undefined;
+
   const { data: goalData, isLoading: goalIsLoading, error: goalError } = useGoal(goalId);
 
   return (
     <>
-      {!goalIsLoading && goalData && <EntryForm isCreate={true} goalId={goalData.id} goalType={goalData.goalType} goalUnit={goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : ''} />}
+      {!goalIsLoading && goalData && <EntryForm
+        isCreate={true}
+        goalId={goalData.id}
+        goalType={goalData.goalType}
+        goalUnit={goalData.goalType === GoalQuantifyType.Numeric ? goalData.numericUnit : ''}
+        entryDate={date}
+      />}
     </>
   )
 }

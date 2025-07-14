@@ -37,6 +37,16 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
   )
 }
 
+const findExistingEntryAndTodayDate = (goalEntries: Array<GoalEntryResponse> | undefined) => {
+  const todayDate = new Date();
+  const todayDateStr = (todayDate).toDateString();
+  const existingEntryToday = goalEntries && goalEntries?.find((entry) => {
+    const entryDate = new Date(entry.entryDate);
+    const entryDateStr = entryDate.toDateString();
+    return entryDateStr === todayDateStr
+  });
+  return { existingEntryToday, todayDate };
+}
 
 /**
  * Goal Card Descriptive-type: 
@@ -52,12 +62,7 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, descri
   const navigate = useNavigate()
   const goalId = goalData.id;
   const { data: goalEntries } = useGoalEntries({ goalId: goalId, year: selectedYear });
-
-  const existingEntryToday = goalEntries && goalEntries?.find((entry) => {
-    const entryDateStr = (new Date(entry.entryDate)).toDateString();
-    const todayDateStr = (new Date()).toDateString();
-    return entryDateStr === todayDateStr
-  });
+  const { existingEntryToday, todayDate } = findExistingEntryAndTodayDate(goalEntries);
 
   const descriptionTypeContent = (() => {
     return <>
@@ -75,7 +80,7 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, descri
           }}/>
           <IconButton iconName="square-plus" tooltip="Log Today" onClickCallback={() => {
             // Log today: check whether today's date has an entry or not
-            navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
+            navigateToCreateOrEdit(goalId, existingEntryToday, todayDate, navigate)
           }}/>
           <IconButton iconName="square-chevron-right" tooltip="Goal Details" onClickCallback={() => {
             navigate(
@@ -113,12 +118,7 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
   const navigate = useNavigate()
   const goalId = goalData.id;
   const { data: goalEntries } = useGoalEntries({ goalId: goalId, year: selectedYear });
-
-  const existingEntryToday = goalEntries && goalEntries?.find((entry) => {
-    const entryDateStr = (new Date(entry.entryDate)).toDateString();
-    const todayDateStr = (new Date()).toDateString();
-    return entryDateStr === todayDateStr
-  });
+  const { existingEntryToday, todayDate } = findExistingEntryAndTodayDate(goalEntries);
 
   const controlOnlyTypeContent = ((() => {
     return <>
@@ -132,7 +132,7 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
             // TODOsss: open calendar to choose which day to get stuff. Need entries data to populate data...
           }}/>
           <IconButton iconName="square-plus" tooltip="Log Today" onClickCallback={() => {
-            navigateToCreateOrEdit(goalId, existingEntryToday, navigate)
+            navigateToCreateOrEdit(goalId, existingEntryToday, todayDate, navigate)
           }}/>
         </div>
       </div>

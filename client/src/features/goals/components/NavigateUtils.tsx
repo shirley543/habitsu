@@ -9,9 +9,10 @@ import type { UseNavigateResult } from "@tanstack/react-router"
  * Navigate to create entry or edit entry page, based on presence of an existing entry
  * @param goalId 
  * @param existingEntry 
+ * @param selectedDate 
  * @param navigate 
  */
-export const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryResponse | undefined, navigate: UseNavigateResult<string>) => {
+export const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryResponse | undefined, selectedDate: Date | undefined, navigate: UseNavigateResult<string>) => {
   if (existingEntry) {
     navigate({
       to: '/goals/$goalId/entries/$entryId/edit', 
@@ -24,6 +25,7 @@ export const navigateToCreateOrEdit = (goalId: number, existingEntry: GoalEntryR
     navigate({
       to: '/goals/$goalId/entries/create', 
       params: { goalId: goalId.toString() },
+      state: { date: selectedDate?.toISOString() }
     })
   }
 }

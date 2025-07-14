@@ -29,7 +29,6 @@ declare module '@tanstack/react-router' {
   }
   interface HistoryState {
     date?: string,
-    goal?: { id: number, units: string }
   }
 }
 
