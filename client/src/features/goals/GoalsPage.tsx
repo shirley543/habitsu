@@ -10,6 +10,7 @@ import { GoalQuantifyType } from "@habit-tracker/shared";
 import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
+import Calendar14 from "@/components/calendar-14";
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
 // TODOss: lazy loading/ infinite scroll results
@@ -21,6 +22,7 @@ export const GoalsPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
+      <Calendar14 />
       {/* Topbar slotted */}
       <TopBarSlotted
         title="Goals List"
