@@ -28,7 +28,6 @@ interface BaseInterface {
 
 interface BooleanInterface extends BaseInterface {
   goalType: GoalQuantifyType.Boolean;
-  booleanValue: boolean;
 }
 
 interface NumericalInterface extends BaseInterface {
@@ -47,7 +46,7 @@ const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
 export const GoalEntryTypePartialSchema = 
   z.object({
-    numericValue: z.number().nullable()
+    numericValue: z.number().nullable().optional()
   })
 
 

@@ -65,7 +65,7 @@ export type GoalResponse = z.infer<typeof GoalResponseSchema>;
 
 export const GoalEntryTypePartialSchema = 
   z.object({
-    numericValue: z.number().nullable()
+    numericValue: z.number().nullable().optional()
   })
 
 
