@@ -78,7 +78,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const handleDelete = () => {
     if (defaultValues?.id) {
       deleteGoalMutateFn(defaultValues.id, {
-        onSuccess: navigateBack,
+        onSuccess: () => navigate({ to: '/goals' }),
         onError: (error) => setDisplayedError({
           error: error,
           category: ErrorDialogCategory.FormSubmissionFailed
