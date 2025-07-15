@@ -99,7 +99,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
     }, {});
   }
 
-  const currentYear = new Date().getFullYear();
+  const calendarYear = searchParams?.year || new Date().getFullYear();
   return (
     <Calendar
       mode="single"
@@ -117,8 +117,8 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
       modifiersStyles={modifiersStyles}
       modifiersClassNames={modifiersClassNames}
       captionLayout="dropdown-months"
-      startMonth={new Date(searchParams?.year || currentYear, 0)}
-      endMonth={new Date(searchParams?.year || currentYear, 11)}
+      startMonth={new Date(calendarYear, 0)}
+      endMonth={new Date(calendarYear, 11)}
       showOutsideDays={true}
     />
   )
