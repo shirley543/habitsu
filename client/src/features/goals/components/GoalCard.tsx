@@ -32,7 +32,7 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
   
   return (
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
-    <div className="goal-card max-w-full w-fit bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
+    <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {contentSlot}
       {isLoading && <SkeletonHeatmap />}
       {entriesData && <Heatmap entriesData={entriesData} goalData={goalData} year={selectedYear}/>}
