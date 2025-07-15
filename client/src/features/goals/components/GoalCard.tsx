@@ -1,12 +1,15 @@
-import  { Heatmap, SkeletonHeatmap, type ColourGoalData } from "./Heatmap";
+import  { Heatmap, SkeletonHeatmap } from "./Heatmap";
 import { type IconName } from 'lucide-react/dynamic';
 import { GoalIconText, SkeletonGoalIconText } from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
-import { useNavigate, type UseNavigateResult } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
 import { useGoalEntries } from "../GoalApi";
-import type { GoalEntryResponse, GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
+import type { GoalEntryResponse, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 import { navigateToCreateOrEdit } from "./NavigateUtils";
+import type { ColourGoalData } from "@/lib/colourUtils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import EntryCalendar from "./EntryCalendar";
 
 export type GoalCardGoalData = ColourGoalData;
 
@@ -26,7 +29,6 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
     year: selectedYear,
   }
   const { data: entriesData, isLoading, error } = useGoalEntries(searchParams);
-  console.log("Entries data", entriesData)
   
   return (
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
@@ -128,10 +130,17 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
         <YearDropdown selectedYear={selectedYear} onSelect={onCalendarSelect} />
         {/* Buttons */}
         <div className="buttons-container flex flex-row gap-1">
-          <IconButton iconName="calendar-plus" tooltip="Log Date" onClickCallback={() => {
-            console.log("Clicked on goal details card > calendar select for choosing which day to modify")
-            // TODOsss: open calendar to choose which day to get stuff. Need entries data to populate data...
-          }}/>
+          <Popover>
+            <PopoverTrigger asChild>
+              <IconButton iconName="calendar-plus" tooltip="Log Date" />
+            </PopoverTrigger>
+            <PopoverContent>
+              <EntryCalendar goalId={goalId} searchParams={{
+                goalId: goalId,
+                year: selectedYear,
+              }} />
+            </PopoverContent>
+          </Popover>
           <IconButton iconName="square-plus" tooltip="Log Today" onClickCallback={() => {
             navigateToCreateOrEdit(goalId, existingEntryToday, todayDate, navigate)
           }}/>

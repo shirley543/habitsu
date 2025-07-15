@@ -6,7 +6,7 @@ import React from "react";
 interface IconButtonProps {
   iconName: IconName,
   tooltip?: string,
-  onClickCallback: () => void;
+  onClickCallback?: () => void;
 }
 
 /**

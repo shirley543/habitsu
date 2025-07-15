@@ -66,7 +66,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
           modifierConfigs = [{
             name: `modifierFull`,
             dates: entriesData?.map((entry) => new Date(entry.entryDate)) || [],
-            colour: goalData.colour,
+            colour: `#${goalData.colour}`,
           }]
         }
         break;

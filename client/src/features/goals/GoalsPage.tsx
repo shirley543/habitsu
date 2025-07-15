@@ -4,13 +4,10 @@ import { TopBarSlotted } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
 import IconButton from "@/components/custom/IconButton";
 import { YearDropdown } from "./components/YearDropdown";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useGoals } from "./GoalApi";
-import { GoalQuantifyType } from "@habit-tracker/shared";
-import { CircleAlert } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
-import EntryCalendar from "./components/EntryCalendar";
+
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
 // TODOss: lazy loading/ infinite scroll results
@@ -22,10 +19,6 @@ export const GoalsPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <EntryCalendar goalId={11} searchParams={{
-        year: 2025,
-        goalId: 11,
-      }} />
       {/* Topbar slotted */}
       <TopBarSlotted
         title="Goals List"
