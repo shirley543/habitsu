@@ -26,6 +26,7 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
     year: selectedYear,
   }
   const { data: entriesData, isLoading, error } = useGoalEntries(searchParams);
+  console.log("Entries data", entriesData)
   
   return (
     // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
