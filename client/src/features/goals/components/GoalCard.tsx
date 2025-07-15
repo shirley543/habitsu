@@ -1,4 +1,4 @@
-import  { Heatmap, SkeletonHeatmap, type HeatmapGoalData } from "./Heatmap";
+import  { Heatmap, SkeletonHeatmap, type ColourGoalData } from "./Heatmap";
 import { type IconName } from 'lucide-react/dynamic';
 import { GoalIconText, SkeletonGoalIconText } from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
@@ -8,7 +8,7 @@ import { useGoalEntries } from "../GoalApi";
 import type { GoalEntryResponse, GoalQuantifyType, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 import { navigateToCreateOrEdit } from "./NavigateUtils";
 
-export type GoalCardGoalData = HeatmapGoalData;
+export type GoalCardGoalData = ColourGoalData;
 
 /**
  * Goal card base:

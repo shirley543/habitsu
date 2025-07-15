@@ -5,7 +5,7 @@ import { getRouteApi, useNavigate, useRouterState } from '@tanstack/react-router
 import { GoalQuantifyType, type GoalEntryResponse, CreateGoalEntrySchema } from '@habit-tracker/shared';
 import { useCreateGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
-import { capitalizeFirstLetter } from '@/lib/stringManips';
+import { capitalizeFirstLetter } from '@/lib/stringUtils';
 
 
 interface EntryFormProps {

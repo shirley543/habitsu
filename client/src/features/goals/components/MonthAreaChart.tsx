@@ -11,7 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { capitalizeFirstLetter } from "@/lib/stringManips"
+import { capitalizeFirstLetter } from "@/lib/stringUtils"
 import { monthsOfYear } from "@/lib/dateUtils"
 
 interface MonthAreaChartData {

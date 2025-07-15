@@ -1,14 +1,15 @@
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import HoverPopover from '@/components/custom/HoverPopup';
-import * as d3 from 'd3';
 import { forwardRef, useEffect, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
-import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
+import { GoalQuantifyType, type GoalEntryResponse } from '@habit-tracker/shared';
 import { Skeleton } from '@/components/ui/skeleton';
 import { daysOfWeekShort, getPartialDaysOfWeekShort, monthsOfYearShort } from '@/lib/dateUtils';
 import { useNavigate } from '@tanstack/react-router';
 import { navigateToCreateOrEdit } from './NavigateUtils';
+import { computeCellColour, type ColourGoalData } from '@/lib/colourUtils';
+import { getEntryDataForDate } from '../EntryUtils';
 
 /**
  * Public types
@@ -17,11 +18,6 @@ export enum HeatmapDisplayState {
   WITH_LABELS = 'with-labels',
   NO_LABELS = 'no-labels',
 }
-
-export type HeatmapGoalData = Pick<GoalResponse, 'id' | 'colour'> & (
-  | ({ goalType: GoalQuantifyType.Numeric } & Pick<Extract<GoalResponse, { goalType: GoalQuantifyType.Numeric }>, 'numericTarget' | 'numericUnit'>)
-  | ({ goalType: GoalQuantifyType.Boolean })
-);
 
 /**
  * Private functions
@@ -57,7 +53,7 @@ function getDaysInYear(year: number) {
 
 interface CellProps {
   date: Date,
-  goalData: HeatmapGoalData,
+  goalData: ColourGoalData,
   entryData: GoalEntryResponse | undefined,
 }
 
@@ -95,66 +91,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
 ) => {
   const navigate = useNavigate();
 
-  /**
-   * Function for converting value to a color shade
-   * 
-   * @param baseColor - Base color for representing full/ 100% progress on a gridcell
-   * @param threshold - Threshold for value, used for representing full/ 100% progress
-   * @param value - Value to convert
-   * @return - Color shade for given value
-   */
-  const computeBinnedColour = (baseColor: string, threshold: number, value: number) => {
-    // Using threshold, compute 3 equal "bins"
-    // e.g. if threshold is 30, then bin array would be:
-    // [ 10, 20, 30 ]
-    const baseColorFullOpacity = `#${baseColor}FF`;
-    const baseColorNoOpacity = `#${baseColor}00`;
-    const colorInterpolate = d3.interpolate(baseColorNoOpacity, baseColorFullOpacity);
-
-    const BIN_COUNT = 3;
-    const binIncrement = threshold / BIN_COUNT;
-
-    const binArray: number[] = [];
-    for (let i = 1; i <= BIN_COUNT; i++) {
-      binArray.push(binIncrement * i);
-    }
-
-    // Using base color, compute 4 colors for range with changing opacity
-    // e.g. if base color is rgb(255, 0, 0), then color array would be:
-    // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)', 
-    //  'rgba(255, 0, 0, 0.75)', 'rgb(255, 0, 0)']
-    const COLOR_COUNT = BIN_COUNT + 1;
-    const colorArray: string[] = [];
-    for (let i = 1; i <= COLOR_COUNT; i++) {
-      const idx = i / COLOR_COUNT;
-      colorArray.push(colorInterpolate(idx));
-    }
-
-    // Convert value to color
-    const domain = binArray; // Thresholds
-    const range = colorArray; // Values for each threshold
-    const thresholdScale = d3.scaleThreshold(domain, range);
-    const colorShade = thresholdScale(value);
-    return colorShade;
-  }
-
-  const cellColor: string = (() => {
-    const NO_ENTRY_COLOUR = '#F5F5F5' ///< Neutral/100
-    switch (goalData.goalType) {
-      case GoalQuantifyType.Numeric: {
-        const color = (goalData?.numericTarget && entryData?.numericValue) ? 
-          computeBinnedColour(goalData.colour, goalData.numericTarget, entryData?.numericValue) 
-          : NO_ENTRY_COLOUR;
-        return color;
-      }
-
-      case GoalQuantifyType.Boolean: {
-        const color = entryData ? computeBinnedColour(goalData.colour, 1, entryData ? 1 : 0)
-          : NO_ENTRY_COLOUR;
-        return color;
-      }
-    }
-  })();
+  const cellColor: string = computeCellColour(goalData, entryData);
 
   const labelText: string = (() => {
     const NO_ENTRY_TEXT = "No entry";
@@ -162,7 +99,9 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       case GoalQuantifyType.Numeric:
         return entryData?.numericValue ? `${entryData?.numericValue} ${goalData.numericUnit}` : NO_ENTRY_TEXT;
       case GoalQuantifyType.Boolean:
-        return entryData ? "Completed" : NO_ENTRY_TEXT
+        return entryData ? "Completed" : NO_ENTRY_TEXT;
+      default:
+        return "Unknown"
     }
   })()
 
@@ -200,7 +139,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
  */
 
 interface HeatmapProps {
-  goalData: HeatmapGoalData,
+  goalData: ColourGoalData,
   entriesData: Array<GoalEntryResponse>,
   year: number,
   displayState?: HeatmapDisplayState
@@ -233,12 +172,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayS
       return newDate;
     })();
 
-    const entryDataForCell = entriesData.find((entry) => {
-      const entryDate = new Date(entry.entryDate);
-      const entryDateWithoutTime = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-      const cellDateWithoutTime = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
-      return entryDateWithoutTime.getTime() === cellDateWithoutTime.getTime()
-    });
+    const entryDataForCell = getEntryDataForDate(entriesData, cellDate);
     const isCellForTodaysDate = cellDate.getTime() === today.getTime();
 
     return <Cell key={`cell_${idx}`} date={cellDate} 

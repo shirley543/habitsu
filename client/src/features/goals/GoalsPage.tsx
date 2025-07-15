@@ -22,7 +22,7 @@ export const GoalsPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <EntryCalendar searchParams={{
+      <EntryCalendar goalId={11} searchParams={{
         year: 2025,
         goalId: 11,
       }} />
