@@ -8,11 +8,13 @@ import { navigateToCreateOrEdit } from "./NavigateUtils";
 import { getEntryDataForDate } from "../EntryUtils";
 import { useNavigate } from "@tanstack/react-router";
 
-
+/**
+ * Modifier config, for grouping modifier-related properties
+ */
 interface ModifierConfig {
-  name: string,
-  dates: Date[],
-  colour: string,
+  name: string,     ///< Name key for modifiers struct, e.g. `modifier0` = low entry progress modifier, `modifierFull`
+  dates: Date[],    ///< Dates associated with the modifier e.g. dates with low entry progress
+  colour: string,   ///< Colour to represent/ indicate the modifier e.g. colour shade to denote low entry progress dates (border colour of Calendar's Day Button)
 }
 
 interface EntryCalendarProps {
@@ -31,12 +33,9 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
   const { data: goalData } = useGoal(goalId.toString());
   const { data: entriesData, isLoading, error } = useGoalEntries(searchParams);
 
-  let lowProgressDates: Date[] = [];
-  let medProgressDates: Date[] = [];
-  let highProgressDates: Date[] = [];
-  let fullProgressDates: Date[] = [];
-
-
+  let modifiers = {};
+  let modifiersStyles = {};
+  let modifiersClassNames = {};
   if (goalData) {
     // Compute modifier configs
     let modifierConfigs: ModifierConfig[] = [];
@@ -49,7 +48,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
               if (idx === 0) {
                 return entry.numericValue && entry.numericValue < binArray[idx]
               } else if (idx === (colorArray.length - 1)) {
-                return entry.numericValue && entry.numericValue >= binArray[idx]
+                return entry.numericValue && entry.numericValue >= binArray[idx - 1]
               } else {
                 return entry.numericValue && entry.numericValue < binArray[idx] && entry.numericValue >= binArray[idx - 1]
               }
@@ -60,16 +59,10 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
               colour: color,
             }
           })
-
-          lowProgressDates = entriesData?.filter((entry) => entry.numericValue && entry.numericValue < 10).map((entry) => new Date(entry.entryDate)) || []
-          medProgressDates = entriesData?.filter((entry) => entry.numericValue && entry.numericValue < 20 && entry.numericValue >= 10).map((entry) => new Date(entry.entryDate)) || []
-          highProgressDates = entriesData?.filter((entry) => entry.numericValue && entry.numericValue < 30 && entry.numericValue >= 20).map((entry) => new Date(entry.entryDate)) || []
-          fullProgressDates = entriesData?.filter((entry) => entry.numericValue && entry.numericValue >= 30 && entry.numericValue >= 5).map((entry) => new Date(entry.entryDate)) || []
         }
         break;
       case GoalQuantifyType.Boolean:
         {
-          fullProgressDates = entriesData?.map((entry) => new Date(entry.entryDate)) || [];
           modifierConfigs = [{
             name: `modifierFull`,
             dates: entriesData?.map((entry) => new Date(entry.entryDate)) || [],
@@ -79,23 +72,31 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
         break;
     }
 
-    // Compute reduced objects
-    // const modifiers = modifierConfigs.reduce((accumulator, currentValue, index) => {
-    //   (accumulator as any)[currentValue.name] = currentValue.dates;
-    //   return accumulator;
-    // });
+    // Compute reduced objects:
+    // * modifiers (dates e.g. 
+    //      for numeric goal type: `modifier0`, `1`, `2`, `3` = low, med, high, full entry-progress dates. 
+    //      for boolean goal type: `modifierFull` = entry-completed dates)
+    // * modifiers styles (CSS properties styles, for dynamic styles e.g. border colour)
+    // * modifiers class names (Tailwind CSS class names, for non-dynamic styles)
+    modifiers = modifierConfigs.reduce((obj, item) => Object.assign(obj, {
+      [item.name]: item.dates
+    }), {});
 
-    const modifiers = modifierConfigs.reduce((obj, item) => Object.assign(obj, { [item.name]: item.dates }), {})
-    console.log("modifiers", modifiers);
-  }
+    modifiersStyles = modifierConfigs.reduce((obj, item) => {
+      const styleClass: React.CSSProperties = {
+        borderColor: item.colour,
+      };
+      return Object.assign(obj, {
+        [item.name]: styleClass,
+      })
+    }, {});
 
-
-  
-
-  const modifiersStyles = {
-    lowProgress: {
-      borderColor: goalData?.colour,
-    }
+    modifiersClassNames = modifierConfigs.reduce((obj, item) => {
+      const className = "border-2 rounded-lg [&>button]:font-medium";
+      return Object.assign(obj, {
+        [item.name]: className,
+      })
+    }, {});
   }
 
   return (
@@ -111,20 +112,10 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) =
           navigateToCreateOrEdit(goalData.id, goalEntryForDate, date, navigate);
         }
       }}
-      modifiers={{
-        lowProgress: lowProgressDates,
-        medProgress: medProgressDates,
-        highProgress: highProgressDates,
-        fullProgress: fullProgressDates,
-      }}
-      modifiersClassNames={{
-        lowProgress: "border-2 border-[#FF0000]/10 rounded-lg [&>button]:font-medium",
-        medProgress: "border-2 border-[#FF0000]/15 rounded rounded-lg [&>button]:font-medium",
-        highProgress: "border-2 border-[#FF0000]/20 rounded rounded-lg [&>button]:font-medium",
-        fullProgress: "border-2 border-[#FF0000]/50 rounded rounded-lg [&>button]:font-medium",
-      }}
+      modifiers={modifiers}
+      modifiersStyles={modifiersStyles}
+      modifiersClassNames={modifiersClassNames}
       showOutsideDays={true}
-      className="rounded-lg border shadow-sm"
     />
   )
 }
