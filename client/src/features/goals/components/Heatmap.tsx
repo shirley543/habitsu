@@ -66,7 +66,7 @@ const cellVariants = cva(
         outlined: "border-solid border-black border-2"
       },
       size: {
-        default: "h-5 w-5 rounded-sm",
+        default: "h-3 w-3 rounded-xs",
         sm: "h-4 w-4 rounded-md",
         lg: "h-16 w-16 rounded-md",
       },
@@ -236,7 +236,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayS
 
   return (
     <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} 
-      grid-flow-col gap-1 w-full overflow-x-auto`
+      grid-flow-col gap-0.5 w-fit max-w-full overflow-x-auto`
     }>
       {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
       {finalWeekdayLabels}
