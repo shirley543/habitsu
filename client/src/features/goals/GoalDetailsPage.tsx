@@ -62,7 +62,7 @@ export const GoalDetailsPage = () => {
       />}
       {(goalData) && <>
         {/* Goal description container */}
-        <div className="header-container flex flex-row justify-between bg-white rounded-xl p-2.5 shadow-sm">
+        <div className="header-container flex flex-row justify-between items-center bg-white rounded-xl p-2.5 shadow-sm">
           <GoalIconText title={goalData.title} description={goalData.description} baseColour={goalData.colour} iconName={goalData.icon as IconName} />
           <div className="buttons-container flex flex-row gap-1">
             <IconButton iconName="pencil" tooltip="Edit Goal" onClickCallback={() => {

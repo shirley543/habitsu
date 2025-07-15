@@ -69,7 +69,7 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({ title, descri
 
   const descriptionTypeContent = (() => {
     return <>
-      <div className="header-container flex flex-row justify-between">
+      <div className="header-container flex flex-row justify-between items-center">
         {/* Icon and Text */}
         <GoalIconText title={title} description={description} baseColour={goalData.colour} iconName={iconName} />
         {/* Buttons */}
@@ -125,7 +125,7 @@ const GoalCardControlled: React.FC<GoalCardControlledProps> = ({ goalData, selec
 
   const controlOnlyTypeContent = ((() => {
     return <>
-      <div className="header-container flex flex-row justify-between">
+      <div className="header-container flex flex-row justify-between items-center">
         {/* Year and Calendar button */}
         <YearDropdown selectedYear={selectedYear} onSelect={onCalendarSelect} />
         {/* Buttons */}
