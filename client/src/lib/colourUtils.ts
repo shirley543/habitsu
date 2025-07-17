@@ -117,4 +117,11 @@ export const computeCellColour = (goalData: ColourGoalData, entryData: GoalEntry
 // Input: goalData (colour and numeric target)
 // Output: numeric bins. for filters (>= or <=)
 
-// TODOs: use useMemo at callsite to cache computation of bins and colour shades (dependent on goal only)
+// TODO list for 17-July-2025:
+// - [done] Create Pages: update styling of inputs, text areas, etc. to better reflect actual behaviour
+// - [done] delete entry: have delete button for EntryCreatePage
+// - loading component for details loading
+// - Goal order + visibility: add to Prisma schema, and logic for checking order is correct/ unique
+// - use useMemo at callsite to cache computation of bins and colour shades (dependent on goal only), to see if it helps performance
+// - Authentication... Auth0 since using at work? Lucia since simpler abstractions/ lets you do whatever you want? Auth.js since more popular (but mainly for Next.js?)
+//     - PassportJS (older but still?). I think: go with Passport JS (learn the basics with provided guides before jumping else where)

@@ -32,9 +32,9 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     icon: '',
   } as CreateGoalDto;
 
-  const { error: createError, mutate: createGoalMutateFn } = useCreateGoalMutation();
-  const { error: editError, mutate: updateGoalMutateFn } = useUpdateGoalMutation();
-  const { error: deleteError, mutate: deleteGoalMutateFn } = useDeleteGoalMutation();
+  const { mutate: createGoalMutateFn } = useCreateGoalMutation();
+  const { mutate: updateGoalMutateFn } = useUpdateGoalMutation();
+  const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation();
 
   const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
 
@@ -82,7 +82,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         onSuccess: () => navigate({ to: '/goals' }),
         onError: (error) => setDisplayedError({
           error: error,
-          category: ErrorDialogCategory.FormSubmissionFailed
+          category: ErrorDialogCategory.DeleteFailed
         }),
       })
     }

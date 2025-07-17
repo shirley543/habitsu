@@ -135,10 +135,10 @@ export class GoalEntriesController {
   @ApiOkResponse({ type: GoalEntryEntity })
   remove(
     @Param('goalId', ParseIntPipe) goalId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('entryId', ParseIntPipe) entryId: number,
   ) {
     // TODOsss: use goal ID to determine if:
     // - said goal ID is associated with the logged in user OR user has set both their profile public and that goal to be public (shows up on their profile)
-    return this.goalEntriesService.remove(goalId, id);
+    return this.goalEntriesService.remove(goalId, entryId);
   }
 }

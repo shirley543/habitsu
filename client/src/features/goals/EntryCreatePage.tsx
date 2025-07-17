@@ -3,9 +3,10 @@ import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate, useRouterState } from '@tanstack/react-router';
 import { GoalQuantifyType, type GoalEntryResponse, CreateGoalEntrySchema } from '@habit-tracker/shared';
-import { useCreateGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
+import { useCreateGoalEntryMutation, useDeleteGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { capitalizeFirstLetter } from '@/lib/stringUtils';
+import { Button } from '@/components/ui/button';
 
 
 interface EntryFormProps {
@@ -32,10 +33,31 @@ const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalU
     numericValue?: number | null
   }
 
-  const { error: createError, mutate: createGoalEntryMutateFn } = useCreateGoalEntryMutation();
-  const { error: editError, mutate: updateGoalEntryMutateFn } = useUpdateGoalEntryMutation();
+  const { mutate: createGoalEntryMutateFn } = useCreateGoalEntryMutation();
+  const { mutate: updateGoalEntryMutateFn } = useUpdateGoalEntryMutation();
+  const { mutate: deleteGoalEntryMutateFn } = useDeleteGoalEntryMutation();
 
-  const [displayedError, setDisplayedError] = useState<Error | undefined>(undefined);
+  const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
+
+  const handleDelete = () => {
+    if (defaultValues?.id) {
+      deleteGoalEntryMutateFn(
+        {
+          goalId: goalId,
+          entryId: defaultValues.id
+        },
+        {
+          onSuccess: () => navigate({ to: '/goals' }),
+          onError: (error) => {
+            setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.DeleteFailed
+            })
+          }
+        }
+      )
+    }
+  }
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -53,14 +75,20 @@ const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalU
         createGoalEntryMutateFn({ goalId: goalId, createDto: parsed }, 
           {
             onSuccess: () => navigate({ to: "/goals"}),
-            onError: (error) => setDisplayedError(error),
+            onError: (error) => setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.FormSubmissionFailed
+            }),
           }
         );
       } else {
         if (defaultValues?.id) {
           updateGoalEntryMutateFn({ goalId: goalId, entryId: defaultValues?.id, updateDto: parsed }, {
             onSuccess: () => navigate({ to: "/goals"}),
-            onError: (error) => setDisplayedError(error),
+            onError: (error) => setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.FormSubmissionFailed
+            }),
           })
         }
       }
@@ -100,13 +128,18 @@ const EntryForm: React.FC<EntryFormProps> = ({ isCreate, goalId, goalType, goalU
 
         <div className="flex justify-end">
           <form.AppForm>
+            {!isCreate && 
+              <Button type="button" variant={'ghostDestructive'} onClick={handleDelete}>
+                Delete
+              </Button>
+            }
             <form.SubscribeButton label={isCreate ? "Create" : "Save"} />
           </form.AppForm>
         </div>
       </form>
       {(displayedError) && <ErrorDialogComponent
-        error={displayedError}
-        category={ErrorDialogCategory.FormSubmissionFailed}
+        error={displayedError.error}
+        category={displayedError.category}
         isShow={displayedError !== undefined}
         onClose={() => { 
           setDisplayedError(undefined) 
