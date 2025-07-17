@@ -26,6 +26,7 @@ export class GoalsService {
         icon: createGoalDto.icon,
         publicity: createGoalDto.publicity,
         goalType: createGoalDto.goalType as GoalQuantify,
+        visibility: true,
         user: {
           connect: { id: userId }
         }

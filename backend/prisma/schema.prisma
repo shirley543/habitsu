@@ -39,6 +39,7 @@ model Goal {
   entries       GoalEntry[]
   userId        Int
   user          User          @relation(fields: [userId], references: [id])
+  visibility    Boolean
 }
 
 model GoalEntry {
@@ -57,3 +58,5 @@ model GoalEntry {
 
 // TODOs: Figure out if a Profile model is necessary (what summary stats to show)
 // Activity log? Number of days filled out a goal? Number of filled out gridcells total?
+
+// TODOs: add db indexes for faster querying

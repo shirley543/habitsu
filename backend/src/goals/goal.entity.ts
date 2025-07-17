@@ -36,5 +36,8 @@ export class GoalEntity implements Goal {
   numericUnit: string | null;
   
   @ApiProperty()
+  visibility: boolean;
+
+  @ApiProperty()
   userId: number;
 }
