@@ -39,7 +39,7 @@ model Goal {
   entries       GoalEntry[]
   userId        Int
   user          User          @relation(fields: [userId], references: [id])
-  visibility    Boolean
+  visibility    Boolean       @default(true)
 }
 
 model GoalEntry {

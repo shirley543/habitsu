@@ -12,13 +12,22 @@ interface GoalVisibilityCardProps {
 }
 
 export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {  
-  const { data, mutate: updateGoalMutateFn } = useUpdateGoalMutation();
+  const { data, mutate: updateGoalMutateFn, isPending } = useUpdateGoalMutation();
+  const isVisible = data ? data.visibility : goal.visibility;
 
   const onEyeButtonClick = () => {
-    // TODOss: uncomment once visibility field added to goal in db/ backend
-    // updateGoalMutateFn({ id: goal.id, update: { visibility: data.visibility || goal.visibility } }, {
-    //   onError: (error) => console.log(error),
-    // })
+    if (isPending) {
+      // Only send update if there's no update pending.
+      // TODOssss add debounce with setTimeout?
+      return;
+    }
+
+    updateGoalMutateFn({ id: goal.id, update: {
+      ...goal, ///< TODOsss: fix this hack (and other places where goal is updated; shouldn't need to send entire goal obj to satisfy discriminated union, just to toggle visibility... update zod schemas to try and split out common vs. discriminated update schemas)
+      visibility: !isVisible, ///< Toggle visible flag
+    } }, {
+      onError: (error) => console.log(error),
+    })
   }
 
   return (
@@ -27,7 +36,7 @@ export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {
         <div className="circle w-[12px] h-[12px] shrink-0 rounded-4xl" style={{backgroundColor: `#${goal.colour}`}}></div>
         <h2 className="title w-full text-sm font-semibold">{goal.title}</h2>
         <div className="buttons flex flex-row gap-1">
-          <IconButton iconName={true ? "eye" : "eye-off" } tooltip={true ? "Show" : "Hide"} onClickCallback={onEyeButtonClick}/>
+          <IconButton iconName={isVisible ? "eye" : "eye-off" } tooltip={isVisible ? "Show" : "Hide"} onClickCallback={onEyeButtonClick}/>
         </div>
       </div>
     </div>

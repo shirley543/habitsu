@@ -16,6 +16,8 @@ export const GoalsPage = () => {
   const [selectedYear, setSelectedYear] = useState<number>(2025)
 
   const { data, isLoading, error } = useGoals();
+  const displayedData = data?.filter((d) => d.visibility);
+  // TODOsss: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
   return (
     <div className="flex flex-col gap-3">
@@ -37,8 +39,8 @@ export const GoalsPage = () => {
         }
       />
       {/* Heatmaps container */}
-      {(data || isLoading) && <div className="flex flex-col gap-3">
-        {data && data.map((d) => {
+      {(displayedData || isLoading) && <div className="flex flex-col gap-3">
+        {displayedData && displayedData.map((d) => {
           return <GoalCardDescriptive
             key={`goalCard_${d.id}`}
             title={d.title}

@@ -26,7 +26,6 @@ export class GoalsService {
         icon: createGoalDto.icon,
         publicity: createGoalDto.publicity,
         goalType: createGoalDto.goalType as GoalQuantify,
-        visibility: true,
         user: {
           connect: { id: userId }
         }
@@ -64,6 +63,7 @@ export class GoalsService {
         icon: updateGoalDto.icon,
         publicity: updateGoalDto.publicity,
         goalType: updateGoalDto.goalType as GoalQuantify,
+        visibility: updateGoalDto.visibility,
       }
       switch (updateGoalDto.goalType) {
         case GoalQuantifyType.Boolean:

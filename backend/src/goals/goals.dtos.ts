@@ -61,6 +61,7 @@ export const BaseGoalSchema = z.object({
     .min(1, "Colour is required")
     .regex(/^[a-fA-F0-9]{6}$/, "Colour must be a valid 6-digit hex string"),
   publicity: GoalPublicityTypeSchema,
+  visibility: z.boolean().default(true),
 });
 
 export const GoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
