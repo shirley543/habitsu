@@ -12,6 +12,7 @@ import { RadioGroup as ShadcnRadioGroup, RadioGroupItem as ShadcnRadioGroupItem 
 import { Label } from '@/components/ui/label'
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
 import type { ChangeEvent } from 'react'
+import { cn } from '@/lib/utils'
 
 
 export const StandardIcons: IconName[] = [
@@ -53,7 +54,32 @@ export enum ColourEnum {
   Rose = "FB7185",
 }
 
+/**
+ * Wrapper around label component with style overrides
+ * @param label: Label string to display
+ * @returns: Form label component
+ */
+function StyledLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
+  return (
+    <Label
+      className={cn("mb-2", className)}
+      {...props}
+    />
+  )
+}
 
+const StyledInputClassName = "px-3 py-2 h-10 box-border bg-white border-none shadow-none w-full";
+function StyledInput({ className, ...props }: React.ComponentProps<typeof Input>) {
+  return (
+    <Input
+      className={cn(
+        StyledInputClassName,
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 export function SubscribeButton({ label }: { label: string }) {
   const form = useFormContext()
@@ -100,10 +126,10 @@ export function NumberField({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
-      <Input
+      </StyledLabel>
+      <StyledInput
         type="number"
         inputMode='numeric'
         value={field.state.value}
@@ -128,14 +154,15 @@ export function TextField({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
-        {label}
-      </Label>
-      <Input
+          <StyledLabel htmlFor={label}>
+      {label}
+    </StyledLabel>
+      <StyledInput
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
+        className="px-3 py-2 h-10 box-border bg-white border-none shadow-none"
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -156,9 +183,9 @@ export function TextArea({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
+      </StyledLabel>
       <ShadcnTextarea
         id={label}
         value={field.state.value}
@@ -184,10 +211,10 @@ export function DateField({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
-      <Input
+      </StyledLabel>
+      <StyledInput
         type="date"
         value={field.state.value}
         placeholder={placeholder}
@@ -214,15 +241,15 @@ export function Select({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
+      </StyledLabel>
       <ShadcnSelect.Select
         name={field.name}
         value={field.state.value}
         onValueChange={(value) => field.handleChange(value)}
       >
-        <ShadcnSelect.SelectTrigger className="w-full">
+        <ShadcnSelect.SelectTrigger className={StyledInputClassName}>
           <ShadcnSelect.SelectValue placeholder={placeholder} />
         </ShadcnSelect.SelectTrigger>
         <ShadcnSelect.SelectContent>
@@ -247,9 +274,9 @@ export function Slider({ label }: { label: string }) {
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
+      </StyledLabel>
       <ShadcnSlider
         id={label}
         onBlur={field.handleBlur}
@@ -274,7 +301,9 @@ export function Switch({ label }: { label: string }) {
           checked={field.state.value}
           onCheckedChange={(checked) => field.handleChange(checked)}
         />
-        <Label htmlFor={label}>{label}</Label>
+        <StyledLabel htmlFor={label}>
+          {label}
+        </StyledLabel>
       </div>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -289,14 +318,14 @@ export function RadioGroup({ label, values }: {
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <StyledLabel htmlFor={label}>
         {label}
-      </Label>
+      </StyledLabel>
       <ShadcnRadioGroup defaultValue={values[0].value} className="grid-cols-2" onValueChange={(value) => field.handleChange(value)}>
         {values.map((value) => (
           <div key={value.value} className="flex items-center space-x-2">
             <ShadcnRadioGroupItem key={value.value} value={value.value} />
-            <Label htmlFor={value.value}>{value.label}</Label>
+            <StyledLabel htmlFor={value.value}>{value.label}</StyledLabel>
           </div>
         ))}
       </ShadcnRadioGroup>
@@ -317,7 +346,9 @@ export function ColourSelect({ label }: { label: string }) {
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">{label}</Label>
+      <StyledLabel htmlFor={label}>
+        {label}
+      </StyledLabel>
       <div className="flex flex-row flex-wrap gap-1.5">
         {Object.values(ColourEnum).map((colourEnum) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
@@ -347,7 +378,9 @@ export function IconSelect({ label }: { label: string }) {
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">{label}</Label>
+      <StyledLabel htmlFor={label}>
+        {label}
+      </StyledLabel>
       <div className="flex flex-row flex-wrap gap-1.5">
         {StandardIcons.map((standardIcon) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
