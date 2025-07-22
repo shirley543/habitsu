@@ -16,7 +16,7 @@ export const GoalsPage = () => {
   const [selectedYear, setSelectedYear] = useState<number>(2025)
 
   const { data, isLoading, error } = useGoals();
-  const displayedData = data?.filter((d) => d.visibility);
+  const displayedData = data?.filter((d) => d.visibility).sort((a, b) => a.order - b.order);
   // TODOsss: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
   return (

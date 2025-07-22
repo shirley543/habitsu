@@ -75,7 +75,10 @@ export const ReorderGoalSchema = z.object({
 export const CreateGoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
 // TODOs: UpdateGoalSchema incorrect currently. To fix; numericTarget and numericUnits fields should be optional, but goal type should be required
 export const UpdateGoalSchema = BaseGoalSchema.partial().and(GoalTypeDiscriminatorSchema);
-export const GoalResponseSchema = (BaseGoalSchema.extend({ id: z.number() }).and(GoalTypeDiscriminatorSchema))
+export const GoalResponseSchema = (BaseGoalSchema.extend({
+  id: z.number(),
+  order: z.number(),
+}).and(GoalTypeDiscriminatorSchema))
 
 /**
  * Interfaces: Goals

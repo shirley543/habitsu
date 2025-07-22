@@ -182,7 +182,7 @@ export class GoalsService {
       if (reorderOrders.length === 1) {
         return true;
       }
-      for (let i = 0; i < reorderOrders.length; i++) {
+      for (let i = 1; i < reorderOrders.length; i++) {
         if (reorderOrders[i] - reorderOrders[i - 1] !== 1) {
           return false
         }

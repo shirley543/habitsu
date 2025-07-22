@@ -139,10 +139,6 @@ export function GoalOrderPage() {
     }
 
     const reorderData: ReorderGoalDto = goals.map((goal, idx) => ({ id: goal.id, order: idx + 1 }));
-
-    // TODOsssssss: fix bug here with reordering. + error handling/ display
-    console.log("reorder Data", reorderData)
-
     const result = ReorderGoalSchema.safeParse(reorderData);
     if (result.error?.issues) {
       console.log("TODOsss display these issues");
@@ -152,6 +148,7 @@ export function GoalOrderPage() {
         {
           onSuccess: navigateBack,
           onError: (error) => console.log("TODOsss error on reordering, to display", error)
+          // TODOss toast? Error modal?
         }
       );
     }

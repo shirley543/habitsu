@@ -31,6 +31,7 @@ export class GoalsController {
 
   @Get()
   @ApiOkResponse({ type: GoalEntity, isArray: true })
+  // TODOssss how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
   findAll() {
     return this.goalsService.findAll();
   }
