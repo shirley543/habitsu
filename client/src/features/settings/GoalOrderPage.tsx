@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 
-import type { GoalResponse } from "@habit-tracker/shared";
-import { useGoals } from "../goals/GoalApi";
+import { ReorderGoalSchema, type GoalResponse, type ReorderGoalDto } from "@habit-tracker/shared";
+import { useGoals, useReorderGoalsMutation } from "../goals/GoalApi";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
+import { Button } from "@/components/ui/button";
 
 interface GoalOrderCardProps {
   goal: GoalResponse,
@@ -50,8 +51,20 @@ export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardPro
 export function GoalOrderPage() {
   const navigate = useNavigate();
   const { data: goalsRaw, isLoading, error } = useGoals();
+  const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation();
 
   const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined);
+
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+
+  const navigateBack = () => {
+    if (canGoBack) {
+      router.history.back();
+    } else {
+      navigate({ to: "/settings"});
+    }
+  }
 
   // Update displayed goals data from goals raw 
   // (from backend) data once available
@@ -120,6 +133,30 @@ export function GoalOrderPage() {
     })
   }
 
+  function handleSave(): void {
+    if (goals === undefined) {
+      return;
+    }
+
+    const reorderData: ReorderGoalDto = goals.map((goal, idx) => ({ id: goal.id, order: idx + 1 }));
+
+    // TODOsssssss: fix bug here with reordering. + error handling/ display
+    console.log("reorder Data", reorderData)
+
+    const result = ReorderGoalSchema.safeParse(reorderData);
+    if (result.error?.issues) {
+      console.log("TODOsss display these issues");
+    } else {
+      // No issues during parsing, hence send to backend
+      reorderGoalsMutateFn(reorderData, 
+        {
+          onSuccess: navigateBack,
+          onError: (error) => console.log("TODOsss error on reordering, to display", error)
+        }
+      );
+    }
+  }
+
 
   // TODOsss DND:
   // - Fix bug where goal order card can be dragged out of bounds and resizes entire window
@@ -133,19 +170,24 @@ export function GoalOrderPage() {
       {error && <ErrorBodyComponent error={error} onRefreshClick={() => { console.log("on refresh click" )}}/>}
       {/* Order controls container */}
       {(goals && goalsIds) &&
-        <DndContext 
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={goalsIds}
-            strategy={verticalListSortingStrategy}
+        <>
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            {goals.map((goal) => (
-              <GoalOrderCard key={goal.id} goal={goal} onUpClick={() => handleUpClick(goal.id)} onDownClick={() => handleDownClick(goal.id)}/>
-            ))}
-          </SortableContext>
-        </DndContext>
+            <SortableContext items={goalsIds}
+              strategy={verticalListSortingStrategy}
+            >
+              {goals.map((goal) => (
+                <GoalOrderCard key={goal.id} goal={goal} onUpClick={() => handleUpClick(goal.id)} onDownClick={() => handleDownClick(goal.id)}/>
+              ))}
+            </SortableContext>
+          </DndContext>
+          <Button onClick={handleSave}>
+            Save
+          </Button>
+        </>
       }
     </div>
   )

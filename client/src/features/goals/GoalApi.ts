@@ -1,4 +1,4 @@
-import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto, UpdateGoalDto, CreateGoalEntryDto, UpdateGoalEntryDto } from "@habit-tracker/shared";
+import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto, UpdateGoalDto, CreateGoalEntryDto, UpdateGoalEntryDto, ReorderGoalDto } from "@habit-tracker/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
@@ -62,6 +62,16 @@ async function deleteGoal(goalId: number): Promise<{}> {
 export function useDeleteGoalMutation() {
   return useMutation({
     mutationFn: (goalId: number) => { return deleteGoal(goalId) },
+  })
+}
+
+async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<{}> {
+  return ky.post(`${BACKEND_BASE_URL}/goals/reorder`, { retry: KY_FETCH_RETRY_NUM, json: reorderGoal }).json();
+}
+
+export function useReorderGoalsMutation() {
+  return useMutation({
+    mutationFn: (reorder: ReorderGoalDto) => { return reorderGoals(reorder) },
   })
 }
 

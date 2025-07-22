@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalDto, UpdateGoalDto } from './goals.dtos';
+import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from './goals.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
@@ -141,4 +141,75 @@ export class GoalsService {
       return tx.goal.delete({ where: { id }})
     });
   }
+
+  async reorder(reorderGoalDto: ReorderGoalDto) {
+    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
+
+    // Expect all goals to be present (lengths same)
+    // Expect all IDs present
+    // Expect orders to be sequential (i.e. no gaps)
+    const usersGoals = await this.prisma.goal.findMany({
+      where: { userId },
+      orderBy: { 
+        id: 'asc'
+      }
+    });
+
+    if (usersGoals.length !== reorderGoalDto.length) {
+      throw new Error('Bad Request: Reorder goals length does not match goals length');
+    }
+
+    // Check IDs to reorder are the same as in users (existing) goals
+    // Note: ordering starts at 1
+    const usersGoalIds = usersGoals.map((goal) => goal.id).sort((a, b) => a - b);
+    const reorderGoalIds = reorderGoalDto.map((entry) => entry.id).sort((a, b) => a - b);
+    const areIdsEqual = (() => {
+      for (let i = 0; i < usersGoalIds.length; i++) {
+        if (usersGoalIds[i] !== reorderGoalIds[i]) {
+          return false
+        }
+      }
+      return true;
+    })();
+
+    if (!areIdsEqual) {
+      throw new Error('Bad Request: Invalid Goal IDs');
+    }
+
+    // Check orders are sequential
+    const reorderOrders = reorderGoalDto.map((entry) => entry.order).sort((a, b) => a - b);
+    const areOrdersSequential = (() => {
+      if (reorderOrders.length === 1) {
+        return true;
+      }
+      for (let i = 0; i < reorderOrders.length; i++) {
+        if (reorderOrders[i] - reorderOrders[i - 1] !== 1) {
+          return false
+        }
+      }
+      return true;
+    })();
+
+    if (!areOrdersSequential) {
+      throw new Error('Bad Request: Invalid Goal Orders')
+    }
+
+    // Use transaction to update order of all given entries
+    // Future work: Potentially evaluate performance of this:
+    //              Prisma does not allow for bulk `updateMany` across different IDs.
+    //              To see if raw SQL could be faster.
+    return await this.prisma.$transaction(async (tx) => {
+      for (const entry of reorderGoalDto) {
+        await tx.goal.update({
+          where: { id: entry.id },
+          data: { order: entry.order },
+        })
+      }
+    });
+  }
 }
+
+// TODOss 23-July-2025:
+// Handle goal order update passed in from frontend.
+// How to handle e.g. large number of goals being updated order-wise.
+// Diff them? Blindly trust their provided order?

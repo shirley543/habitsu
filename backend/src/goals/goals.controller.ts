@@ -11,7 +11,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
-import { CreateGoalDto, CreateGoalSchema, UpdateGoalDto, UpdateGoalSchema } from './goals.dtos';
+import { CreateGoalDto, CreateGoalSchema, ReorderGoalDto, ReorderGoalSchema, UpdateGoalDto, UpdateGoalSchema } from './goals.dtos';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
@@ -64,5 +64,12 @@ export class GoalsController {
   @ApiOkResponse({ type: GoalEntity })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.goalsService.remove(id);
+  }
+
+  @Post('/reorder')
+  @ApiOkResponse()
+  reorder(@Body(new ZodValidationPipe(ReorderGoalSchema)) reorderGoalDto: ReorderGoalDto)
+  {
+    return this.goalsService.reorder(reorderGoalDto);
   }
 }

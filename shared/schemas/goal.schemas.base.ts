@@ -45,6 +45,31 @@ export const BaseGoalSchema = z.object({
   visibility: z.boolean().default(true),
 });
 
+export const ReorderGoalSchema = z.object({
+  id: z.number(),
+  order: z.number()
+}).array().superRefine((data, ctx) => {
+  const ids = data.map(item => item.id);
+  const uniqueIds = new Set(ids);
+
+  if (ids.length !== uniqueIds.size) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Data array must have unique ids.`,
+    })
+  }
+
+  const orders = data.map(item => item.order);
+  const uniqueOrders = new Set(orders);
+
+  if (orders.length !== uniqueOrders.size) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Data array must have unique orders.`,
+    })
+  }
+})
+
 // --------------------
 
 export const CreateGoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
@@ -58,7 +83,7 @@ export const GoalResponseSchema = (BaseGoalSchema.extend({ id: z.number() }).and
 export type CreateGoalDto = z.infer<typeof CreateGoalSchema>;
 export type UpdateGoalDto = z.infer<typeof UpdateGoalSchema>;
 export type GoalResponse = z.infer<typeof GoalResponseSchema>;
-
+export type ReorderGoalDto = z.infer<typeof ReorderGoalSchema>;
 
 /**
  * Schemas: Goal Entries
