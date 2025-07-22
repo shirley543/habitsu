@@ -14,9 +14,21 @@ enum GoalQuantifyType {
 export class GoalsService {
   constructor(private prisma: PrismaService) {}
 
-  create(createGoalDto: CreateGoalDto) {
+  async create(createGoalDto: CreateGoalDto) {
     const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
     // TODOss error handling when user ID is not valid/ not found.
+
+    // Ordering: get current maximum order number for the user's goals,
+    // and use to determine their new goal's order number
+    const maxOrderNum = await this.prisma.goal.aggregate({
+      _max: {
+        order: true,
+      },
+      where: {
+        userId: userId,
+      }
+    });
+    const nextOrderNum = maxOrderNum._max.order ? maxOrderNum._max.order + 1 : 1;
 
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalCreateInput = {
@@ -26,6 +38,7 @@ export class GoalsService {
         icon: createGoalDto.icon,
         publicity: createGoalDto.publicity,
         goalType: createGoalDto.goalType as GoalQuantify,
+        order: nextOrderNum,
         user: {
           connect: { id: userId }
         }
@@ -84,7 +97,48 @@ export class GoalsService {
     });
   }
 
-  remove(id: number) {
-    return this.prisma.goal.delete({ where: { id } });
+  async remove(id: number) {
+    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
+    // TODOss error handling when user ID is not valid/ not found.
+
+    // Find goal to delete and validate ownership
+    const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
+      where: { id }
+    });
+
+    if (goalToDelete.userId !== userId) {
+      throw new Error('Unauthorized: Goal does not belong to user');
+    }
+
+    // Start transaction, so that if any fail entire batch is rolled back,
+    // to prevent e.g. delete failing but previous order updates
+    // were already completed
+    return await this.prisma.$transaction(async (tx) => {
+      // Ordering: determine goals to update based on 
+      // current goal being removed (e.g. goal with order 4 being removed, 
+      // hence goal with order 5 becomes 4, 6 becomes 5, etc)
+
+      // Get goals with order greater than goal to delete's order
+      const goalsToUpdate = await tx.goal.findMany({
+        where: {
+          userId,
+          order: {
+            gt: goalToDelete.order,
+          }
+        },
+        orderBy: { order: 'asc' }
+      });
+
+      // Update each goal's order by decreasing by one
+      for (const goal of goalsToUpdate) {
+        await tx.goal.update({
+          where: { id: goal.id },
+          data: { order: goal.order - 1 }
+        })
+      }
+
+      // Delete the goal
+      return tx.goal.delete({ where: { id }})
+    });
   }
 }

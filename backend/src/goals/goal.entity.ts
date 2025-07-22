@@ -39,5 +39,8 @@ export class GoalEntity implements Goal {
   visibility: boolean;
 
   @ApiProperty()
+  order: number;
+
+  @ApiProperty()
   userId: number;
 }

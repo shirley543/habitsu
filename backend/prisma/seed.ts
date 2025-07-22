@@ -25,6 +25,7 @@ async function main() {
             numericTarget: 6,
             numericUnit: 'cups',
             visibility: true,
+            order: 1,
             entries: {
               create: [
                 { entryDate: new Date('2025-01-01'), numericValue: 3 },
@@ -87,6 +88,7 @@ async function main() {
             publicity: GoalPublicity.PUBLIC,
             goalType: GoalQuantify.BOOLEAN,
             visibility: true,
+            order: 2,
             entries: {
               create: [
                 { entryDate: new Date('2025-01-01') },
@@ -151,6 +153,7 @@ async function main() {
             numericTarget: 30,
             numericUnit: 'minutes',
             visibility: true,
+            order: 3,
             entries: {
               create: [
                 // First streak (longest: 14 days)
