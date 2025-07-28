@@ -1,18 +1,28 @@
 import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
 
+import { config as loadEnv } from 'dotenv';
+import { envSchema } from 'src/env/env';
+
 const prisma = new PrismaClient()
 
 async function main() {
+  // Parse environment variables
+  loadEnv();
+  const parsed = envSchema.safeParse(process.env);
+  if (!parsed.success) {
+    console.error('Invalid environment variables:', parsed.error.format());
+    process.exit(1);
+  }
+  const env = parsed.data;
+
   // Clear existing data
   await prisma.goalEntry.deleteMany()
   await prisma.goal.deleteMany()
   await prisma.user.deleteMany()
 
-  const saltRounds: number = 10;
-  const hashedPassword = await bcrypt.hash('alicespassword', saltRounds);
-
   // Create a user
+  const hashedPassword = await bcrypt.hash('alicespassword', env.SALT_ROUNDS);
   const user = await prisma.user.create({
     data: {
       username: 'Alice',

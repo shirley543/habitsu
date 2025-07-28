@@ -29,7 +29,7 @@ export class AppController {
   }
 }
 
-// TODOs 28-July-2025 / 29-July-2025
+// TODOs 28-July-2025 / TODOs 29-July-2025
 // Figure out which routes to protect with JwtAuthGuard + how to handle profiles being:
 // - private (only goal's creator user, i.e. check logged in user is goal's creator user)
 // - public (profile visible to all users)
@@ -37,7 +37,4 @@ export class AppController {
 // - private (only shown on profile if profile viewer user is the creator)
 // - public (shown on profile for all users)
 // Refactor .env so that:
-// - there is type-safety
 // - there are local, dev, and prod versions of variables
-// - saltRounds is actually used
-
