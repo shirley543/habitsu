@@ -2,7 +2,7 @@ import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
 
 import { config as loadEnv } from 'dotenv';
-import { envSchema } from 'src/env/env';
+import { envSchema } from '../src/env/env';
 
 const prisma = new PrismaClient()
 
