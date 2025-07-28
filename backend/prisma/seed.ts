@@ -1,4 +1,5 @@
 import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client'
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient()
 
@@ -8,11 +9,15 @@ async function main() {
   await prisma.goal.deleteMany()
   await prisma.user.deleteMany()
 
+  const saltRounds: number = 10;
+  const hashedPassword = await bcrypt.hash('alicespassword', saltRounds);
+
   // Create a user
   const user = await prisma.user.create({
     data: {
-      name: 'Alice',
+      username: 'Alice',
       email: 'alice@example.com',
+      password: hashedPassword,
       goals: {
         create: [
           {
