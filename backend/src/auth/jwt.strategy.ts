@@ -1,14 +1,16 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(configService: ConfigService) {
+    const jwtSecret = configService.getOrThrow<string>('JWT_SECRET');
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: "jwtsecret", ///< TODOs to refactor and define in ConfigService. Currently symmetric secret. Future work: investigate PEM-encoded (asymmetric) public key
+      secretOrKey: jwtSecret, ///< Future work: Currently symmetric secret. Investigate PEM-encoded (asymmetric) public key
     });
   }
 
