@@ -8,6 +8,8 @@ import { GoalsModule } from './goals/goals.module';
 import { GoalEntriesModule } from './goalEntries/goalEntries.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
 
 @Module({
   imports: [
@@ -17,8 +19,10 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     AuthModule,
     ConfigModule.forRoot({
+      validate: (env) => envSchema.parse(env),
       isGlobal: true,
-    })
+    }),
+    EnvModule,
   ],
   controllers: [AppController],
   providers: [AppService],
