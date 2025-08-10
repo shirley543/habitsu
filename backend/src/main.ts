@@ -16,7 +16,7 @@ async function bootstrap() {
   // Future work:
   // - investigate CSRF tokens to protect sensitive requests (POST, PUT, DELETE, etc)
   // - investigate session-based auth, over current JWT in cookie auth (harder token revocation/ invalidation, as lasts until expiry)
-  // - expand on current JWT in cookie auth, with refresh tokens (decrease JWT token expiry to ~10mins, refresh ~1 week?)
+  // - expand on current JWT in cookie auth, with refresh tokens e.g. JWT in (fe React state) memory + refresh in HttpOnly cookie (decrease JWT token expiry to ~10mins, refresh ~1 week?)
   app.use(cookieParser());
   
   const config = new DocumentBuilder()
