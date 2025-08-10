@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as EntrysRouteImport } from './routes/entrys'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,9 +26,19 @@ import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.ed
 import { Route as GoalsGoalIdEntriesCreateRouteImport } from './routes/goals_/$goalId_.entries.create'
 import { Route as GoalsGoalIdEntriesEntryIdEditRouteImport } from './routes/goals_/$goalId_.entries_.$entryId.edit'
 
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoalsRoute = GoalsRouteImport.update({
@@ -101,7 +113,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/entrys': typeof EntrysRouteWithChildren
   '/goals': typeof GoalsRouteWithChildren
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
+  '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -115,6 +129,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
   '/settings/goalorder': typeof SettingsGoalorderRoute
@@ -131,7 +147,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/entrys': typeof EntrysRouteWithChildren
   '/goals': typeof GoalsRouteWithChildren
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRouteWithChildren
+  '/sign-up': typeof SignUpRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
   '/goals_/create': typeof GoalsCreateRoute
   '/settings_/goalorder': typeof SettingsGoalorderRoute
@@ -149,7 +167,9 @@ export interface FileRouteTypes {
     | '/'
     | '/entrys'
     | '/goals'
+    | '/login'
     | '/settings'
+    | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -163,6 +183,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
     | '/settings/goalorder'
@@ -178,7 +200,9 @@ export interface FileRouteTypes {
     | '/'
     | '/entrys'
     | '/goals'
+    | '/login'
     | '/settings'
+    | '/sign-up'
     | '/goals_/$goalId'
     | '/goals_/create'
     | '/settings_/goalorder'
@@ -195,7 +219,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EntrysRoute: typeof EntrysRouteWithChildren
   GoalsRoute: typeof GoalsRouteWithChildren
+  LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRouteWithChildren
+  SignUpRoute: typeof SignUpRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
   GoalsCreateRoute: typeof GoalsCreateRoute
   SettingsGoalorderRoute: typeof SettingsGoalorderRoute
@@ -207,11 +233,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/goals': {
@@ -345,7 +385,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EntrysRoute: EntrysRouteWithChildren,
   GoalsRoute: GoalsRouteWithChildren,
+  LoginRoute: LoginRoute,
   SettingsRoute: SettingsRouteWithChildren,
+  SignUpRoute: SignUpRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
   GoalsCreateRoute: GoalsCreateRoute,
   SettingsGoalorderRoute: SettingsGoalorderRoute,
