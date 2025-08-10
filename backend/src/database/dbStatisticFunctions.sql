@@ -103,7 +103,7 @@ BEGIN
     SELECT AVG("numericValue")
     FROM (
 		SELECT * FROM get_goal_entries_for_year(p_goal_id, p_year)
-	)
+	) AS sub
   );
 END;
 $$ LANGUAGE plpgsql;
@@ -130,7 +130,7 @@ BEGIN
     SELECT COUNT(*)
     FROM (
 		SELECT * FROM get_goal_entries_for_year(p_goal_id, p_year)
-	)
+	) AS sub
   );
 END;
 $$ LANGUAGE plpgsql;
@@ -142,7 +142,7 @@ SELECT get_goal_year_count(9, 2025) AS "yearCount";
 
 
 
-DROP FUNCTION get_streaks(INT, INT);
+DROP FUNCTION IF EXISTS get_streaks(INT, INT);
 
 /*
 	Returns streak table for the given goal ID and year
@@ -170,7 +170,7 @@ BEGIN
 				ROW_NUMBER() OVER (ORDER BY "entryDate") AS "rowNum"
 			FROM (
 				SELECT * FROM get_goal_entries_for_year(p_goal_id, p_year)
-			)
+			) AS sub
 		),
 		-- `normalised`: derived table from `numbered` which normalises 
 		-- consecutive dates to the same reference point (normRefDate i.e. normalised reference date),
@@ -234,7 +234,7 @@ BEGIN
 	SELECT "streakLength"
 	FROM (
 		SELECT * FROM get_streaks(p_goal_id, p_year)
-	)
+	) AS sub
 	WHERE "startDate" <= CURRENT_DATE AND "endDate" >= CURRENT_DATE
   );
 END;
@@ -262,7 +262,7 @@ BEGIN
 	SELECT MAX("streakLength")
 	FROM (
 		SELECT * FROM get_streaks(p_goal_id, p_year)
-	)
+	) AS sub
   );
 END;
 $$ LANGUAGE plpgsql;
