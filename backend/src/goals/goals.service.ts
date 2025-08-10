@@ -65,14 +65,27 @@ export class GoalsService {
     return this.prisma.goal.create({ data: prismaInput });
   }
 
-  // TODOs: userId for all find goal-related service functions
-  // TODOs: fix bug where 401 unauthorized always returned despite jwt token provided in cookie
-  findAll() {
-    return this.prisma.goal.findMany();
+  async findAll(targetUserId: number, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    // TODOss: need to figure out logic of this.
+    // findAll specifically for logged in user?
+    // or find based on targetUserId (which could be same as current userId OR could be a userId visiting a different targetUserId. find by username as well, for easier profile searching?)
+    
+
+    return this.prisma.goal.findMany({ where: { userId } });
   }
 
-  findOne(id: number) {
-    return this.prisma.goal.findUniqueOrThrow({ where: { id } });
+  async findOne(id: number, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // TODOss: same as above
+    return this.prisma.goal.findUniqueOrThrow({ where: { id, userId } });
   }
 
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {

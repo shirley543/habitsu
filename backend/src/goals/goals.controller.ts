@@ -41,16 +41,22 @@ export class GoalsController {
   @Get()
   @ApiOkResponse({ type: GoalEntity, isArray: true })
   // TODOssss how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
-  findAll() {
-    console.log("goals findAll")
-    return this.goalsService.findAll();
+  findAll(
+    @Req() req,
+  ) {
+    const userId = req.user.id;
+    return this.goalsService.findAll(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.goalsService.findOne(id).catch((error) => {
+  findOne(
+    @Req() req,
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    const userId = req.user.id;
+    return this.goalsService.findOne(id, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {
           case 'P2025':

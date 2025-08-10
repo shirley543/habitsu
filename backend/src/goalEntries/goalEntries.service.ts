@@ -29,8 +29,8 @@ export class GoalEntriesService {
     private goalsService: GoalsService,
   ) {}
 
-  async create(goalId: number, createGoalEntryDto: CreateGoalEntryDto) {
-    const goal = await this.goalsService.findOne(goalId);
+  async create(goalId: number, createGoalEntryDto: CreateGoalEntryDto, userId: number) {
+    const goal = await this.goalsService.findOne(goalId, userId);
     if (!goal) {
       throw new NotFoundException("Goal not found for the given goal ID");
     }
@@ -64,7 +64,7 @@ export class GoalEntriesService {
     return this.prisma.goalEntry.findMany();
   }
 
-  findMany(searchParamsGoalEntryDto: SearchParamsGoalEntryDto) {
+  findMany(searchParamsGoalEntryDto: SearchParamsGoalEntryDto, userId: number) {
     const year = searchParamsGoalEntryDto.year;
     const goalId = searchParamsGoalEntryDto.goalId;
 
@@ -83,8 +83,8 @@ export class GoalEntriesService {
     return this.prisma.goalEntry.findUnique({ where: { id } });
   }
 
-  async update(goalId: number, entryId: number, updateGoalEntryDto: UpdateGoalEntryDto) {
-    const goal = await this.goalsService.findOne(goalId);
+  async update(goalId: number, entryId: number, updateGoalEntryDto: UpdateGoalEntryDto, userId: number) {
+    const goal = await this.goalsService.findOne(goalId, userId);
     if (!goal) {
       throw new NotFoundException("Goal not found for the given goal ID");
     }
@@ -155,7 +155,10 @@ export class GoalEntriesService {
   /**
    * Statistics-specific
    */
-  async getStatistics(goalId: number, year: number) {
+  async getStatistics(goalId: number, year: number, userId: number) {
+    // TODOss: validate ownership. If goal is private, only the goal's owner can view.
+    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
     // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
@@ -173,8 +176,12 @@ export class GoalEntriesService {
     return stats;
   }
 
-  async getMonthlyAverages(goalId: number, year: number) {
-    const goal = await this.goalsService.findOne(goalId);
+  async getMonthlyAverages(goalId: number, year: number, userId: number) {
+    const goal = await this.goalsService.findOne(goalId, userId);
+    if (!goal) {
+      throw new NotFoundException("Goal not found for given Goal ID");
+    }
+
     if (goal.goalType !== GoalQuantify.NUMERIC) {
       throw new BadRequestException("Goal type must be NUMERIC")
     }
@@ -195,7 +202,12 @@ export class GoalEntriesService {
     return stats;
   }
 
-  async getMonthlyCounts(goalId: number, year: number) {
+  async getMonthlyCounts(goalId: number, year: number, userId: number) {
+    const goal = await this.goalsService.findOne(goalId, userId);
+    if (!goal) {
+      throw new NotFoundException("Goal not found for given Goal ID");
+    }
+
     // TODOs: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_counts(${goalId}::INT, ${year}::INT);`;
 
