@@ -10,6 +10,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateGoalDto, CreateGoalSchema, ReorderGoalDto, ReorderGoalSchema, UpdateGoalDto, UpdateGoalSchema } from './goals.dtos';
@@ -28,8 +29,12 @@ export class GoalsController {
   @Post()
   @ApiCreatedResponse({ type: GoalEntity })
   // @ApiBody({}) // TODOs: update to format API body properly with Swagger/ OpenAPI.
-  create(@Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto) {
-    return this.goalsService.create(createGoalDto);
+  create(
+    @Req() req,
+    @Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto
+  ) {
+    const userId = req.user.id;
+    return this.goalsService.create(createGoalDto, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -62,24 +67,33 @@ export class GoalsController {
   @Patch(':id')
   @ApiCreatedResponse({ type: GoalEntity })
   update(
+    @Req() req,
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
-    return this.goalsService.update(id, updateGoalDto);
+    const userId = req.user.id;
+    return this.goalsService.update(id, updateGoalDto, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOkResponse({ type: GoalEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.goalsService.remove(id);
+  remove(
+    @Req() req,
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    const userId = req.user.id;
+    return this.goalsService.remove(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/reorder')
   @ApiOkResponse()
-  reorder(@Body(new ZodValidationPipe(ReorderGoalSchema)) reorderGoalDto: ReorderGoalDto)
+  reorder(
+    @Req() req,
+    @Body(new ZodValidationPipe(ReorderGoalSchema)) reorderGoalDto: ReorderGoalDto)
   {
-    return this.goalsService.reorder(reorderGoalDto);
+    const userId = req.user.id;
+    return this.goalsService.reorder(reorderGoalDto, userId);
   }
 }

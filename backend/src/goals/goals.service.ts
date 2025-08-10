@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from './goals.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
+import { UsersService } from 'src/users/users.service';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
 // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
@@ -12,11 +13,16 @@ enum GoalQuantifyType {
 
 @Injectable()
 export class GoalsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private usersService: UsersService,
+  ) {}
 
-  async create(createGoalDto: CreateGoalDto) {
-    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
-    // TODOss error handling when user ID is not valid/ not found.
+  async create(createGoalDto: CreateGoalDto, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     // Ordering: get current maximum order number for the user's goals,
     // and use to determine their new goal's order number
@@ -59,6 +65,8 @@ export class GoalsService {
     return this.prisma.goal.create({ data: prismaInput });
   }
 
+  // TODOs: userId for all find goal-related service functions
+  // TODOs: fix bug where 401 unauthorized always returned despite jwt token provided in cookie
   findAll() {
     return this.prisma.goal.findMany();
   }
@@ -67,7 +75,21 @@ export class GoalsService {
     return this.prisma.goal.findUniqueOrThrow({ where: { id } });
   }
 
-  update(id: number, updateGoalDto: UpdateGoalDto) {
+  async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Find goal to update and validate ownership
+    const goalToUpdate = await this.prisma.goal.findUniqueOrThrow({
+      where: { id }
+    });
+
+    if (goalToUpdate.userId !== userId) {
+      throw new Error('Unauthorized: Goal does not belong to user');
+    }
+
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalUpdateInput = {
         title: updateGoalDto.title,
@@ -97,9 +119,11 @@ export class GoalsService {
     });
   }
 
-  async remove(id: number) {
-    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
-    // TODOss error handling when user ID is not valid/ not found.
+  async remove(id: number, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     // Find goal to delete and validate ownership
     const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
@@ -142,8 +166,11 @@ export class GoalsService {
     });
   }
 
-  async reorder(reorderGoalDto: ReorderGoalDto) {
-    const userId = 4; //< TODOs: Address this hack, user ID should derived from JWT/ session
+  async reorder(reorderGoalDto: ReorderGoalDto, userId: number) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     // Expect all goals to be present (lengths same)
     // Expect all IDs present
