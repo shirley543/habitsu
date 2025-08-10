@@ -41,8 +41,9 @@ export function useDeleteUserMutation() {
   })
 }
 
+// TODOs: refactor all BACKEND_BASE_URL usages to instead refer to api
 async function postLoginUser(user: LoginUserDto) {
-  return ky.post(`${BACKEND_BASE_URL}/auth/login`, { retry: KY_FETCH_RETRY_NUM, json: user }).json();
+  return ky.post(`/api/auth/login`, { retry: KY_FETCH_RETRY_NUM, json: user }).json();
 }
 
 export function useLoginUserMutation() {

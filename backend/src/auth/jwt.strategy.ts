@@ -8,7 +8,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(envConfigService: EnvService) {
     const jwtSecret = envConfigService.get('JWT_SECRET');
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req) => {
+          return req.cookies.jwt; ///< Get token from cookie
+        }
+      ]),
       ignoreExpiration: false,
       secretOrKey: jwtSecret, ///< Future work: Currently symmetric secret. Investigate PEM-encoded (asymmetric) public key
     });

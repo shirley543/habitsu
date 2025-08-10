@@ -1,31 +1,33 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { Response } from 'express';
 
-@Controller()
+@Controller('auth')
 export class AppController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
-  async login(@Request() req) {
-    // Return JWT access token upon successful login
-    return this.authService.login(req.user);
+  @Post('login')
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+    // Return JWT access token via cookie upon successful login
+    const { access_token } = await this.authService.login(req.user);
+    res.cookie('jwt', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.send({ message: 'Logged in' });
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/logout')
+  @Post('logout')
   async logout(@Request() req) {
     return req.logout();
-  }
-
-  // Dummy protected route to confirm JwtAuthGuard working as intended (i.e. said route only accessible with valid access_token)
-  // TODOs: remove later
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }
 

@@ -2,16 +2,23 @@ import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalSta
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
-const BACKEND_BASE_URL = "http://localhost:8080";
+const BACKEND_BASE_URL = "";
 
 const KY_FETCH_RETRY_NUM = 0;
 const REACT_QUERY_RETRY_NUM = 0;
+
+// TODOs: refactor all BACKEND_BASE_URL usages to instead refer to api
+const api = ky.create({
+  prefixUrl: '/api',
+  credentials: 'include',
+  retry: KY_FETCH_RETRY_NUM,
+});
 
 /**
  * /goals
  */
 async function fetchGoals(): Promise<Array<GoalResponse>> {
-  return ky.get(`${BACKEND_BASE_URL}/goals`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get('goals').json();
 }
 
 export function useGoals() {

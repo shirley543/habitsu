@@ -11,7 +11,18 @@ export default defineConfig({
     tanstackRouter({ 
       autoCodeSplitting: true,
       target: 'react',
-    }), viteReact(), tailwindcss()],
+    }), viteReact(), tailwindcss()
+  ],
+  server: {
+    proxy: {
+      '/api': { // This is the path that will be proxied
+        target: 'http://localhost:8080', // The address of your backend API
+        changeOrigin: true, // Needed for virtual hosted sites
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''), // Rewrites the path by removing '/api'
+      },
+    }
+  },
   test: {
     globals: true,
     environment: "jsdom",
