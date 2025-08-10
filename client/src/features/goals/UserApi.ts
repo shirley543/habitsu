@@ -2,17 +2,22 @@ import type { UserResponse, CreateUserDto, UpdateUserDto, LoginUserDto } from "@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
-const BACKEND_BASE_URL = "http://localhost:8080";
-
 const KY_FETCH_RETRY_NUM = 0;
 const REACT_QUERY_RETRY_NUM = 0;
+
+// prefixUrl replaced by Vite proxy in dev to avoid CORS issues
+const api = ky.create({
+  prefixUrl: '/api',
+  credentials: 'include',
+  retry: KY_FETCH_RETRY_NUM,
+});
 
 /**
  * /users
  */
 
 async function postCreateUser(newUser: CreateUserDto): Promise<UserResponse> {
-  return ky.post(`${BACKEND_BASE_URL}/users`, { retry: KY_FETCH_RETRY_NUM, json: newUser }).json();
+  return api.post('users', { json: newUser }).json();
 }
 
 export function useCreateUserMutation() {
@@ -22,7 +27,7 @@ export function useCreateUserMutation() {
 }
 
 async function patchUpdateUser(userId: number, updateUser: UpdateUserDto): Promise<UserResponse> {
-  return ky.patch(`${BACKEND_BASE_URL}/users/${userId}`, { retry: KY_FETCH_RETRY_NUM, json: updateUser }).json();
+  return api.patch(`users/${userId}`, { json: updateUser }).json();
 }
 
 export function useUpdateUserMutation() {
@@ -32,7 +37,7 @@ export function useUpdateUserMutation() {
 }
 
 async function deleteUser(userId: number): Promise<{}> {
-  return ky.delete(`${BACKEND_BASE_URL}/users/${userId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.delete(`users/${userId}`).json();
 }
 
 export function useDeleteUserMutation() {
@@ -41,9 +46,8 @@ export function useDeleteUserMutation() {
   })
 }
 
-// TODOs: refactor all BACKEND_BASE_URL usages to instead refer to api
 async function postLoginUser(user: LoginUserDto) {
-  return ky.post(`/api/auth/login`, { retry: KY_FETCH_RETRY_NUM, json: user }).json();
+  return api.post('auth/login', { json: user }).json();
 }
 
 export function useLoginUserMutation() {
@@ -54,7 +58,7 @@ export function useLoginUserMutation() {
 
 // TODOs check: logout shouldn't need post body as should already have auth bearer token 
 async function postLogoutUser() {
-  return ky.post(`${BACKEND_BASE_URL}/auth/logout`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.post('auth/logout').json();
 }
 
 export function useLogoutUserMutation() {

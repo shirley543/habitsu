@@ -2,12 +2,10 @@ import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalSta
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
-const BACKEND_BASE_URL = "";
-
 const KY_FETCH_RETRY_NUM = 0;
 const REACT_QUERY_RETRY_NUM = 0;
 
-// TODOs: refactor all BACKEND_BASE_URL usages to instead refer to api
+// prefixUrl replaced by Vite proxy in dev to avoid CORS issues
 const api = ky.create({
   prefixUrl: '/api',
   credentials: 'include',
@@ -30,7 +28,7 @@ export function useGoals() {
 }
 
 async function fetchGoalById(goalId: number): Promise<GoalResponse> {
-  return ky.get(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`goals/${goalId}`).json();
 }
 
 export function useGoal(goalId: string) {
@@ -43,7 +41,7 @@ export function useGoal(goalId: string) {
 }
 
 async function postCreateGoal(newGoal: CreateGoalDto): Promise<GoalResponse> {
-  return ky.post(`${BACKEND_BASE_URL}/goals`, { retry: KY_FETCH_RETRY_NUM, json: newGoal }).json();
+  return api.post('goals', { json: newGoal }).json();
 }
 
 export function useCreateGoalMutation() {
@@ -53,7 +51,7 @@ export function useCreateGoalMutation() {
 }
 
 async function patchUpdateGoal(goalId: number, updateGoal: UpdateGoalDto): Promise<GoalResponse> {
-  return ky.patch(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM, json: updateGoal }).json();
+  return api.patch(`goals/${goalId}`, { json: updateGoal }).json();
 }
 
 export function useUpdateGoalMutation() {
@@ -63,7 +61,7 @@ export function useUpdateGoalMutation() {
 }
 
 async function deleteGoal(goalId: number): Promise<{}> {
-  return ky.delete(`${BACKEND_BASE_URL}/goals/${goalId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.delete(`goals/${goalId}`).json();
 }
 
 export function useDeleteGoalMutation() {
@@ -73,7 +71,7 @@ export function useDeleteGoalMutation() {
 }
 
 async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<{}> {
-  return ky.post(`${BACKEND_BASE_URL}/goals/reorder`, { retry: KY_FETCH_RETRY_NUM, json: reorderGoal }).json();
+  return api.post('goals/reorder', { json: reorderGoal }).json();
 }
 
 export function useReorderGoalsMutation() {
@@ -90,7 +88,7 @@ async function fetchGoalEntriesBySearchParams(searchParams: SearchParamsGoalEntr
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  return ky.get(`${BACKEND_BASE_URL}/entries?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`entries?${searchSegment}`).json();
 }
 
 export function useGoalEntries(searchParams: SearchParamsGoalEntryDto) {
@@ -102,7 +100,7 @@ export function useGoalEntries(searchParams: SearchParamsGoalEntryDto) {
 }
 
 async function fetchGoalEntryById(entryId: number): Promise<GoalEntryResponse> {
-  return ky.get(`${BACKEND_BASE_URL}/entries/${entryId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`entries/${entryId}`).json();
 }
 
 export function useGoalEntry(entryId: string) {
@@ -118,7 +116,7 @@ async function fetchGoalStatisticsBySearchParams(searchParams: SearchParamsGoalE
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  return ky.get(`${BACKEND_BASE_URL}/entries/statistics?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`entries/statistics?${searchSegment}`).json();
 }
 
 export function useGoalStatistics(searchParams: SearchParamsGoalEntryDto) {
@@ -134,7 +132,7 @@ async function fetchGoalMonthlyAvgsBySearchParams(searchParams: SearchParamsGoal
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  return ky.get(`${BACKEND_BASE_URL}/entries/monthly-averages?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`entries/monthly-averages?${searchSegment}`).json();
 }
 
 export function useGoalMonthlyAvgs(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
@@ -150,7 +148,7 @@ async function fetchGoalMonthlyCountsBySearchParams(searchParams: SearchParamsGo
   const searchSegment = Object.entries(searchParams).map(([key, value]) => {
     return `${key}=${value}`
   }).join('&');
-  return ky.get(`${BACKEND_BASE_URL}/entries/monthly-counts?${searchSegment}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.get(`entries/monthly-counts?${searchSegment}`).json();
 }
 
 export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, enabled: boolean) {
@@ -163,7 +161,7 @@ export function useGoalMonthlyCounts(searchParams: SearchParamsGoalEntryDto, ena
 }
 
 async function postCreateGoalEntry(goalId: number, createDto: CreateGoalEntryDto): Promise<GoalEntryResponse> {
-  return ky.post(`${BACKEND_BASE_URL}/goals/${goalId}/entries`, { retry: KY_FETCH_RETRY_NUM, json: createDto }).json();
+  return api.post(`goals/${goalId}/entries`, { json: createDto }).json();
 }
 
 export function useCreateGoalEntryMutation() {
@@ -175,7 +173,7 @@ export function useCreateGoalEntryMutation() {
 }
 
 async function patchUpdateGoalEntry(goalId: number, entryId: number, updateGoalEntry: UpdateGoalEntryDto): Promise<GoalEntryResponse> {
-  return ky.patch(`${BACKEND_BASE_URL}/goals/${goalId}/entries/${entryId}`, { retry: KY_FETCH_RETRY_NUM, json: updateGoalEntry }).json();
+  return api.patch(`goals/${goalId}/entries/${entryId}`, { json: updateGoalEntry }).json();
 }
 
 export function useUpdateGoalEntryMutation() {
@@ -187,7 +185,7 @@ export function useUpdateGoalEntryMutation() {
 }
 
 async function deleteGoalEntry(goalId: number, entryId: number): Promise<{}> {
-  return ky.delete(`${BACKEND_BASE_URL}/goals/${goalId}/entries/${entryId}`, { retry: KY_FETCH_RETRY_NUM }).json();
+  return api.delete(`goals/${goalId}/entries/${entryId}`).json();
 }
 
 export function useDeleteGoalEntryMutation() {
