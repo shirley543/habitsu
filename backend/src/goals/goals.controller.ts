@@ -68,6 +68,7 @@ export class GoalsController {
   ) {
     // TODOs: more error catching and mapping prisma errors to other errors.
     // if instance of error is other generic exception, keep error type the same.
+    // TODOs: revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
     const userId = req.user.id;
     return this.goalsService.findOne(id, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {
