@@ -109,8 +109,8 @@ export const GoalEntrySchema = BaseGoalEntrySchema.and(GoalEntryTypePartialSchem
 
 export const SearchParamsGoalEntrySchema = z.object({
   goalId: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
-  year: z.preprocess((val) => (val ? Number(val) : undefined), z.number()),
-}).partial();
+  year: z.preprocess((val) => (val ? Number(val) : undefined), z.number()).optional(),
+});
 
 
 const PartialBaseGoalEntrySchema = BaseGoalEntrySchema.partial();

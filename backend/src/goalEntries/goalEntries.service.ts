@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGoalEntryDto,
@@ -12,9 +12,10 @@ import {
   GoalMonthlyAveragesSchema,
   GoalMonthlyCountsSchema,
 } from './goalEntries.dtos';
-import { GoalQuantify, Prisma } from '@prisma/client';
+import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from 'src/goals/goals.service';
+import { assertCanModify, assertCanView, assertFound } from 'src/common/assert/assertions';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
 // // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
@@ -60,51 +61,85 @@ export class GoalEntriesService {
     return this.prisma.goalEntry.create({ data: prismaInput });
   }
 
-  findAll() {
-    return this.prisma.goalEntry.findMany();
+  async findAll(userId: number) {
+    return this.prisma.goalEntry.findMany({
+      where: { 
+        goal: {
+          userId: userId,
+        }
+      }
+    });
   }
 
-  findMany(searchParamsGoalEntryDto: SearchParamsGoalEntryDto, userId: number) {
-    const year = searchParamsGoalEntryDto.year;
+  async findMany(searchParamsGoalEntryDto: SearchParamsGoalEntryDto, currentUserId: number) {
     const goalId = searchParamsGoalEntryDto.goalId;
+    const year = searchParamsGoalEntryDto.year;
 
-    return this.prisma.goalEntry.findMany({
+    const goal = await this.prisma.goal.findUnique({
+      where: { id: goalId },
+      select: { userId: true, publicity: true },
+    });
+    assertFound(goal, 'Goal not found');
+    assertCanView(goal, currentUserId, 'Goal not viewable (unauthorized)');
+
+    const entries = await this.prisma.goalEntry.findMany({
       where: {
         goalId: goalId,
         entryDate: {
           lte: year ? new Date(year, 11, 31) : undefined,
           gte: year ? new Date(year, 0, 1) : undefined,
-        }
-      }
-    })
+        },
+      },
+    });
+
+    return entries;
   }
 
-  findOne(id: number) {
-    return this.prisma.goalEntry.findUnique({ where: { id } });
+  async findOne(id: number, userId: number) {
+    const entry = await this.prisma.goalEntry.findUnique({
+      where: { id },
+      include: {
+        goal: {
+          select: {
+            userId: true,
+            publicity: true,
+          },
+        },
+      },
+    });
+    assertFound(entry, 'Goal entry not found');
+    assertFound(entry.goal, 'Associated goal not found');
+    assertCanView(entry.goal, userId, 'Associated goal not viewable (unauthorized)');
+
+    return entry;
   }
 
   async update(goalId: number, entryId: number, updateGoalEntryDto: UpdateGoalEntryDto, userId: number) {
-    const goal = await this.goalsService.findOne(goalId, userId);
-    if (!goal) {
-      throw new NotFoundException("Goal not found for the given goal ID");
-    }
-
     const entry = await this.prisma.goalEntry.findUnique({
       where: {
         goalId: goalId,
         id: entryId,
-      }
+      },
+      include: {
+        goal: {
+          select: {
+            userId: true,
+            publicity: true,
+            goalType: true,
+          },
+        },
+      },
     });
-    if (!entry) {
-      throw new NotFoundException("Entry not found for this goal");
-    }
+    assertFound(entry, 'Goal entry not found');
+    assertFound(entry.goal, 'Associated goal not found');
+    assertCanModify(entry.goal, userId); // Only owner can modify (edit)
 
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryUpdateInput = {
         entryDate: updateGoalEntryDto.entryDate,
         note: updateGoalEntryDto.note,
       }
-      switch (goal.goalType) {
+      switch (entry.goal.goalType) {
         case GoalQuantifyType.Boolean:
         default:
           return {
@@ -121,21 +156,30 @@ export class GoalEntriesService {
     return this.prisma.goalEntry.update({
       where: { 
         id: entryId,
-       },
+      },
       data: prismaInput,
     });
   }
 
-  async remove(goalId: number, entryId: number) {
+  async remove(goalId: number, entryId: number, userId: number) {
     const entry = await this.prisma.goalEntry.findUnique({
       where: {
         goalId: goalId,
         id: entryId,
-      }
+      },
+      include: {
+        goal: {
+          select: {
+            userId: true,
+            goalType: true,
+          },
+        },
+      },
     });
-    if (!entry) {
-      throw new NotFoundException("Entry not found for this goal");
-    }
+
+    assertFound(entry, 'Goal entry not found');
+    assertFound(entry.goal, 'Associated goal not found');
+    assertCanModify(entry.goal, userId); // Only owner can modify (delete)
 
     return this.prisma.goalEntry.delete({ 
       where: { 
@@ -156,8 +200,13 @@ export class GoalEntriesService {
    * Statistics-specific
    */
   async getStatistics(goalId: number, year: number, userId: number) {
-    // TODOss: validate ownership. If goal is private, only the goal's owner can view.
+    // Validate ownership. If goal is private, only the goal's owner can view.
     // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    const goal = await this.prisma.goal.findUnique({
+      where: { id: goalId },
+    });
+    assertFound(goal, 'Goal not found');
+    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
 
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
@@ -177,10 +226,13 @@ export class GoalEntriesService {
   }
 
   async getMonthlyAverages(goalId: number, year: number, userId: number) {
-    const goal = await this.goalsService.findOne(goalId, userId);
-    if (!goal) {
-      throw new NotFoundException("Goal not found for given Goal ID");
-    }
+    // Validate ownership. If goal is private, only the goal's owner can view.
+    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    const goal = await this.prisma.goal.findUnique({
+      where: { id: goalId },
+    });
+    assertFound(goal, 'Goal not found');
+    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
 
     if (goal.goalType !== GoalQuantify.NUMERIC) {
       throw new BadRequestException("Goal type must be NUMERIC")
@@ -203,10 +255,13 @@ export class GoalEntriesService {
   }
 
   async getMonthlyCounts(goalId: number, year: number, userId: number) {
-    const goal = await this.goalsService.findOne(goalId, userId);
-    if (!goal) {
-      throw new NotFoundException("Goal not found for given Goal ID");
-    }
+    // Validate ownership. If goal is private, only the goal's owner can view.
+    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    const goal = await this.prisma.goal.findUnique({
+      where: { id: goalId },
+    });
+    assertFound(goal, 'Goal not found');
+    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
 
     // TODOs: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_counts(${goalId}::INT, ${year}::INT);`;

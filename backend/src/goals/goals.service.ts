@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from './goals.dtos';
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
+import { assertCanModify, assertFound } from 'src/common/assert/assertions';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
 
 // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
@@ -19,11 +20,6 @@ export class GoalsService {
   ) {}
 
   async create(createGoalDto: CreateGoalDto, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
     // Ordering: get current maximum order number for the user's goals,
     // and use to determine their new goal's order number
     const maxOrderNum = await this.prisma.goal.aggregate({
@@ -65,43 +61,21 @@ export class GoalsService {
     return this.prisma.goal.create({ data: prismaInput });
   }
 
-  async findAll(targetUserId: number, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    // TODOss: need to figure out logic of this.
-    // findAll specifically for logged in user?
-    // or find based on targetUserId (which could be same as current userId OR could be a userId visiting a different targetUserId. find by username as well, for easier profile searching?)
-    
-
+  async findAll(userId: number) {
     return this.prisma.goal.findMany({ where: { userId } });
   }
 
   async findOne(id: number, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // TODOss: same as above
     return this.prisma.goal.findUniqueOrThrow({ where: { id, userId } });
   }
 
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
     // Find goal to update and validate ownership
     const goalToUpdate = await this.prisma.goal.findUniqueOrThrow({
       where: { id }
     });
-
-    if (goalToUpdate.userId !== userId) {
-      throw new Error('Unauthorized: Goal does not belong to user');
-    }
+    assertFound(goalToUpdate);
+    assertCanModify(goalToUpdate, userId);
 
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalUpdateInput = {
@@ -133,19 +107,12 @@ export class GoalsService {
   }
 
   async remove(id: number, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
     // Find goal to delete and validate ownership
     const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
       where: { id }
     });
-
-    if (goalToDelete.userId !== userId) {
-      throw new Error('Unauthorized: Goal does not belong to user');
-    }
+    assertFound(goalToDelete);
+    assertCanModify(goalToDelete, userId);
 
     // Start transaction, so that if any fail entire batch is rolled back,
     // to prevent e.g. delete failing but previous order updates
@@ -180,11 +147,6 @@ export class GoalsService {
   }
 
   async reorder(reorderGoalDto: ReorderGoalDto, userId: number) {
-    const user = await this.usersService.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
     // Expect all goals to be present (lengths same)
     // Expect all IDs present
     // Expect orders to be sequential (i.e. no gaps)
@@ -196,7 +158,7 @@ export class GoalsService {
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new Error('Bad Request: Reorder goals length does not match goals length');
+      throw new BadRequestException('Bad Request: Reorder goals length does not match goals length');
     }
 
     // Check IDs to reorder are the same as in users (existing) goals
@@ -213,7 +175,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new Error('Bad Request: Invalid Goal IDs');
+      throw new BadRequestException('Bad Request: Invalid Goal IDs');
     }
 
     // Check orders are sequential
@@ -231,7 +193,7 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new Error('Bad Request: Invalid Goal Orders')
+      throw new BadRequestException('Bad Request: Invalid Goal Orders')
     }
 
     // Use transaction to update order of all given entries
