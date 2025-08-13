@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from './goals.dtos';
-import { GoalQuantify, Prisma } from '@prisma/client';
+import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import { assertCanModify, assertFound } from 'src/common/assert/assertions';
 // import { GoalQuantifyType } from '@habit-tracker/shared';
@@ -63,6 +63,25 @@ export class GoalsService {
 
   async findAll(userId: number) {
     return this.prisma.goal.findMany({ where: { userId } });
+  }
+
+  async findManyByUsername(targetUsername: string, requestingUserId: number) {
+    // Fetch user to get their userId (optional optimization if you already have it)
+    const user = await this.prisma.user.findUnique({
+      where: { username: targetUsername },
+    });
+    assertFound(user, 'User not found');
+
+    const isOwner = requestingUserId === user.id;
+    const goals = await this.prisma.goal.findMany({
+      where: {
+        userId: user.id,
+        // If owner, no publicity filter; otherwise only public goals
+        ...(isOwner ? {} : { publicity: GoalPublicity.PUBLIC }),
+      },
+    });
+
+    return goals;
   }
 
   async findOne(id: number, userId: number) {
