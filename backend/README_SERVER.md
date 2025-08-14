@@ -1,4 +1,4 @@
-Node.js Express Backend
+Node.js Express Backend (TODOs reword and combine with backend README.md)
 
 # Getting Started
 
