@@ -1,16 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from './goals.dtos';
+import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from '@habit-tracker/shared';
 import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import { assertCanModify, assertFound } from 'src/common/assert/assertions';
-// import { GoalQuantifyType } from '@habit-tracker/shared';
+import { GoalQuantifyType } from '@habit-tracker/shared';
 
-// TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
-enum GoalQuantifyType {
-  Numeric = 'NUMERIC',
-  Boolean = 'BOOLEAN',
-}
 
 @Injectable()
 export class GoalsService {

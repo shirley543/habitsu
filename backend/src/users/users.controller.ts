@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, CreateUserSchema, UpdateUserSchema } from './users.dtos';
+import { CreateUserDto, UpdateUserDto, CreateUserSchema, UpdateUserSchema } from '@habit-tracker/shared';
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';

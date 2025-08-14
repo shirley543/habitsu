@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
 /**
  * Types
  */
@@ -73,7 +72,6 @@ export const ReorderGoalSchema = z.object({
 // --------------------
 
 export const CreateGoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
-// TODOs: UpdateGoalSchema incorrect currently. To fix; numericTarget and numericUnits fields should be optional, but goal type should be required
 export const UpdateGoalSchema = BaseGoalSchema.partial().and(GoalTypeDiscriminatorSchema);
 export const GoalResponseSchema = (BaseGoalSchema.extend({
   id: z.number(),
@@ -126,16 +124,6 @@ export type CreateGoalEntryDto = z.infer<typeof CreateGoalEntrySchema>;
 export type UpdateGoalEntryDto = z.infer<typeof UpdateGoalEntrySchema>;
 export type SearchParamsGoalEntryDto = z.infer<typeof SearchParamsGoalEntrySchema>;
 export type GoalEntryResponse = z.infer<typeof GoalEntryResponseSchema>;
-
-
-// /**
-//  * Zod union which converts Prisma decimal object (from SQL NUMERIC type)
-//  * to primitive number, or keeps number as-is
-//  */
-// const DecimalOrNumber = z.union([
-//   z.number(),
-//   z.instanceof(Decimal)
-// ]).transform((val) => (val instanceof Decimal ? val.toNumber() : val));
 
 export const GoalStatisticsSchema = z.object({
   yearAvg: z.number().nullable(),

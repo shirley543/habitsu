@@ -7,7 +7,6 @@
   },
   "workspaces": [
     "client",
-    "server",
     "backend",
     "shared"
   ]

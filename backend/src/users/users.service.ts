@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, UpdateUserDto } from './users.dtos';
+import { CreateUserDto, UpdateUserDto } from '@habit-tracker/shared';
 import { EnvService } from 'src/env/env.service';
 
 @Injectable()

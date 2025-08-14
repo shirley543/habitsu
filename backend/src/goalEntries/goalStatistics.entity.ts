@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GoalStatisticsReponse } from './goalEntries.dtos';
+import { GoalStatisticsReponse } from '@habit-tracker/shared';
 
 export class GoalStatisticsEntity implements GoalStatisticsReponse {
   @ApiProperty()

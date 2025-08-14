@@ -11,18 +11,12 @@ import {
   GoalStatisticsSchema,
   GoalMonthlyAveragesSchema,
   GoalMonthlyCountsSchema,
-} from './goalEntries.dtos';
-import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
+} from '@habit-tracker/shared';
+import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from 'src/goals/goals.service';
 import { assertCanModify, assertCanView, assertFound } from 'src/common/assert/assertions';
-// import { GoalQuantifyType } from '@habit-tracker/shared';
 
-// // TODOss: Fix build error that's preventing habit-tracker/shared module from being pulled in
-// enum GoalQuantifyType {
-//   Numeric = 'NUMERIC',
-//   Boolean = 'BOOLEAN',
-// }
 
 @Injectable()
 export class GoalEntriesService {
