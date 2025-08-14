@@ -26,9 +26,8 @@ export class GoalEntriesService {
 
   async create(goalId: number, createGoalEntryDto: CreateGoalEntryDto, userId: number) {
     const goal = await this.goalsService.findOne(goalId, userId);
-    if (!goal) {
-      throw new NotFoundException("Goal not found for the given goal ID");
-    }
+    assertFound(goal, 'Associated goal not found');
+    assertCanModify(goal, userId); // Only goal owner can create a goal entry for the given goal
 
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryCreateInput = {
@@ -74,7 +73,7 @@ export class GoalEntriesService {
       select: { userId: true, publicity: true },
     });
     assertFound(goal, 'Goal not found');
-    assertCanView(goal, currentUserId, 'Goal not viewable (unauthorized)');
+    assertCanView(goal, currentUserId, 'Goal, and thus goal entries, not viewable (unauthorized)');
 
     const entries = await this.prisma.goalEntry.findMany({
       where: {

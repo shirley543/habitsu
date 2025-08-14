@@ -133,8 +133,6 @@ export class GoalEntriesController {
     @Param('goalId', ParseIntPipe) goalId: number,
     @Body(new ZodValidationPipe(CreateGoalEntrySchema)) createGoalEntryDto: CreateGoalEntryDto
   ) {
-    // TODOsss: use goal ID to determine if:
-    // - said goal ID is associated with the logged in user
     const userId = req.user.id;
     return this.goalEntriesService.create(goalId, createGoalEntryDto, userId);
   }
@@ -153,8 +151,6 @@ export class GoalEntriesController {
     @Param('entryId', ParseIntPipe) entryId: number,
     @Body(new ZodValidationPipe(UpdateGoalEntrySchema)) updateGoalEntryDto: UpdateGoalEntryDto,
   ) {
-    // TODOsss: use goal ID to determine if:
-    // - said goal ID is associated with the logged in user OR user has set both their profile public and that goal to be public (shows up on their profile)
     const userId = req.user.id;
     return this.goalEntriesService.update(goalId, entryId, updateGoalEntryDto, userId);
   }
@@ -166,8 +162,6 @@ export class GoalEntriesController {
     @Param('goalId', ParseIntPipe) goalId: number,
     @Param('entryId', ParseIntPipe) entryId: number,
   ) {
-    // TODOsss: use goal ID to determine if:
-    // - said goal ID is associated with the logged in user OR user has set both their profile public and that goal to be public (shows up on their profile)
     const userId = req.user.id;
     return this.goalEntriesService.remove(goalId, entryId, userId);
   }

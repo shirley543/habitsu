@@ -22,7 +22,6 @@ interface EntryCalendarProps {
   searchParams: SearchParamsGoalEntryDto,
 }
 
-// TODOs: investigate refactor (searchParams has optional goal ID parameter)
 const EntryCalendar: React.FC<EntryCalendarProps> = ({ goalId, searchParams }) => {
   const navigate = useNavigate();
 

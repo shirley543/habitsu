@@ -65,3 +65,23 @@ export function assertCanModify<T extends { userId: number; }>(
     throw new UnauthorizedException(message);
   }
 }
+
+/**
+ * Asserts that the resource can be created by the given user
+ * (e.g. only goal owners can create goal entries for that goal)
+ * 
+ * @param resource - The resource to check
+ * @param userId - The user ID who is requesting to create
+ * @param message - Optional custom not modifiable (unauthorized) message
+ * @throws UnauthorizedException if resource cannot be created by the inputted user ID
+ */
+export function assertCanCreate<T extends { userId: number; }>(
+  resource: T,
+  userId: number,
+  message = 'Resource cannot be created: Unauthorized'
+) {
+  const isOwner = resource.userId === userId;
+  if (!isOwner) {
+    throw new UnauthorizedException(message);
+  }
+}

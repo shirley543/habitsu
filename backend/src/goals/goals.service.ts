@@ -224,8 +224,3 @@ export class GoalsService {
     });
   }
 }
-
-// TODOss 23-July-2025:
-// Handle goal order update passed in from frontend.
-// How to handle e.g. large number of goals being updated order-wise.
-// Diff them? Blindly trust their provided order?
