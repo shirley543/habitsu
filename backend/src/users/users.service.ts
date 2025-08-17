@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -50,6 +50,12 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { email },
       select: userResponseSelect,
+    })
+  }
+
+  findOneByEmailFull(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
     })
   }
 
