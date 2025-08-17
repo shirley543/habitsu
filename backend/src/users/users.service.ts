@@ -3,8 +3,14 @@ import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, UpdateUserDto } from '@habit-tracker/shared';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from '@habit-tracker/shared';
 import { EnvService } from 'src/env/env.service';
+
+
+export const userResponseSelect: Prisma.UserSelect = {
+  id: true,
+  username: true,
+};
 
 @Injectable()
 export class UsersService {
@@ -13,33 +19,41 @@ export class UsersService {
     private envService: EnvService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, this.envService.get('SALT_ROUNDS'));
     const prismaInput: Prisma.UserCreateInput = {
       username: createUserDto.username,
       email: createUserDto.email,
       password: hashedPassword,
     }
-    return this.prisma.user.create({ data: prismaInput });
+    return this.prisma.user.create({
+      data: prismaInput,
+      select: userResponseSelect,
+    });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  findOne(id: number): Promise<UserResponseDto | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: userResponseSelect,
+    });
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+  findOneByUsername(username: string): Promise<UserResponseDto | null> {
+    return this.prisma.user.findUnique({
+      where: { username },
+      select: userResponseSelect,
+    })
   }
 
-  findOneByUsername(username: string) {
-    return this.prisma.user.findUnique({ where: { username } })
+  findOneByEmail(email: string): Promise<UserResponseDto | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: userResponseSelect,
+    })
   }
 
-  findOneByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email }})
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
     const prismaInput: Prisma.UserUpdateInput = {
       username: updateUserDto.username,
       email: updateUserDto.email
@@ -47,10 +61,14 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id },
       data: prismaInput,
+      select: userResponseSelect,
     });
   }
 
   remove(id: number) {
-    return this.prisma.user.delete({ where: { id } });
+    return this.prisma.user.delete({
+      where: { id },
+      select: userResponseSelect,
+    });
   }
 }

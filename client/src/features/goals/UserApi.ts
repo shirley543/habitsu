@@ -1,4 +1,4 @@
-import type { UserResponse, CreateUserDto, UpdateUserDto, LoginUserDto } from "@habit-tracker/shared";
+import type { UserResponseDto, CreateUserDto, UpdateUserDto, LoginUserDto } from "@habit-tracker/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
@@ -16,7 +16,7 @@ const api = ky.create({
  * /users
  */
 
-async function postCreateUser(newUser: CreateUserDto): Promise<UserResponse> {
+async function postCreateUser(newUser: CreateUserDto): Promise<UserResponseDto> {
   return api.post('users', { json: newUser }).json();
 }
 
@@ -26,7 +26,7 @@ export function useCreateUserMutation() {
   })
 }
 
-async function patchUpdateUser(userId: number, updateUser: UpdateUserDto): Promise<UserResponse> {
+async function patchUpdateUser(userId: number, updateUser: UpdateUserDto): Promise<UserResponseDto> {
   return api.patch(`users/${userId}`, { json: updateUser }).json();
 }
 
@@ -36,7 +36,7 @@ export function useUpdateUserMutation() {
   })
 }
 
-async function deleteUser(userId: number): Promise<{}> {
+async function deleteUser(userId: number): Promise<UserResponseDto> {
   return api.delete(`users/${userId}`).json();
 }
 
@@ -46,7 +46,7 @@ export function useDeleteUserMutation() {
   })
 }
 
-async function postLoginUser(user: LoginUserDto) {
+async function postLoginUser(user: LoginUserDto): Promise<UserResponseDto> {
   return api.post('auth/login', { json: user }).json();
 }
 
