@@ -14,9 +14,12 @@ async function bootstrap() {
   // Middleware for parsing cookies in header e.g.
   // JWT token for auth
   // Future work:
-  // - investigate CSRF tokens to protect sensitive requests (POST, PUT, DELETE, etc)
-  // - investigate session-based auth, over current JWT in cookie auth (harder token revocation/ invalidation, as lasts until expiry)
-  // - expand on current JWT in cookie auth, with refresh tokens e.g. JWT in (fe React state) memory + refresh in HttpOnly cookie (decrease JWT token expiry to ~10mins, refresh ~1 week?)
+  // - [Low] Investigate CSRF tokens to protect sensitive requests (POST, PUT, DELETE), if moving to cross-domain requests
+  // - [Low] Investigate session-based auth (server-stored sessions make token revocation/invalidation easier than JWT-in-cookie, which lasts until expiry)
+  // - [Med] Expand on current JWT-in-cookie auth with refresh tokens:
+  //     - Store access JWT in React memory
+  //     - Store refresh token in HttpOnly cookie
+  //     - Shorten access JWT expiry (e.g., 10 mins), refresh token expiry longer (e.g., 1 week)
   app.use(cookieParser());
   
   const config = new DocumentBuilder()
