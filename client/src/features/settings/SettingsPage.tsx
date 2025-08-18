@@ -5,6 +5,7 @@ import { RadioGroupItem, RadioGroup } from "@/components/ui/radio-group";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
 import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator"
 
 interface SettingGroup {
   groupName: string, ///< e.g. Theme
@@ -28,6 +29,7 @@ interface ToggleConfig {
 }
 
 interface RadioGroupConfig {
+  label: string,
   values: Array<{ label: string; value: string }>,
   onValueChange: (val: string) => void,
 }
@@ -47,12 +49,13 @@ export function SettingsPage() {
   const navigate = useNavigate();
 
   const SETTING_GROUPS: SettingGroup[] = [
-    // Theme
+    // Appearance
     {
-      groupName: "Theme",
+      groupName: "Appearance",
       settingItems: [{
         settingType: SettingType.RadioGroup,
         config: {
+          label: "Theme",
           values: [
             { label: "Light", value: "light" },
             { label: "Dark", value: "dark" },
@@ -63,9 +66,9 @@ export function SettingsPage() {
         }
       }]
     },
-    // Home
+    // Goal Settings
     {
-      groupName: "Home",
+      groupName: "Goal Settings",
       settingItems: [
         {
           settingType: SettingType.MenuItem,
@@ -96,21 +99,48 @@ export function SettingsPage() {
         },
       ]
     },
-    // Profile Privacy
+    // Profile Settings
     {
-      groupName: "Profile Privacy",
-      settingItems: [{
-        settingType: SettingType.RadioGroup,
-        config: {
-          values: [
-            { label: "Private", value: "private" },
-            { label: "Public", value: "public" },
-          ],
-          onValueChange: (val: string) => {
-            console.log("value changed", val)
+      groupName: "Profile Settings",
+      settingItems: [
+        {
+          settingType: SettingType.RadioGroup,
+          config: {
+            label: "Profile Privacy",
+            values: [
+              { label: "Private", value: "private" },
+              { label: "Public", value: "public" },
+            ],
+            onValueChange: (val: string) => {
+              console.log("value changed", val)
+            }
           }
-        }
-      }]
+        },
+        {
+          settingType: SettingType.MenuItem,
+          config: {
+            label: "Account Details",
+            onMenuClick: () => {
+              // navigate({ to: "/settings/account-details" });
+            }
+          }
+        },
+      ]
+    },
+    // Danger Zone
+    {
+      groupName: "Danger Zone",
+      settingItems: [
+        {
+          settingType: SettingType.MenuItem,
+          config: {
+            label: "Delete Account",
+            onMenuClick: () => {
+              // navigate({ to: "/settings/delete-account" });
+            }
+          }
+        },
+      ]
     },
   ]
 
@@ -134,23 +164,35 @@ export function SettingsPage() {
                 {group.settingItems.map((item) => {
                   switch (item.settingType) {
                     case SettingType.MenuItem:
-                      return <button className={`hover:bg-neutral-50 transition-colors ${settingItemPaddingClass}`} onClick={item.config.onMenuClick}>
-                        <Label className={settingItemLabelClass}>{item.config.label}</Label>
-                      </button>
+                      return <>
+                        <button className={`hover:bg-neutral-50 transition-colors ${settingItemPaddingClass}`} onClick={item.config.onMenuClick}>
+                          <Label className={settingItemLabelClass}>{item.config.label}</Label>
+                        </button>
+                        <Separator className="mx-4"/>
+                      </>
 
                     case SettingType.Toggle:
-                      return <div className={`flex flex-row justify-between ${settingItemPaddingClass}`}>
-                        <Label className={settingItemLabelClass}>{item.config.label}</Label>
-                        <Switch onClick={item.config.onToggleChange}/>
-                      </div>
+                      return <>
+                        <div className={`flex flex-row justify-between ${settingItemPaddingClass}`}>
+                          <Label className={settingItemLabelClass}>{item.config.label}</Label>
+                          <Switch onClick={item.config.onToggleChange}/>
+                        </div>
+                        <Separator className="mx-4"/>
+                      </>
 
                     case SettingType.RadioGroup:
-                      return <RadioGroup className={`flex flex-col gap-2 ${settingItemPaddingClass}`}>{item.config.values.map((entry) => {
-                        return <div className="flex flex-row gap-2.5 items-center">
-                          <RadioGroupItem value={entry.value}></RadioGroupItem>
-                          <Label className={settingItemLabelClass}>{entry.label}</Label>
-                        </div>
-                      })}</RadioGroup>
+                      return <>
+                        <RadioGroup className={`flex flex-col gap-2 ${settingItemPaddingClass}`}>
+                          <h2>{item.config.label}</h2>
+                          {item.config.values.map((entry) => {
+                            return <div className="flex flex-row gap-2.5 items-center">
+                              <RadioGroupItem value={entry.value}></RadioGroupItem>
+                              <Label className={settingItemLabelClass}>{entry.label}</Label>
+                            </div>
+                          })}
+                        </RadioGroup>
+                        <Separator className="mx-4"/>
+                      </>
                     }
                 })}
               </div>
