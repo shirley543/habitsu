@@ -30,6 +30,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      '@habit-tracker/shared': resolve(__dirname, '../shared/src'),
+      '@habit-tracker/shared/*': resolve(__dirname, '../shared/src/*'),
     },
   }
 });

@@ -26,5 +26,5 @@
       "@habit-tracker/shared": ["../shared/src"],
       "@habit-tracker/shared/*": ["../shared/src/*"]
     }
-  }
+  },
 }
