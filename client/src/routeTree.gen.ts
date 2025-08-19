@@ -18,8 +18,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as GoalsIndexRouteImport } from './routes/goals.index'
 import { Route as EntrysIndexRouteImport } from './routes/entrys.index'
-import { Route as SettingsGoalvisibilityRouteImport } from './routes/settings_/goalvisibility'
-import { Route as SettingsGoalorderRouteImport } from './routes/settings_/goalorder'
+import { Route as SettingsGoalVisibilityRouteImport } from './routes/settings_/goal-visibility'
+import { Route as SettingsGoalOrderRouteImport } from './routes/settings_/goal-order'
+import { Route as SettingsDeleteAccountRouteImport } from './routes/settings_/delete-account'
+import { Route as SettingsAccountDetailsRouteImport } from './routes/settings_/account-details'
 import { Route as GoalsCreateRouteImport } from './routes/goals_/create'
 import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
 import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
@@ -71,14 +73,24 @@ const EntrysIndexRoute = EntrysIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EntrysRoute,
 } as any)
-const SettingsGoalvisibilityRoute = SettingsGoalvisibilityRouteImport.update({
-  id: '/settings_/goalvisibility',
-  path: '/settings/goalvisibility',
+const SettingsGoalVisibilityRoute = SettingsGoalVisibilityRouteImport.update({
+  id: '/settings_/goal-visibility',
+  path: '/settings/goal-visibility',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsGoalorderRoute = SettingsGoalorderRouteImport.update({
-  id: '/settings_/goalorder',
-  path: '/settings/goalorder',
+const SettingsGoalOrderRoute = SettingsGoalOrderRouteImport.update({
+  id: '/settings_/goal-order',
+  path: '/settings/goal-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsDeleteAccountRoute = SettingsDeleteAccountRouteImport.update({
+  id: '/settings_/delete-account',
+  path: '/settings/delete-account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsAccountDetailsRoute = SettingsAccountDetailsRouteImport.update({
+  id: '/settings_/account-details',
+  path: '/settings/account-details',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoalsCreateRoute = GoalsCreateRouteImport.update({
@@ -118,8 +130,10 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
-  '/settings/goalorder': typeof SettingsGoalorderRoute
-  '/settings/goalvisibility': typeof SettingsGoalvisibilityRoute
+  '/settings/account-details': typeof SettingsAccountDetailsRoute
+  '/settings/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings/goal-order': typeof SettingsGoalOrderRoute
+  '/settings/goal-visibility': typeof SettingsGoalVisibilityRoute
   '/entrys/': typeof EntrysIndexRoute
   '/goals/': typeof GoalsIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -133,8 +147,10 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
-  '/settings/goalorder': typeof SettingsGoalorderRoute
-  '/settings/goalvisibility': typeof SettingsGoalvisibilityRoute
+  '/settings/account-details': typeof SettingsAccountDetailsRoute
+  '/settings/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings/goal-order': typeof SettingsGoalOrderRoute
+  '/settings/goal-visibility': typeof SettingsGoalVisibilityRoute
   '/entrys': typeof EntrysIndexRoute
   '/goals': typeof GoalsIndexRoute
   '/settings': typeof SettingsIndexRoute
@@ -152,8 +168,10 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
   '/goals_/create': typeof GoalsCreateRoute
-  '/settings_/goalorder': typeof SettingsGoalorderRoute
-  '/settings_/goalvisibility': typeof SettingsGoalvisibilityRoute
+  '/settings_/account-details': typeof SettingsAccountDetailsRoute
+  '/settings_/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings_/goal-order': typeof SettingsGoalOrderRoute
+  '/settings_/goal-visibility': typeof SettingsGoalVisibilityRoute
   '/entrys/': typeof EntrysIndexRoute
   '/goals/': typeof GoalsIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -172,8 +190,10 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
-    | '/settings/goalorder'
-    | '/settings/goalvisibility'
+    | '/settings/account-details'
+    | '/settings/delete-account'
+    | '/settings/goal-order'
+    | '/settings/goal-visibility'
     | '/entrys/'
     | '/goals/'
     | '/settings/'
@@ -187,8 +207,10 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
-    | '/settings/goalorder'
-    | '/settings/goalvisibility'
+    | '/settings/account-details'
+    | '/settings/delete-account'
+    | '/settings/goal-order'
+    | '/settings/goal-visibility'
     | '/entrys'
     | '/goals'
     | '/settings'
@@ -205,8 +227,10 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals_/$goalId'
     | '/goals_/create'
-    | '/settings_/goalorder'
-    | '/settings_/goalvisibility'
+    | '/settings_/account-details'
+    | '/settings_/delete-account'
+    | '/settings_/goal-order'
+    | '/settings_/goal-visibility'
     | '/entrys/'
     | '/goals/'
     | '/settings/'
@@ -224,8 +248,10 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
   GoalsCreateRoute: typeof GoalsCreateRoute
-  SettingsGoalorderRoute: typeof SettingsGoalorderRoute
-  SettingsGoalvisibilityRoute: typeof SettingsGoalvisibilityRoute
+  SettingsAccountDetailsRoute: typeof SettingsAccountDetailsRoute
+  SettingsDeleteAccountRoute: typeof SettingsDeleteAccountRoute
+  SettingsGoalOrderRoute: typeof SettingsGoalOrderRoute
+  SettingsGoalVisibilityRoute: typeof SettingsGoalVisibilityRoute
   GoalsGoalIdEditRoute: typeof GoalsGoalIdEditRoute
   GoalsGoalIdEntriesCreateRoute: typeof GoalsGoalIdEntriesCreateRoute
   GoalsGoalIdEntriesEntryIdEditRoute: typeof GoalsGoalIdEntriesEntryIdEditRoute
@@ -296,18 +322,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntrysIndexRouteImport
       parentRoute: typeof EntrysRoute
     }
-    '/settings_/goalvisibility': {
-      id: '/settings_/goalvisibility'
-      path: '/settings/goalvisibility'
-      fullPath: '/settings/goalvisibility'
-      preLoaderRoute: typeof SettingsGoalvisibilityRouteImport
+    '/settings_/goal-visibility': {
+      id: '/settings_/goal-visibility'
+      path: '/settings/goal-visibility'
+      fullPath: '/settings/goal-visibility'
+      preLoaderRoute: typeof SettingsGoalVisibilityRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings_/goalorder': {
-      id: '/settings_/goalorder'
-      path: '/settings/goalorder'
-      fullPath: '/settings/goalorder'
-      preLoaderRoute: typeof SettingsGoalorderRouteImport
+    '/settings_/goal-order': {
+      id: '/settings_/goal-order'
+      path: '/settings/goal-order'
+      fullPath: '/settings/goal-order'
+      preLoaderRoute: typeof SettingsGoalOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/delete-account': {
+      id: '/settings_/delete-account'
+      path: '/settings/delete-account'
+      fullPath: '/settings/delete-account'
+      preLoaderRoute: typeof SettingsDeleteAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/account-details': {
+      id: '/settings_/account-details'
+      path: '/settings/account-details'
+      fullPath: '/settings/account-details'
+      preLoaderRoute: typeof SettingsAccountDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/goals_/create': {
@@ -390,8 +430,10 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
   GoalsCreateRoute: GoalsCreateRoute,
-  SettingsGoalorderRoute: SettingsGoalorderRoute,
-  SettingsGoalvisibilityRoute: SettingsGoalvisibilityRoute,
+  SettingsAccountDetailsRoute: SettingsAccountDetailsRoute,
+  SettingsDeleteAccountRoute: SettingsDeleteAccountRoute,
+  SettingsGoalOrderRoute: SettingsGoalOrderRoute,
+  SettingsGoalVisibilityRoute: SettingsGoalVisibilityRoute,
   GoalsGoalIdEditRoute: GoalsGoalIdEditRoute,
   GoalsGoalIdEntriesCreateRoute: GoalsGoalIdEntriesCreateRoute,
   GoalsGoalIdEntriesEntryIdEditRoute: GoalsGoalIdEntriesEntryIdEditRoute,

@@ -92,7 +92,7 @@ export function SettingsPage() {
           config: {
             label: "Goal Order",
             onMenuClick: () => {
-              navigate({ to: "/settings/goalorder" });
+              navigate({ to: "/settings/goal-order" });
             }
           }
         },
@@ -101,7 +101,7 @@ export function SettingsPage() {
           config: {
             label: "Goal Visibility",
             onMenuClick: () => {
-              navigate({ to: "/settings/goalvisibility" });
+              navigate({ to: "/settings/goal-visibility" });
             }
           }
         },
@@ -138,7 +138,7 @@ export function SettingsPage() {
           config: {
             label: "Account Details",
             onMenuClick: () => {
-              // navigate({ to: "/settings/account-details" });
+              navigate({ to: "/settings/account-details" });
             }
           }
         },
@@ -153,7 +153,7 @@ export function SettingsPage() {
           config: {
             label: "Delete Account",
             onMenuClick: () => {
-              // navigate({ to: "/settings/delete-account" });
+              navigate({ to: "/settings/delete-account" });
             }
           }
         },

@@ -1,6 +1,6 @@
 import { GoalVisibilityPage } from '@/features/settings/GoalVisibilityPage'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/settings_/goalvisibility')({
+export const Route = createFileRoute('/settings_/goal-visibility')({
   component: GoalVisibilityPage,
 })
