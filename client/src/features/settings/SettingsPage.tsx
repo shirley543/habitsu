@@ -6,16 +6,24 @@ import { TopBarClose } from "@/components/custom/TopBar";
 import { useNavigate } from "@tanstack/react-router";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator"
+import { ChevronRight } from "lucide-react";
+
+enum SettingGroupStyle {
+  Default = 'default',
+  Danger = 'danger',
+}
 
 interface SettingGroup {
   groupName: string, ///< e.g. Theme
   settingItems: SettingItem[],
+  style?: SettingGroupStyle,
 }
 
 enum SettingType {
   MenuItem = 'menu-item',
   Toggle = 'toggle',
-  RadioGroup = 'radio-group',
+  RadioGroupCompact = 'radio-group-compact',
+  RadioGroupDetailed = 'radio-group-detailed',
 };
 
 interface MenuItemConfig {
@@ -28,9 +36,15 @@ interface ToggleConfig {
   onToggleChange: () => void,
 }
 
-interface RadioGroupConfig {
+interface RadioGroupCompactConfig {
   label: string,
   values: Array<{ label: string; value: string }>,
+  onValueChange: (val: string) => void,
+}
+
+interface RadioGroupDetailedConfig {
+  label: string,
+  values: Array<{ label: string; detail: string; value: string }>,
   onValueChange: (val: string) => void,
 }
 
@@ -41,8 +55,11 @@ type SettingItem = {
   settingType: SettingType.Toggle,
   config: ToggleConfig,
 } | {
-  settingType: SettingType.RadioGroup,
-  config: RadioGroupConfig,
+  settingType: SettingType.RadioGroupCompact,
+  config: RadioGroupCompactConfig,
+} | {
+  settingType: SettingType.RadioGroupDetailed,
+  config: RadioGroupDetailedConfig,
 }
 
 export function SettingsPage() {
@@ -53,9 +70,9 @@ export function SettingsPage() {
     {
       groupName: "Appearance",
       settingItems: [{
-        settingType: SettingType.RadioGroup,
+        settingType: SettingType.RadioGroupCompact,
         config: {
-          label: "Theme",
+          label: "Theme Mode",
           values: [
             { label: "Light", value: "light" },
             { label: "Dark", value: "dark" },
@@ -104,12 +121,12 @@ export function SettingsPage() {
       groupName: "Profile Settings",
       settingItems: [
         {
-          settingType: SettingType.RadioGroup,
+          settingType: SettingType.RadioGroupDetailed,
           config: {
             label: "Profile Privacy",
             values: [
-              { label: "Private", value: "private" },
-              { label: "Public", value: "public" },
+              { label: "Public", detail: "Anyone can see your profile info", value: "public" },
+              { label: "Private", detail: "Only you can see your profile", value: "private" },
             ],
             onValueChange: (val: string) => {
               console.log("value changed", val)
@@ -140,7 +157,8 @@ export function SettingsPage() {
             }
           }
         },
-      ]
+      ],
+      style: SettingGroupStyle.Danger,
     },
   ]
 
@@ -154,10 +172,10 @@ export function SettingsPage() {
       {/* Setting groups */}
       {
         SETTING_GROUPS.map((group) => {
-          const settingItemLabelClass = "text-base font-medium";
+          const settingItemLabelClass = "text-base font-semibold";
           const settingItemPaddingClass = "px-5 py-2.5";
 
-          return <div className="setting-group-with-label flex flex-col gap-0">
+          return <div className={`setting-group-with-label flex flex-col gap-1 ${group.style === SettingGroupStyle.Danger ? 'text-red-800' : 'text-zinc-950'}`}>
             <h2 className="text-base font-semibold">{group.groupName}</h2>
             <div className="card bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="flex flex-col">
@@ -165,8 +183,9 @@ export function SettingsPage() {
                   switch (item.settingType) {
                     case SettingType.MenuItem:
                       return <>
-                        <button className={`hover:bg-neutral-50 transition-colors ${settingItemPaddingClass}`} onClick={item.config.onMenuClick}>
+                        <button className={`hover:bg-neutral-50 transition-colors flex flex-row items-center justify-between ${settingItemPaddingClass}`} onClick={item.config.onMenuClick}>
                           <Label className={settingItemLabelClass}>{item.config.label}</Label>
+                          <ChevronRight size="16"/>
                         </button>
                         <Separator className="mx-4"/>
                       </>
@@ -180,14 +199,34 @@ export function SettingsPage() {
                         <Separator className="mx-4"/>
                       </>
 
-                    case SettingType.RadioGroup:
+                    case SettingType.RadioGroupCompact:
                       return <>
                         <RadioGroup className={`flex flex-col gap-2 ${settingItemPaddingClass}`}>
-                          <h2>{item.config.label}</h2>
+                          <h2 className="text-sm font-semibold">{item.config.label}</h2>
+                          <div className="grid grid-cols-2">
+                            {item.config.values.map((entry) => {
+                              return <div className="flex flex-row gap-2.5 items-center">
+                                <RadioGroupItem value={entry.value}></RadioGroupItem>
+                                <Label className={settingItemLabelClass}>{entry.label}</Label>
+                              </div>
+                            })}
+                          </div>
+
+                        </RadioGroup>
+                        <Separator className="mx-4"/>
+                      </>
+
+                    case SettingType.RadioGroupDetailed:
+                      return <>
+                        <RadioGroup className={`flex flex-col gap-2 ${settingItemPaddingClass}`}>
+                          <h2 className="text-sm font-semibold">{item.config.label}</h2>
                           {item.config.values.map((entry) => {
                             return <div className="flex flex-row gap-2.5 items-center">
                               <RadioGroupItem value={entry.value}></RadioGroupItem>
-                              <Label className={settingItemLabelClass}>{entry.label}</Label>
+                              <div>
+                                <Label className={settingItemLabelClass}>{entry.label}</Label>
+                                <p>{entry.detail}</p>
+                              </div>
                             </div>
                           })}
                         </RadioGroup>
