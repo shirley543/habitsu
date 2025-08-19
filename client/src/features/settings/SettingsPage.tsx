@@ -174,12 +174,13 @@ export function SettingsPage() {
         SETTING_GROUPS.map((group) => {
           const settingItemLabelClass = "text-base font-semibold";
           const settingItemPaddingClass = "px-5 py-2.5";
+          const settingItemsLen = group.settingItems.length;
 
           return <div className={`setting-group-with-label flex flex-col gap-1 ${group.style === SettingGroupStyle.Danger ? 'text-red-800' : 'text-zinc-950'}`}>
             <h2 className="text-base font-semibold">{group.groupName}</h2>
             <div className="card bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="flex flex-col">
-                {group.settingItems.map((item) => {
+                {group.settingItems.map((item, idx) => {
                   switch (item.settingType) {
                     case SettingType.MenuItem:
                       return <>
@@ -187,7 +188,7 @@ export function SettingsPage() {
                           <Label className={settingItemLabelClass}>{item.config.label}</Label>
                           <ChevronRight size="16"/>
                         </button>
-                        <Separator className="mx-4"/>
+                        {idx < (settingItemsLen - 1) && <Separator className="mx-4"/>}
                       </>
 
                     case SettingType.Toggle:
@@ -196,7 +197,7 @@ export function SettingsPage() {
                           <Label className={settingItemLabelClass}>{item.config.label}</Label>
                           <Switch onClick={item.config.onToggleChange}/>
                         </div>
-                        <Separator className="mx-4"/>
+                        {idx < (settingItemsLen - 1) && <Separator className="mx-4"/>}
                       </>
 
                     case SettingType.RadioGroupCompact:
@@ -213,7 +214,7 @@ export function SettingsPage() {
                           </div>
 
                         </RadioGroup>
-                        <Separator className="mx-4"/>
+                        {idx < (settingItemsLen - 1) && <Separator className="mx-4"/>}
                       </>
 
                     case SettingType.RadioGroupDetailed:
@@ -230,7 +231,7 @@ export function SettingsPage() {
                             </div>
                           })}
                         </RadioGroup>
-                        <Separator className="mx-4"/>
+                        {idx < (settingItemsLen - 1) && <Separator className="mx-4"/>}
                       </>
                     }
                 })}
