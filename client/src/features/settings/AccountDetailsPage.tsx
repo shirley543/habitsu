@@ -122,13 +122,13 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }
 }
 
 export function AccountDetailsPage() {
-  const username = "usernameusername";
-  const { data, isLoading, error } = useUser(username);
+  const { data, isLoading, error } = useUser();
   // TODOsss update this to get current logged in user's details for user name, email, etc.
 
   return (
     <>
       {isLoading && <div>Loading...</div>}
+      {/* // TODOss show error message. Some better handling */}
       {error && <div>{error.message}</div>}
       {!isLoading && !error && data && <AccountDetailsForm defaultValues={data}/>}
     </>

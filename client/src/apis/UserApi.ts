@@ -16,14 +16,14 @@ const api = ky.create({
  * /users
  */
 
-async function fetchUser(username: string): Promise<UserResponseDto> {
-  return api.get(`users?${username}`).json();
+async function fetchUser(): Promise<UserResponseDto> {
+  return api.get(`users/me`).json();
 }
 
-export function useUser(username: string) {
+export function useUser() {
   return useQuery<UserResponseDto, HTTPError>({
-    queryKey: ['user', username],
-    queryFn: () => fetchUser(username),
+    queryKey: ['user'],
+    queryFn: () => fetchUser(),
     retry: REACT_QUERY_RETRY_NUM,
   });
 }
@@ -38,23 +38,23 @@ export function useCreateUserMutation() {
   })
 }
 
-async function patchUpdateUser(userId: number, updateUser: UpdateUserDto): Promise<UserResponseDto> {
-  return api.patch(`users/${userId}`, { json: updateUser }).json();
+async function patchUpdateUser(updateUser: UpdateUserDto): Promise<UserResponseDto> {
+  return api.patch(`users/me`, { json: updateUser }).json();
 }
 
 export function useUpdateUserMutation() {
   return useMutation({
-    mutationFn: ({ id, update }: { id: number, update: UpdateUserDto }) => { return patchUpdateUser(id, update) },
+    mutationFn: ({ update }: { update: UpdateUserDto }) => { return patchUpdateUser(update) },
   })
 }
 
-async function deleteUser(userId: number): Promise<UserResponseDto> {
-  return api.delete(`users/${userId}`).json();
+async function deleteUser(): Promise<UserResponseDto> {
+  return api.delete(`users/me`).json();
 }
 
 export function useDeleteUserMutation() {
   return useMutation({
-    mutationFn: (userId: number) => { return deleteUser(userId) },
+    mutationFn: () => { return deleteUser() },
   })
 }
 
@@ -68,7 +68,6 @@ export function useLoginUserMutation() {
   })
 }
 
-// TODOs check: logout shouldn't need post body as should already have auth bearer token 
 async function postLogoutUser() {
   return api.post('auth/logout').json();
 }
