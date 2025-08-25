@@ -1,7 +1,7 @@
 import { useAppForm } from '../../hooks/form'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { CreateUserSchema, LoginUserSchema, type CreateUserDto } from '@habit-tracker/shared';
-import { useCreateUserMutation, useLoginUserMutation } from '../goals/UserApi';
+import { useCreateUserMutation, useLoginUserMutation } from '../../apis/UserApi';
 
 
 interface LoginFormProps {

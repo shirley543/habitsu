@@ -16,12 +16,19 @@ const api = ky.create({
  * /users
  */
 
-async function fetchUser(): Promise<UserResponseDto> {
-  return api.get(`users/me`).json();
+export async function fetchUser(): Promise<UserResponseDto | null> {
+  try {
+    return await api.get('users/me').json();
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      return null;
+    }
+    throw err;
+  }
 }
 
 export function useUser() {
-  return useQuery<UserResponseDto, HTTPError>({
+  return useQuery<UserResponseDto | null, HTTPError>({
     queryKey: ['user'],
     queryFn: () => fetchUser(),
     retry: REACT_QUERY_RETRY_NUM,
