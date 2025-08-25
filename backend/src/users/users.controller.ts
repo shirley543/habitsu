@@ -24,6 +24,9 @@ class UserResponseDtoClass implements UserResponseDto {
 
   @ApiProperty({ example: 'alice' })
   username: string;
+
+  @ApiProperty({ example: 'alice@alice.com'})
+  email: string;
 }
 
 class CreateUserDtoClass implements CreateUserDto {
