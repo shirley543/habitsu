@@ -4,7 +4,7 @@ import { GoalIconText, SkeletonGoalIconText } from "./GoalIconText";
 import IconButton from "@/components/custom/IconButton";
 import { useNavigate } from "@tanstack/react-router";
 import { YearDropdown } from "./YearDropdown";
-import { useGoalEntries } from "../GoalApi";
+import { useGoalEntries } from '../../../apis/GoalApi';
 import type { GoalEntryResponse, SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 import { navigateToCreateOrEdit } from "./NavigateUtils";
 import type { ColourGoalData } from "@/lib/colourUtils";

@@ -6,7 +6,7 @@ import MonthAreaChart from "./components/MonthAreaChart";
 import IconButton from "@/components/custom/IconButton";
 import { TopBarBack } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { useGoal, useGoalMonthlyAvgs, useGoalMonthlyCounts, useGoalStatistics } from "./GoalApi";
+import { useGoal, useGoalMonthlyAvgs, useGoalMonthlyCounts, useGoalStatistics } from '../../apis/GoalApi';
 import { GoalQuantifyType, type GoalResponse, type GoalStatisticsReponse } from "@habit-tracker/shared";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useNavigate, useRouterState } from '@tanstack/react-router';
 import { GoalQuantifyType, type GoalEntryResponse, CreateGoalEntrySchema } from '@habit-tracker/shared';
-import { useCreateGoalEntryMutation, useDeleteGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from './GoalApi';
+import { useCreateGoalEntryMutation, useDeleteGoalEntryMutation, useGoal, useGoalEntry, useUpdateGoalEntryMutation } from '../../apis/GoalApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { capitalizeFirstLetter } from '@/lib/stringUtils';
 import { Button } from '@/components/ui/button';

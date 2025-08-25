@@ -2,29 +2,46 @@ import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { getRouteApi, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
-import { UserPublicityType, type UserResponse, CreateUserSchema, type CreateUserDto } from '@habit-tracker/shared';
-import { useCreateUserMutation, useDeleteUserMutation, useUser, useUpdateUserMutation } from './UserApi';
+import { type UpdateUserDto, type UserResponseDto, UpdateUserSchema } from '@habit-tracker/shared';
+import { useUser, useUpdateUserMutation } from '../../apis/UserApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/custom/DialogComponents';
+import z from 'zod';
 
-// TODOss:
-// - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
+
+const UpdateUserFormSchema = z
+  .object({
+    username: z.string().optional(),
+    email: z.string().email().optional(),
+    newPassword: z.string().optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .refine(
+    (data) =>
+      // If not changing password, skip
+      (!data.newPassword && !data.confirmPassword) ||
+      data.newPassword === data.confirmPassword,
+    {
+      message: "New password and confirm password must match",
+      path: ["confirmPassword"],
+    }
+  );
+
+type UpdateUserFormType = z.infer<typeof UpdateUserFormSchema>;
 
 interface AccountDetailsFormProps {
-  isCreate: boolean;
-  defaultValues?: UserResponse;
+  defaultValues: UserResponseDto;
 }
 
-const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ isCreate, defaultValues }) => {
+const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }) => {
   const navigate = useNavigate();
   const router = useRouter()
   const canGoBack = useCanGoBack()
 
-  const initialValues = defaultValues;
+  const initialValues: UpdateUserFormType = defaultValues;
 
   const { mutate: updateUserMutateFn } = useUpdateUserMutation();
-  // const { mutate: deleteUserMutateFn } = useDeleteUserMutation();
 
   const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
 
@@ -32,17 +49,22 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ isCreate, defau
     if (canGoBack) {
       router.history.back();
     } else {
-      navigate({ to: "/goals"});
+      navigate({ to: "/settings"});
     }
   }
 
   const form = useAppForm({
     defaultValues: initialValues,
     validators: {
-      onChange: CreateUserSchema,
+      onChange: UpdateUserFormSchema,
     },
     onSubmit: ({ value }) => {
-      updateUserMutateFn({ id: defaultValues?.id, update: value }, {
+      const updateValue: UpdateUserDto = {
+        username: value.username,
+        email: value.email,
+        password: value.newPassword,
+      }
+      updateUserMutateFn({ id: defaultValues?.id, update: updateValue }, {
         onSuccess: navigateBack,
         onError: (error) => setDisplayedError({
           error: error,
@@ -51,18 +73,6 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ isCreate, defau
       })
     },
   });
-
-  // const handleDelete = () => {
-  //   if (defaultValues?.id) {
-  //     deleteUserMutateFn(defaultValues.id, {
-  //       onSuccess: () => navigate({ to: '/goals' }),
-  //       onError: (error) => setDisplayedError({
-  //         error: error,
-  //         category: ErrorDialogCategory.DeleteFailed
-  //       }),
-  //     })
-  //   }
-  // }
 
   return (
     <div className="flex flex-col gap-3">
@@ -87,15 +97,15 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ isCreate, defau
           {(field) => <field.TextField label="Email" />}
         </form.AppField>
 
-        <form.AppField name="password">
+        <form.AppField name="newPassword">
           {(field) => <field.TextField label="Current Password" />}
         </form.AppField>
 
-        <form.AppField name="new_password">
-          {(field) => <field.TextField label="New Password (optional)" />}
+        <form.AppField name="newPassword">
+          {(field) => <field.TextField label="New Password" />}
         </form.AppField>
 
-        <form.AppField name="confirm_new_password">
+        <form.AppField name="confirmPassword">
           {(field) => <field.TextField label="Confirm New Password" />}
         </form.AppField>
       </form>
@@ -112,15 +122,15 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ isCreate, defau
 }
 
 export function AccountDetailsPage() {
-  const goalId = 1;
-  const { data, isLoading, error } = useUser(goalId);
-  // TODOsss update this to get current logged in user's details for user name, email, current password, etc.
+  const username = "usernameusername";
+  const { data, isLoading, error } = useUser(username);
+  // TODOsss update this to get current logged in user's details for user name, email, etc.
 
   return (
     <>
       {isLoading && <div>Loading...</div>}
       {error && <div>{error.message}</div>}
-      {!isLoading && !error && <AccountDetailsForm isCreate={false} defaultValues={data}/>}
+      {!isLoading && !error && data && <AccountDetailsForm defaultValues={data}/>}
     </>
   )
 }

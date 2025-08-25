@@ -16,6 +16,18 @@ const api = ky.create({
  * /users
  */
 
+async function fetchUser(username: string): Promise<UserResponseDto> {
+  return api.get(`users?${username}`).json();
+}
+
+export function useUser(username: string) {
+  return useQuery<UserResponseDto, HTTPError>({
+    queryKey: ['user', username],
+    queryFn: () => fetchUser(username),
+    retry: REACT_QUERY_RETRY_NUM,
+  });
+}
+
 async function postCreateUser(newUser: CreateUserDto): Promise<UserResponseDto> {
   return api.post('users', { json: newUser }).json();
 }

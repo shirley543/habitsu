@@ -5,7 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import IconButton from "@/components/custom/IconButton";
 import { YearDropdown } from "./components/YearDropdown";
 import { useState } from "react";
-import { useGoals } from "./GoalApi";
+import { useGoals } from '../../apis/GoalApi';
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 
 

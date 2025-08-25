@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import type { GoalResponse } from "@habit-tracker/shared";
-import { useGoals, useUpdateGoalMutation } from "../goals/GoalApi";
+import { useGoals, useUpdateGoalMutation } from '../../apis/GoalApi';
 import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";

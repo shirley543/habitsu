@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { Calendar } from "@/components/ui/calendar"
-import { useGoalEntries, useGoal } from "../GoalApi";
+import { useGoalEntries, useGoal } from '../../../apis/GoalApi';
 import { GoalQuantifyType, type GoalEntryResponse, type SearchParamsGoalEntryDto } from "@habit-tracker/shared";
 import { computeBinAndColorArrays } from "@/lib/colourUtils";
 import { navigateToCreateOrEdit } from "./NavigateUtils";

@@ -5,7 +5,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from '@dnd-kit/utilities';
 
 import { ReorderGoalSchema, type GoalResponse, type ReorderGoalDto } from "@habit-tracker/shared";
-import { useGoals, useReorderGoalsMutation } from "../goals/GoalApi";
+import { useGoals, useReorderGoalsMutation } from '../../apis/GoalApi';
 import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
