@@ -10,6 +10,7 @@ import { EnvService } from 'src/env/env.service';
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
   username: true,
+  email: true,
 };
 
 @Injectable()
