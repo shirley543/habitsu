@@ -39,7 +39,7 @@ model Goal {
   numericUnit   String?       @db.VarChar(20)
   entries       GoalEntry[]
   userId        Int
-  user          User          @relation(fields: [userId], references: [id])
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   visibility    Boolean       @default(true)
   order         Int
 }

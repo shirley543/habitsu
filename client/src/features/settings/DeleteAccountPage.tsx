@@ -29,8 +29,8 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
       user &&
       data.username === user.username,
     {
-      message: "New password and confirm password must match",
-      path: ["confirmPassword"],
+      message: "You must type your username to confirm account deletion",
+      path: ["username"],
     }
   );
 
@@ -51,12 +51,14 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
       username: '',
     },
     validators: {
-      onChange: DeleteFormSchema,
+      onSubmit: DeleteFormSchema,
     },
     onSubmit: ({ value }) => {
       deleteUserMutateFn(undefined, {
-        onSuccess: () => navigate({ to: '/goals' }), ///< TODOs: navigate back to landing upon successful delete?
-        // TODOsss: fix foreign key constraint violated (cascade so that upon deletion of user, all associated goals and goal entries are deleted)
+        onSuccess: () => {
+          // TODOssss: Fix ERROR [ExceptionsHandler] TypeError: Converting circular structure to JSON, upon successful delete function (deleted in DB, but errors out)
+          navigate({ to: '/' }); ///< Navigate to landing upon successful delete
+        },
         onError: (error) => setDisplayedError({
           error: error,
           category: ErrorDialogCategory.DeleteFailed
