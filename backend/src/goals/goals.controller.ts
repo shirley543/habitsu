@@ -41,6 +41,8 @@ export class GoalsController {
   @Get()
   @ApiOkResponse({ type: GoalEntity, isArray: true })
   // TODOssss how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
+  // No, should keep decoupled and have mapper functions between DTOs (zod) and Prisma entities.
+  // Reason: decoupling (what if change Prisma to another ORM or do DB normalization so schema changes, but want DTOs/ contract between FE and BE to remain the same?)
   findAll(
     @Req() req,
   ) {
