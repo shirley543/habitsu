@@ -2,7 +2,7 @@ import { useStore } from '@tanstack/react-form'
 
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea as ShadcnTextarea } from '@/components/ui/textarea'
 import * as ShadcnSelect from '@/components/ui/select'
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
 import type { ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
+import type { VariantProps } from 'class-variance-authority'
 
 
 export const StandardIcons: IconName[] = [
@@ -81,13 +82,17 @@ function StyledInput({ className, ...props }: React.ComponentProps<typeof Input>
   );
 }
 
-export function SubscribeButton({ label }: { label: string }) {
+type SubscribeButtonProps = {
+  label: string,
+} & VariantProps<typeof buttonVariants>;
+
+export function SubscribeButton({ label, variant }: SubscribeButtonProps) {
   const form = useFormContext()
 
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} variant={variant}>
           {label}
         </Button>
       )}

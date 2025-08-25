@@ -108,6 +108,16 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }
         <form.AppField name="confirmPassword">
           {(field) => <field.TextField label="Confirm New Password" />}
         </form.AppField>
+
+        <div className="flex justify-end">
+          <form.AppForm>
+            <Button type="button" variant={'ghost'} onClick={navigateBack}>
+              Cancel
+            </Button>
+            <form.SubscribeButton label={"Save"} />
+          </form.AppForm>
+        </div>
+
       </form>
       {(displayedError) && <ErrorDialogComponent
         error={displayedError.error}

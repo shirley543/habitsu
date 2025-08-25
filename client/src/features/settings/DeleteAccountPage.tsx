@@ -1,30 +1,40 @@
 import { useAppForm } from '../../hooks/form'
 import { useState } from "react";
 import { TopBarClose } from "@/components/custom/TopBar";
-import { getRouteApi, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
-import { UserPublicityType, type UserResponse, CreateUserSchema, type CreateUserDto } from '@habit-tracker/shared';
-import { useCreateUserMutation, useDeleteUserMutation, useUser, useUpdateUserMutation } from './UserApi';
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
+import { type UserResponseDto, CreateUserSchema } from '@habit-tracker/shared';
+import { useCreateUserMutation, useDeleteUserMutation, useUser, useUpdateUserMutation } from '../../apis/UserApi';
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/custom/DialogComponents';
+import z from 'zod';
 
 // TODOss:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface DeleteAccountFormProps {
-  isCreate: boolean;
-  defaultValues?: UserResponse;
+  user: UserResponseDto | null | undefined
 }
 
-const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ isCreate, defaultValues }) => {
+const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
   const navigate = useNavigate();
   const router = useRouter()
   const canGoBack = useCanGoBack()
 
-  const initialValues = defaultValues;
+  const DeleteFormSchema = z.object({
+    username: z.string(),
+  }).refine(
+    (data) =>
+      // If form username matches current-user's username
+      user &&
+      data.username === user.username,
+    {
+      message: "New password and confirm password must match",
+      path: ["confirmPassword"],
+    }
+  );
 
-  const { mutate: updateUserMutateFn } = useUpdateUserMutation();
-  // const { mutate: deleteUserMutateFn } = useDeleteUserMutation();
+  const { mutate: deleteUserMutateFn } = useDeleteUserMutation();
 
   const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
 
@@ -37,13 +47,16 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ isCreate, default
   }
 
   const form = useAppForm({
-    defaultValues: initialValues,
+    defaultValues: {
+      username: '',
+    },
     validators: {
-      onChange: CreateUserSchema,
+      onChange: DeleteFormSchema,
     },
     onSubmit: ({ value }) => {
-      deleteUserMutateFn(defaultValues.id, {
+      deleteUserMutateFn(undefined, {
         onSuccess: () => navigate({ to: '/goals' }), ///< TODOs: navigate back to landing upon successful delete?
+        // TODOsss: fix foreign key constraint violated (cascade so that upon deletion of user, all associated goals and goal entries are deleted)
         onError: (error) => setDisplayedError({
           error: error,
           category: ErrorDialogCategory.DeleteFailed
@@ -67,13 +80,24 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ isCreate, default
         }}
         className="space-y-6"
       >
+        <div className='flex flex-col gap-2.5'>
+          <h2 className='text-red-700 text-base font-semibold'>This action is permanent.</h2>
+          <p className='text-sm font-normal [&>b]:text-red-700 [&>b]:font-semibold'>Deleting your account will <b>remove</b> all your data and <b>cannot</b> be undone.</p>
+          <p className='text-sm font-normal'>To confirm, type your username below:</p>
+        </div>
+
         <form.AppField name="username">
-          {(field) => <field.TextField label="Username" />}
+          {(field) => <field.TextField label="Username" placeholder={`Type your username: ${user?.username}`}/>}
         </form.AppField>
 
-        <form.AppField name="password">
-          {(field) => <field.TextField label="Current Password" />}
-        </form.AppField>
+        <div className="flex justify-end">
+          <form.AppForm>
+            <Button type="button" variant={'ghost'} onClick={navigateBack}>
+              Cancel
+            </Button>
+            <form.SubscribeButton variant={'destructive'} label={"Delete"} />
+          </form.AppForm>
+        </div>
       </form>
       {(displayedError) && <ErrorDialogComponent
         error={displayedError.error}
@@ -88,15 +112,13 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ isCreate, default
 }
 
 export function DeleteAccountPage() {
-  const goalId = 1;
-  const { data, isLoading, error } = useUser(goalId);
-  // TODOsss update this to get current logged in user's details for user name, email, current password, etc.
+  const { data, isLoading, error } = useUser();
 
   return (
     <>
       {isLoading && <div>Loading...</div>}
       {error && <div>{error.message}</div>}
-      {!isLoading && !error && <DeleteAccountForm isCreate={false} defaultValues={data}/>}
+      {!isLoading && !error && <DeleteAccountForm user={data}/>}
     </>
   )
 }
