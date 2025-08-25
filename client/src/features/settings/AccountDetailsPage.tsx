@@ -64,7 +64,7 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }
         email: value.email,
         password: value.newPassword,
       }
-      updateUserMutateFn({ id: defaultValues?.id, update: updateValue }, {
+      updateUserMutateFn({ update: updateValue }, {
         onSuccess: navigateBack,
         onError: (error) => setDisplayedError({
           error: error,
