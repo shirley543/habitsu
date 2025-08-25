@@ -1,57 +1,101 @@
 import { useAppForm } from '../../hooks/form'
-import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
-import { CreateUserSchema, LoginUserSchema, type CreateUserDto } from '@habit-tracker/shared';
+import { useNavigate } from '@tanstack/react-router';
+import { CreateUserSchema, LoginUserSchema, type CreateUserDto, type LoginUserDto } from '@habit-tracker/shared';
 import { useCreateUserMutation, useLoginUserMutation } from '../../apis/UserApi';
 
 
-interface LoginFormProps {
-  isCreate: boolean;
+interface LoginPageProps {
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ isCreate }) => {
+export const LoginPage: React.FC<LoginPageProps> = () => {
   const navigate = useNavigate();
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
+
+  const { mutate: loginUserMutateFn } = useLoginUserMutation();
+
+  const loginInitialValues = {
+    email: '',
+    password: '',
+  } as LoginUserDto;
+
+  const form = useAppForm({
+    defaultValues: loginInitialValues,
+    validators: {
+      onChange: LoginUserSchema,
+    },
+    onSubmit: ({ value }) => {
+      loginUserMutateFn(value,
+        {
+          onSuccess: () => navigate({ to: '/goals' }),
+          onError: (error: any) => console.log(error)
+        }
+      )
+    },
+  });
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Form controls container */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+        className="space-y-6"
+      >
+        <form.AppField name="email">
+          {(field) => <field.TextField label="Email" />}
+        </form.AppField>
+
+        <form.AppField name="password">
+          {(field) => <field.TextField label="Password" />}
+        </form.AppField>
+
+        <div className="flex flex-row gap-1.5 justify-end">
+          <form.AppForm>
+            <form.SubscribeButton label={"Login"} />
+          </form.AppForm>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+
+interface SignUpPageProps {
+}
+
+export const SignUpPage: React.FC<SignUpPageProps> = () => {
+  const navigate = useNavigate();
 
   const { mutate: createUserMutateFn } = useCreateUserMutation();
   const { mutate: loginUserMutateFn } = useLoginUserMutation();
 
-  const initialValues = {
+  const createInitialValues = {
     username: '',
     email: '',
     password: '',
   } as CreateUserDto;
 
-
   const form = useAppForm({
-    defaultValues: initialValues,
+    defaultValues: createInitialValues,
     validators: {
-      // onChange: isCreate ? CreateUserSchema : LoginUserSchema,
       onChange: CreateUserSchema,
     },
     onSubmit: ({ value }) => {
-      if (isCreate) {
-        createUserMutateFn(value, 
-          {
-            onSuccess: () => {
-              loginUserMutateFn(value,
-                {
-                  onSuccess: () => navigate({ to: '/goals' }),
-                  onError: (error: any) => console.log(error)
-                }
-              )
-            },
-            onError: (error: any) => console.log(error)
-          }
-        );
-      } else {
-        loginUserMutateFn(value,
-          {
-            onSuccess: () => navigate({ to: '/goals' }),
-            onError: (error: any) => console.log(error)
-          }
-        )
-      }
+      createUserMutateFn(value, 
+        {
+          onSuccess: () => {
+            loginUserMutateFn(value,
+              {
+                onSuccess: () => navigate({ to: '/goals' }),
+                onError: (error: any) => console.log(error)
+              }
+            )
+          },
+          onError: (error: any) => console.log(error)
+        }
+      );
     },
   });
 
@@ -80,22 +124,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ isCreate }) => {
 
         <div className="flex flex-row gap-1.5 justify-end">
           <form.AppForm>
-            <form.SubscribeButton label={isCreate ? "Sign Up" : "Login"} />
+            <form.SubscribeButton label={"Sign Up"} />
           </form.AppForm>
         </div>
       </form>
     </div>
-  )
-}
-
-export function LoginPage() {
-  return (
-    <LoginForm isCreate={false}/>
-  )
-}
-
-export function SignUpPage() {
-  return (
-    <LoginForm isCreate={true}/>
   )
 }
