@@ -10,6 +10,7 @@ import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 import { Button } from "@/components/ui/button";
+import { EmptyStateBodyComponent } from "@/components/custom/EmptyStateComponents";
 
 interface GoalOrderCardProps {
   goal: GoalResponse,
@@ -166,7 +167,7 @@ export function GoalOrderPage() {
       {/* Error component */}
       {error && <ErrorBodyComponent error={error} onRefreshClick={() => { console.log("on refresh click" )}}/>}
       {/* Order controls container */}
-      {(goals && goalsIds) &&
+      {(goals && goals.length > 0 && goalsIds && goalsIds.length > 0) &&
         <>
           <DndContext 
             sensors={sensors}
@@ -185,6 +186,15 @@ export function GoalOrderPage() {
             Save
           </Button>
         </>
+      }
+      {(goals && goals.length === 0) &&
+        <EmptyStateBodyComponent 
+          onButtonClick={() => {
+            navigate({ to: '/goals/create' });
+          }}
+          headerText="No goals to reorder"
+          descriptionText="Tip: Once you have multiple goals, you can drag and drop them to change their home-screen order."
+        />
       }
     </div>
   )

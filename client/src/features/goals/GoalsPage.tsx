@@ -7,6 +7,7 @@ import { YearDropdown } from "./components/YearDropdown";
 import { useState } from "react";
 import { useGoals } from '../../apis/GoalApi';
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
+import { EmptyStateBodyComponent } from "@/components/custom/EmptyStateComponents";
 
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
@@ -54,6 +55,9 @@ export const GoalsPage = () => {
           return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`}/>
         })}
       </div>}
+      {(displayedData && displayedData.length === 0) && <EmptyStateBodyComponent onButtonClick={() => {
+        navigate({ to: '/goals/create' });
+      }} />}
       {/* Error component */}
       {(error) && <ErrorBodyComponent
         error={error}

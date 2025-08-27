@@ -6,6 +6,7 @@ import { useGoals, useUpdateGoalMutation } from '../../apis/GoalApi';
 import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
+import { EmptyStateBodyComponent } from "@/components/custom/EmptyStateComponents";
 
 interface GoalVisibilityCardProps {
   goal: GoalResponse,
@@ -65,6 +66,15 @@ export function GoalVisibilityPage() {
       {goals && goals.map((goal) => (
         <GoalVisibilityCard key={goal.id} goal={goal} />
       ))}
+      {(goals && goals.length === 0) &&
+        <EmptyStateBodyComponent 
+          onButtonClick={() => {
+            navigate({ to: '/goals/create' });
+          }}
+          headerText="No goals to show or hide"
+          descriptionText="Tip: Once you have goals, you can toggle their home-screen visibility. This won't affect public/private status."
+        />
+      }
     </div>
   )
 }
