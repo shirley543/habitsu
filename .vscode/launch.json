@@ -11,9 +11,8 @@
         "--experimental-specifier-resolution=node",
         "dist/src/main.js"
       ],
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "preLaunchTask": "Start NestJS Backend",
+      "skipFiles": ["<node_internals>/**"],
       "env": {
         "NODE_ENV": "development"
       }
