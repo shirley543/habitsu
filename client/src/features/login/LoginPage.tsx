@@ -2,6 +2,7 @@ import { useAppForm } from '../../hooks/form'
 import { useNavigate } from '@tanstack/react-router';
 import { CreateUserSchema, LoginUserSchema, type CreateUserDto, type LoginUserDto } from '@habit-tracker/shared';
 import { useCreateUserMutation, useLoginUserMutation } from '../../apis/UserApi';
+import { HTTPError } from 'ky';
 
 
 interface LoginPageProps {
@@ -26,7 +27,17 @@ export const LoginPage: React.FC<LoginPageProps> = () => {
       loginUserMutateFn(value,
         {
           onSuccess: () => navigate({ to: '/goals' }),
-          onError: (error: any) => console.log(error)
+          onError: (error: Error) => {
+            if (error instanceof HTTPError) {
+              switch (error.response.status) {
+                case 401:
+                  form.fieldInfo.password.instance?.setErrorMap({
+						        onSubmit: "Incorrect email or password. Try again.",
+					        });
+                  break;
+              }
+            }
+          }
         }
       )
     },
@@ -48,7 +59,7 @@ export const LoginPage: React.FC<LoginPageProps> = () => {
         </form.AppField>
 
         <form.AppField name="password">
-          {(field) => <field.TextField label="Password" />}
+          {(field) => <field.TextField label="Password" type="password" />}
         </form.AppField>
 
         <div className="flex flex-row gap-1.5 justify-end">

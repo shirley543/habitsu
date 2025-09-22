@@ -10,6 +10,7 @@ export const Route = createFileRoute('/')({
 function App() {
   return (
     <div className="text-center">
+      Landing page TODOs
     </div>
   )
 }

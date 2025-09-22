@@ -149,9 +149,11 @@ export function NumberField({
 
 export function TextField({
   label,
+  type,
   placeholder,
 }: {
   label: string
+  type?: React.HTMLInputTypeAttribute
   placeholder?: string
 }) {
   const field = useFieldContext<string>()
@@ -159,15 +161,16 @@ export function TextField({
 
   return (
     <div>
-          <StyledLabel htmlFor={label}>
-      {label}
-    </StyledLabel>
+      <StyledLabel htmlFor={label}>
+        {label}
+      </StyledLabel>
       <StyledInput
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         className="px-3 py-2 h-10 box-border bg-white border-none shadow-none"
+        type={type}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
