@@ -59,7 +59,7 @@ export const LoginPage: React.FC<LoginPageProps> = () => {
         </form.AppField>
 
         <form.AppField name="password">
-          {(field) => <field.TextField label="Password" type="password" />}
+          {(field) => <field.PasswordField label="Password" />}
         </form.AppField>
 
         <div className="flex flex-row gap-1.5 justify-end">

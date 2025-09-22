@@ -5,6 +5,7 @@ import {
   DateField,
   IconSelect,
   NumberField,
+  PasswordField,
   RadioGroup,
   Select,
   SubscribeButton,
@@ -16,6 +17,7 @@ import { fieldContext, formContext } from './form-context'
 export const { useAppForm } = createFormHook({
   fieldComponents: {
     TextField,
+    PasswordField,
     NumberField,
     DateField,
     Select,

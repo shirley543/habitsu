@@ -11,9 +11,10 @@ import { Switch as ShadcnSwitch } from '@/components/ui/switch'
 import { RadioGroup as ShadcnRadioGroup, RadioGroupItem as ShadcnRadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
-import type { ChangeEvent } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
 import type { VariantProps } from 'class-variance-authority'
+import { Eye, EyeOff } from 'lucide-react'
 
 
 export const StandardIcons: IconName[] = [
@@ -147,13 +148,59 @@ export function NumberField({
   )
 }
 
-export function TextField({
+export function PasswordField({
   label,
-  type,
   placeholder,
 }: {
   label: string
-  type?: React.HTMLInputTypeAttribute
+  placeholder?: string
+}) {
+  const field = useFieldContext<string>()
+  const errors = useStore(field.store, (state) => state.meta.errors)
+  const [isView, setIsView] = useState(false);
+
+  const eyeButtonStyleClassNames = "absolute top-[50%] right-0 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-gray-500";
+
+  return (
+    <div>
+      <StyledLabel htmlFor={label}>
+        {label}
+      </StyledLabel>
+      <div className="relative">
+        <StyledInput
+          type={isView ? "text" : "password"}
+          value={field.state.value}
+          placeholder={placeholder}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          className="px-3 py-2 h-10 box-border bg-white border-none shadow-none"
+        />
+        {isView ? (
+          <Eye
+            className={eyeButtonStyleClassNames}
+            size={20}
+            onClick={() => {
+              setIsView(!isView)
+            }}
+          />
+        ) : (
+          <EyeOff
+            className={eyeButtonStyleClassNames}
+            size={20}
+            onClick={() => setIsView(!isView)}
+          />
+        )}
+      </div>
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  )
+};
+
+export function TextField({
+  label,
+  placeholder,
+}: {
+  label: string
   placeholder?: string
 }) {
   const field = useFieldContext<string>()
@@ -170,7 +217,6 @@ export function TextField({
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         className="px-3 py-2 h-10 box-border bg-white border-none shadow-none"
-        type={type}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
