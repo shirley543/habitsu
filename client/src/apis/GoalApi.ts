@@ -130,8 +130,60 @@ async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<{}> {
 export function useReorderGoalsMutation() {
   return useMutation({
     mutationFn: (reorder: ReorderGoalDto) => { return reorderGoals(reorder) },
+    onMutate: async (reorder: ReorderGoalDto) => {
+      // Optimistically update the cache before mutation resolves:
+      // - pause ongoing fetches,
+      // - snapshot previous data for rollback if needed,
+      // - then otimistically update the goal color in cache
+      await queryClient.cancelQueries({ queryKey: ['goals'] });
+
+      const previousGoals = queryClient.getQueryData(['goals']);
+
+      function reorderGoals(
+        goals: GoalResponse[],
+        reorderData: { id: number; order: number }[]
+      ): GoalResponse[] {
+        const orderMap = new Map<number, number>(
+          reorderData.map(({ id, order }) => [id, order])
+        );
+
+        return [...goals].sort((a, b) => {
+          const orderA = orderMap.get(a.id);
+          const orderB = orderMap.get(b.id);
+
+          // If both have order, sort by order
+          if (orderA != null && orderB != null) {
+            return orderA - orderB;
+          }
+
+          // If only one has order, it comes first
+          if (orderA != null) return -1;
+          if (orderB != null) return 1;
+
+          // If neither has order, keep original order
+          return 0;
+        });
+      }
+
+      queryClient.setQueryData<GoalResponse[]>(['goals'], (oldGoals) => {
+        if (!oldGoals) return oldGoals;
+        return reorderGoals(oldGoals, reorder)
+      });
+
+      // Return context for rollback on error
+      return { previousGoals };
+    },
+    onError: (err, variables, context) => {
+      // Rollback to previous cache on error
+      if (context?.previousGoals) {
+        queryClient.setQueryData(['goals'], context.previousGoals);
+      }
+    },
+    onSettled: (data, error, variables) => {
+      // Invalidate queries to ensure fresh data next time
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
   })
-  // TODOss: optimistic update when reordering
 }
 
 
