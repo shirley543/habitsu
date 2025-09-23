@@ -26,7 +26,11 @@ export const LoginPage: React.FC<LoginPageProps> = () => {
     onSubmit: ({ value }) => {
       loginUserMutateFn(value,
         {
-          onSuccess: () => navigate({ to: '/goals' }),
+          onSuccess: () => {
+            // TODOs: Investigate why this navigate is failing
+            console.log("Success! navigate to goals...")
+            navigate({ to: "/goals"})
+          },
           onError: (error: Error) => {
             if (error instanceof HTTPError) {
               switch (error.response.status) {
