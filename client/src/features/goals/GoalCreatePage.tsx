@@ -7,7 +7,6 @@ import { useCreateGoalMutation, useDeleteGoalMutation, useGoal, useUpdateGoalMut
 import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/custom/DialogComponents';
-import { queryClient } from '@/integrations/tanstack-query/root-provider';
 
 // TODOss:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -34,7 +33,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   } as CreateGoalDto;
 
   const { mutate: createGoalMutateFn } = useCreateGoalMutation();
-  const { mutate: updateGoalMutateFn } = useUpdateGoalMutation(queryClient);
+  const { mutate: updateGoalMutateFn } = useUpdateGoalMutation();
   const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation();
 
   const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);

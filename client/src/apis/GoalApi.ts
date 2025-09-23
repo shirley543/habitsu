@@ -1,3 +1,4 @@
+import { queryClient } from "@/integrations/tanstack-query/root-provider";
 import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto, UpdateGoalDto, CreateGoalEntryDto, UpdateGoalEntryDto, ReorderGoalDto } from "@habit-tracker/shared";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
@@ -24,7 +25,6 @@ export function useGoals() {
     queryKey: ['goals'],
     queryFn: () => fetchGoals(),
     retry: REACT_QUERY_RETRY_NUM,
-    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -34,7 +34,7 @@ async function fetchGoalById(goalId: number): Promise<GoalResponse> {
 
 export function useGoal(goalId: string) {
   return useQuery<GoalResponse, HTTPError>({
-    queryKey: ['goal', goalId],
+    queryKey: ['goal', Number(goalId)],
     queryFn: () => fetchGoalById(Number(goalId)),
     enabled: Number.isInteger(Number(goalId)),
     retry: REACT_QUERY_RETRY_NUM,
@@ -55,7 +55,7 @@ async function patchUpdateGoal(goalId: number, updateGoal: UpdateGoalDto): Promi
   return api.patch(`goals/${goalId}`, { json: updateGoal }).json();
 }
 
-export function useUpdateGoalMutation(queryClient: QueryClient) {
+export function useUpdateGoalMutation() {
   return useMutation({
     mutationFn: ({ id, update }: { id: number, update: UpdateGoalDto }) => { return patchUpdateGoal(id, update) },
     onMutate: async ({ id, update }: { id: number, update: UpdateGoalDto }) => {
@@ -64,11 +64,14 @@ export function useUpdateGoalMutation(queryClient: QueryClient) {
       // - snapshot previous data for rollback if needed,
       // - then otimistically update the goal color in cache
       await queryClient.cancelQueries({ queryKey: ['goals'] });
+      await queryClient.cancelQueries({ queryKey: ['goal', id] });
+
       const previousGoals = queryClient.getQueryData(['goals']);
-      queryClient.setQueryData(['goals'], (oldGoals: GoalResponse[]) => {
+      const previousGoal = queryClient.getQueryData(['goal', id]);
+
+      queryClient.setQueryData<GoalResponse[]>(['goals'], (oldGoals) => {
         if (!oldGoals) return oldGoals;
         return oldGoals.map(goal =>
-
           goal.id === id ? { 
             ...goal,
             colour: update.colour,
@@ -79,18 +82,33 @@ export function useUpdateGoalMutation(queryClient: QueryClient) {
         );
       });
 
+      queryClient.setQueryData<GoalResponse>(['goal', id], (oldGoal) => {
+        if (!oldGoal) return oldGoal;
+        return {
+          ...oldGoal,
+          colour: update.colour,
+          description: update.description,
+          icon: update.icon,
+          title: update.title,
+        } as GoalResponse;
+      });
+
       // Return context for rollback on error
-      return { previousGoals };
+      return { previousGoals, previousGoal };
     },
     onError: (err, variables, context) => {
       // Rollback to previous cache on error
       if (context?.previousGoals) {
         queryClient.setQueryData(['goals'], context.previousGoals);
       }
+      if (context?.previousGoal) {
+        queryClient.setQueryData(['goal', variables.id], context.previousGoal);
+      }
     },
-    onSettled: () => {
+    onSettled: (data, error, variables) => {
       // Invalidate queries to ensure fresh data next time
       queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.invalidateQueries({ queryKey: ['goal', variables.id] });
     },
   })
 }
@@ -113,6 +131,7 @@ export function useReorderGoalsMutation() {
   return useMutation({
     mutationFn: (reorder: ReorderGoalDto) => { return reorderGoals(reorder) },
   })
+  // TODOss: optimistic update when reordering
 }
 
 
