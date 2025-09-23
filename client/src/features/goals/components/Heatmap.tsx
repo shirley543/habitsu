@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import HoverPopover from '@/components/custom/HoverPopup';
-import { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useMemo, useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { GoalQuantifyType, type GoalEntryResponse } from '@habit-tracker/shared';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +10,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { navigateToCreateOrEdit } from './NavigateUtils';
 import { computeCellColour, type ColourGoalData } from '@/lib/colourUtils';
 import { getEntryDataForDate } from '../EntryUtils';
+import React from 'react';
 
 /**
  * Public types
@@ -79,7 +80,7 @@ const cellVariants = cva(
   }
 )
 
-const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVariants>>((
+const Cell = React.memo(forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVariants>>((
   {
     date,
     goalData,
@@ -132,7 +133,7 @@ const Cell = forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVari
       }>
     </HoverPopover>
   )
-})
+}))
 
 /**
  * Public functions
@@ -145,7 +146,7 @@ interface HeatmapProps {
   displayState?: HeatmapDisplayState
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayState=HeatmapDisplayState.WITH_LABELS }) => {
+const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayState=HeatmapDisplayState.NO_LABELS }) => {
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
@@ -165,35 +166,39 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayS
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() ));
 
-  const progressCells = [...Array(daysInYear)].map((_, idx) => {
-    const cellDate = (() => {
-      const newDate = new Date(Date.UTC(selectedYear, 0, 1));
-      newDate.setUTCDate(newDate.getUTCDate() + idx);
-      return newDate;
-    })();
+  const cells = useMemo(() => {
+    // Progress cells
+    const progressCells = [...Array(daysInYear)].map((_, idx) => {
+      const cellDate = new Date(Date.UTC(selectedYear, 0, 1));
+      cellDate.setUTCDate(cellDate.getUTCDate() + idx);
 
-    const entryDataForCell = getEntryDataForDate(entriesData, cellDate);
-    const isCellForTodaysDate = cellDate.getTime() === today.getTime();
+      const entryDataForCell = getEntryDataForDate(entriesData, cellDate);
+      const isCellForTodaysDate = cellDate.getTime() === today.getTime();
 
-    return <Cell key={`cell_${idx}`} date={cellDate} 
-            ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
-            goalData={goalData}
-            entryData={entryDataForCell}
-            variant={isCellForTodaysDate ? "outlined" : "default"}
-          />
-  });
+      return (
+        <Cell
+          key={`cell_${idx}`}
+          date={cellDate}
+          ref={isCellForTodaysDate ? todayCellTargetRef : undefined}
+          goalData={goalData}
+          entryData={entryDataForCell}
+          variant={isCellForTodaysDate ? "outlined" : "default"}
+        />
+      );
+    });
 
-  // Holder cells: for gap/ placeholder to align 
-  // first day of year to week day
-  const weekStartDay = 1; // 0 for Sunday, 1 for Monday
-  const firstDate = new Date(selectedYear, 0, 1);
-  const firstDay = firstDate.getDay();
-  const holderCells = [...Array(firstDay - weekStartDay)].map((_, idx) => {
-    return <div className="holder-cell" key={`holderCell_${idx}`}></div>
-  })
+    // Holder cells for alignment
+    const weekStartDay = 1; // Monday
+    const firstDate = new Date(selectedYear, 0, 1);
+    const firstDay = firstDate.getDay();
+    const holderCells = [...Array(firstDay - weekStartDay)].map((_, idx) => (
+      <div className="holder-cell" key={`holderCell_${idx}`} />
+    ));
 
-  // Group holder cells and add column title
-  const cells = [...holderCells, ...progressCells];
+    // Combine
+    return [...holderCells, ...progressCells];
+  }, [entriesData, goalData, year, today, todayCellTargetRef]);
+
 
   const contentSlot = (() => {
     switch (displayState) {
