@@ -53,7 +53,7 @@ export function GoalVisibilityPage() {
   // Update displayed goals data from goals raw 
   // (from backend) data once available
   useEffect(() => {
-    setGoals(goalsRaw)
+    setGoals(goalsRaw?.sort((a, b) => a.order - b.order))
   }, [goalsRaw])
 
   return (

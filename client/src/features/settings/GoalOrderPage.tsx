@@ -70,7 +70,8 @@ export function GoalOrderPage() {
   // Update displayed goals data from goals raw 
   // (from backend) data once available
   useEffect(() => {
-    setGoals(goalsRaw)
+    // TODOs: Fix bug where upon pressing save, flicker of old order
+    setGoals(goalsRaw?.sort((a, b) => a.order - b.order))
   }, [goalsRaw])
 
   const goalsIds = useMemo(() => {
