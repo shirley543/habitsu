@@ -145,7 +145,7 @@ interface HeatmapProps {
   displayState?: HeatmapDisplayState
 }
 
-const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayState=HeatmapDisplayState.NO_LABELS }) => {
+const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayState=HeatmapDisplayState.WITH_LABELS }) => {
   const selectedYear = year;
   const daysInYear = getDaysInYear(selectedYear);
   const todayCellTargetRef = useRef<null | HTMLDivElement>(null); // Initialize with null
@@ -194,53 +194,71 @@ const Heatmap: React.FC<HeatmapProps> = ({ goalData, entriesData, year, displayS
 
   // Group holder cells and add column title
   const cells = [...holderCells, ...progressCells];
-  const a = cells.slice();
-  var arrays = [], size = 7;
-    
-  while (a.length > 0) {
-    arrays.push(a.splice(0, size));
-  }
 
-  // Iterate over week-grouped arrays and add month label
-  for (let i = 0; i < arrays.length; i++) {
-    const firstDayOfMonthElem = arrays[i].find((elem) => {
-      if (elem.type === Cell) {
-        const elDate = elem.props.date as Date;
-        return elDate.getDate() === 1;
-      };
-      return false;
-    });
+  const contentSlot = (() => {
+    switch (displayState) {
+      case HeatmapDisplayState.WITH_LABELS:
+        {
+          const a = cells.slice();
+          var arrays = [], size = 7;
+            
+          while (a.length > 0) {
+            arrays.push(a.splice(0, size));
+          }
 
-    const labelElement = firstDayOfMonthElem ? 
-      <div className='w-8 text-base font-medium flex justify-center items-center'>
-        {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
-      </div> :
-      <div></div>
-    arrays[i].unshift(labelElement)
-  }
+          // Iterate over week-grouped arrays and add month label
+          for (let i = 0; i < arrays.length; i++) {
+            const firstDayOfMonthElem = arrays[i].find((elem) => {
+              if (elem.type === Cell) {
+                const elDate = elem.props.date as Date;
+                return elDate.getDate() === 1;
+              };
+              return false;
+            });
 
-  const gridWithMonthLabels = arrays.flat().slice();
-  const gridNoMonthLabels = cells.slice();
-  const finalGridCells = displayState === HeatmapDisplayState.WITH_LABELS ? gridWithMonthLabels : gridNoMonthLabels;
+            const labelElement = firstDayOfMonthElem ? 
+              <div className='w-5 text-xs font-medium flex justify-center items-center'>
+                {monthsOfYearShort[(firstDayOfMonthElem.props.date as Date).getMonth()]}
+              </div> :
+              <div></div>
+            arrays[i].unshift(labelElement)
+          }
 
-  // Weekday labels
-  const weekdayLabels = daysOfWeekShort.map((shortLabel) => {
-    const weekdayString = shortLabel;
-    if (getPartialDaysOfWeekShort([0, 2, 4]).includes(weekdayString)) {
-      return <div className='h-8 text-base font-medium flex justify-center items-center'>{weekdayString}</div>
-    } else {
-      return <div className="weekday-empty"></div>
+          // Weekday labels
+          const weekdayLabels = daysOfWeekShort.map((shortLabel) => {
+            const weekdayString = shortLabel;
+            if (getPartialDaysOfWeekShort([0, 2, 4]).includes(weekdayString)) {
+              return <div className='h-5 text-xs font-medium flex justify-center items-center'>{weekdayString}</div>
+            } else {
+              return <div className="weekday-empty"></div>
+            }
+          })
+
+          const gridWithMonthLabels = arrays.flat().slice();
+
+          return <>
+            <div className="corner-holder-cell"></div>
+            {weekdayLabels}
+            {gridWithMonthLabels}
+          </>
+        }
+        break;
+
+      case HeatmapDisplayState.NO_LABELS:
+        {
+          const gridNoMonthLabels = cells.slice();
+          return <>
+            {gridNoMonthLabels}
+          </>
+        }
     }
-  })
-  const finalWeekdayLabels = displayState === HeatmapDisplayState.WITH_LABELS ? weekdayLabels : undefined;
+  })();
 
   return (
     <div className={`grid ${displayState === HeatmapDisplayState.WITH_LABELS ? "grid-rows-8" : "grid-rows-7"} 
       grid-flow-col gap-1 w-full overflow-x-auto`
     }>
-      {displayState === HeatmapDisplayState.WITH_LABELS ? <div className="corner-holder-cell"></div> : undefined}
-      {finalWeekdayLabels}
-      {finalGridCells}
+      {contentSlot}
     </div>
   )
 }
