@@ -1,5 +1,5 @@
 import type { GoalEntryResponse, GoalResponse, SearchParamsGoalEntryDto, GoalStatisticsReponse, GoalMonthlyAveragesResponse, GoalMonthlyCountsResponse, CreateGoalDto, UpdateGoalDto, CreateGoalEntryDto, UpdateGoalEntryDto, ReorderGoalDto } from "@habit-tracker/shared";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import ky, { HTTPError } from 'ky';
 
 const KY_FETCH_RETRY_NUM = 0;
@@ -21,9 +21,10 @@ async function fetchGoals(): Promise<Array<GoalResponse>> {
 
 export function useGoals() {
   return useQuery<Array<GoalResponse>, HTTPError>({
-    queryKey: ['goal'],
+    queryKey: ['goals'],
     queryFn: () => fetchGoals(),
     retry: REACT_QUERY_RETRY_NUM,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -54,9 +55,43 @@ async function patchUpdateGoal(goalId: number, updateGoal: UpdateGoalDto): Promi
   return api.patch(`goals/${goalId}`, { json: updateGoal }).json();
 }
 
-export function useUpdateGoalMutation() {
+export function useUpdateGoalMutation(queryClient: QueryClient) {
   return useMutation({
     mutationFn: ({ id, update }: { id: number, update: UpdateGoalDto }) => { return patchUpdateGoal(id, update) },
+    onMutate: async ({ id, update }: { id: number, update: UpdateGoalDto }) => {
+      // Optimistically update the cache before mutation resolves:
+      // - pause ongoing fetches,
+      // - snapshot previous data for rollback if needed,
+      // - then otimistically update the goal color in cache
+      await queryClient.cancelQueries({ queryKey: ['goals'] });
+      const previousGoals = queryClient.getQueryData(['goals']);
+      queryClient.setQueryData(['goals'], (oldGoals: GoalResponse[]) => {
+        if (!oldGoals) return oldGoals;
+        return oldGoals.map(goal =>
+
+          goal.id === id ? { 
+            ...goal,
+            colour: update.colour,
+            description: update.description,
+            icon: update.icon,
+            title: update.title,
+          } as GoalResponse : goal
+        );
+      });
+
+      // Return context for rollback on error
+      return { previousGoals };
+    },
+    onError: (err, variables, context) => {
+      // Rollback to previous cache on error
+      if (context?.previousGoals) {
+        queryClient.setQueryData(['goals'], context.previousGoals);
+      }
+    },
+    onSettled: () => {
+      // Invalidate queries to ensure fresh data next time
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
   })
 }
 

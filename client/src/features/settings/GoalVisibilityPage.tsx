@@ -7,13 +7,14 @@ import IconButton from "@/components/custom/IconButton";
 import { TopBarClose } from "@/components/custom/TopBar";
 import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
 import { EmptyStateBodyComponent } from "@/components/custom/EmptyStateComponents";
+import { queryClient } from "@/integrations/tanstack-query/root-provider";
 
 interface GoalVisibilityCardProps {
   goal: GoalResponse,
 }
 
 export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {  
-  const { data, mutate: updateGoalMutateFn, isPending } = useUpdateGoalMutation();
+  const { data, mutate: updateGoalMutateFn, isPending } = useUpdateGoalMutation(queryClient);
   const isVisible = data ? data.visibility : goal.visibility;
 
   const onEyeButtonClick = () => {
