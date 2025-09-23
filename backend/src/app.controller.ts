@@ -24,7 +24,7 @@ export class AppController {
     return { message: 'Logged in' };
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Request() req) {
     console.log("Logout req", req)
