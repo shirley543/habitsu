@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DropdownMenuOptions, { type DropdownMenuOptionsItemConfig } from "@/components/custom/DropdownMenuOptions";
 import { useLogoutUserMutation } from "@/apis/UserApi";
 import { HTTPError } from "ky";
+import { HeatmapCacheProvider } from "./components/Heatmap";
 
 
 // TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
@@ -72,16 +73,30 @@ export const GoalsPage = () => {
       />
       {/* Heatmaps container */}
       {(displayedData || isLoading) && <div className="flex flex-col gap-3">
+        {/* {displayedData && <HeatmapCacheProvider>
+          {displayedData.map((d) => {
+            return <GoalCardDescriptive
+              key={`goalCard_${d.id}`}
+              title={d.title}
+              description={d.description}
+              iconName={d.icon as IconName}
+              goalData={d}
+              selectedYear={selectedYear}
+            />
+          })}
+        </HeatmapCacheProvider>
+        } */}
         {displayedData && displayedData.map((d) => {
-          return <GoalCardDescriptive
-            key={`goalCard_${d.id}`}
-            title={d.title}
-            description={d.description}
-            iconName={d.icon as IconName}
-            goalData={d}
-            selectedYear={selectedYear}
-          />
-        })}
+            return <GoalCardDescriptive
+              key={`goalCard_${d.id}`}
+              title={d.title}
+              description={d.description}
+              iconName={d.icon as IconName}
+              goalData={d}
+              selectedYear={selectedYear}
+            />
+          })
+        }
         {isLoading && [...Array(3)].map((_, idx) => {
           return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`}/>
         })}
