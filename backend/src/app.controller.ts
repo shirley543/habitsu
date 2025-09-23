@@ -26,10 +26,19 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Request() req) {
-    console.log("Logout req", req)
-    console.log("TODOs invalidate refresh token, once refresh tokens implemented?")
-    // return req.logout();
+  @HttpCode(200)
+  async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+    // TODOs invalidate refresh token, once refresh tokens implemented?
+
+    // Clear the JWT cookie
+    res.clearCookie('jwt', {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      path: '/',
+    });
+
+    console.log(`User ${req.user['email']} logged out`);
+    return { message: 'Logged out' };
   }
 }
 
