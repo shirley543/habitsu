@@ -9,7 +9,6 @@ import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
-import { HeatmapCacheProvider } from './features/goals/components/Heatmap.tsx'
 
 // Create a new router instance
 const router = createRouter({
@@ -40,9 +39,7 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider>
-      <HeatmapCacheProvider>
         <RouterProvider router={router} />
-      </HeatmapCacheProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )
