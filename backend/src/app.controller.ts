@@ -10,7 +10,7 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+  async login(@Request() req, @Res() res: Response) {
     // Return JWT access token via cookie upon successful login
     const { access_token } = await this.authService.login(req.user);
     res.cookie('jwt', access_token, {
@@ -20,14 +20,15 @@ export class AppController {
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
-    return res.send({ message: 'Logged in' });
+    res.status(200).send({ message: 'Logged in' });
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('logout')
   async logout(@Request() req) {
-    return req.logout();
+    console.log("Logout req", req)
+    console.log("TODOs invalidate refresh token, once refresh tokens implemented?")
+    // return req.logout();
   }
 }
 
