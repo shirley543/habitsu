@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Post, Request, Res, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -10,7 +10,8 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res() res: Response) {
+  @HttpCode(200)
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     // Return JWT access token via cookie upon successful login
     const { access_token } = await this.authService.login(req.user);
     res.cookie('jwt', access_token, {
@@ -20,7 +21,7 @@ export class AppController {
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    res.status(200).send({ message: 'Logged in' });
+    return { message: 'Logged in' };
   }
 
   @UseGuards(LocalAuthGuard)
