@@ -1,4 +1,4 @@
-# Habitsu - Habit Tracker with Heatmap
+# Habitsu - Habit Tracker with Heatmaps
 
 **Habitsu** is a full-stack habit tracker inspired by GitHub's contribution heatmap. It features authentication, responsive UI, and database schema design. Users can track private and public goals, view goal statistics such as current and longest streaks, and maintain daily notes. Built with **React**, **Prisma**, **PostgreSQL**, and **TailwindCSS**.  
 
