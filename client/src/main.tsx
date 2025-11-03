@@ -20,6 +20,10 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  // TODOs #23 investigate slow loading
+  defaultPendingMs: 0,
+  defaultPendingMinMs: 0,
+  defaultPendingComponent: () => 'loading...',
 })
 
 // Register the router instance for type safety

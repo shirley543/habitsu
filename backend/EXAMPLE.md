@@ -68,4 +68,4 @@ curl -X POST http://localhost:8080/profiles \
   }'
 ```
 
-<!-- TODOs: add DELETE, PUT requests, after updating to non-example schema -->
+<!-- TODOs #24: add DELETE, PUT requests, after updating to non-example schema -->

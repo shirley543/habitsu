@@ -81,7 +81,7 @@ export class GoalEntriesController {
   ) {
     const userId = req.user.id;
 
-    // TODOs: refactor this to use Zod validation pipe instead of manual call to .safeParse
+    // TODOs #32: refactor this to use Zod validation pipe instead of manual call to .safeParse
     const parsed = SearchParamsGoalEntrySchema.safeParse(searchParamsGoalEntryDto);
     if (!parsed.success) {
       throw new BadRequestException(parsed.error.flatten());

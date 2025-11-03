@@ -17,7 +17,7 @@ Working through DB structure:
 - A goal entry consists of:
   - Goal ID: goal it's associated with
   - Day/ Date: date it's associated with (better to store as a date, or just year + index?) (storing as date feels more extensible; what if wanting to display in other methods and not just heatmap + filtering entries by date in future?)
-  - Value: number or boolean (TODOss how to ensure type matches parent goal? enforceable in DB or by backend?)
+  - Value: number or boolean (TODOs #25 how to ensure type matches parent goal? enforceable in DB or by backend?)
     - if Numeric goal:
       - value: number
     - if Boolean goal:

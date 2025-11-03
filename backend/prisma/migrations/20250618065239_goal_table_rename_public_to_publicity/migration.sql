@@ -25,7 +25,7 @@ ALTER TABLE "Goal" RENAME COLUMN "public" to "publicity";
 
 -- -> rename column public to publicity
 -- -> change value of column public/ publicity from boolean (true, false) to enum (PUBLIC, PRIVATE)
---        TODOs: DB type is incorrect (currently 'text', should be 'GoalPublicity')
+--        TODOs #37: DB type is incorrect (currently 'text', should be 'GoalPublicity')
 ALTER TABLE "Goal" ALTER COLUMN publicity DROP DEFAULT;
 ALTER TABLE "Goal" ALTER COLUMN publicity TYPE TEXT USING 
   CASE

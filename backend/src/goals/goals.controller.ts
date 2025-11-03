@@ -28,7 +28,7 @@ export class GoalsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiCreatedResponse({ type: GoalEntity })
-  // @ApiBody({}) // TODOs: update to format API body properly with Swagger/ OpenAPI.
+  // @ApiBody({}) // TODOs #34: update to format API body properly with Swagger/ OpenAPI.
   create(
     @Req() req,
     @Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto
@@ -40,7 +40,7 @@ export class GoalsController {
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOkResponse({ type: GoalEntity, isArray: true })
-  // TODOssss how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
+  // TODOs #35 how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
   // No, should keep decoupled and have mapper functions between DTOs (zod) and Prisma entities.
   // Reason: decoupling (what if change Prisma to another ORM or do DB normalization so schema changes, but want DTOs/ contract between FE and BE to remain the same?)
   findAll(
@@ -68,9 +68,9 @@ export class GoalsController {
     @Req() req,
     @Param('id', ParseIntPipe) id: number
   ) {
-    // TODOs: more error catching and mapping prisma errors to other errors.
+    // TODOs #36: more error catching and mapping prisma errors to other errors.
     // if instance of error is other generic exception, keep error type the same.
-    // TODOs: revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
+    // revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
     const userId = req.user.id;
     return this.goalsService.findOne(id, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {

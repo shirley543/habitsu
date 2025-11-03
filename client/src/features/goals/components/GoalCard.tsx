@@ -31,7 +31,7 @@ const GoalCardBase: React.FC<GoalCardBaseProps & { contentSlot: React.ReactNode 
   const { data: entriesData, isLoading, error } = useGoalEntries(searchParams);
   
   return (
-    // TODOs: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
+    // TODOs #14: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?
     <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
       {contentSlot}
       {isLoading && <SkeletonHeatmap />}

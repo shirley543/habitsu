@@ -47,13 +47,13 @@ Habitsu allows users to:
 |-------------------|--------------|-------------|
 | ![Dashboard](docs/screenshots/dashboard.png) | ![Goal Details](docs/screenshots/goal.png) | ![Daily Notes](docs/screenshots/notes.png) |
 
-TODOs screenshots `docs/screenshots/`
+TODOs #38 screenshots `docs/screenshots/`
 
 ## Getting Started
 
 Instructions for setting up and running the app locally:
 
-<!-- TODOs update this for backend, frontend, shared commands -->
+<!-- TODOs #39 update this for backend, frontend, shared commands -->
 
 ### 1. Clone the repository
 ```bash

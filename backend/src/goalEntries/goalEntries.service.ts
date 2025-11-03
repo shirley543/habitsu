@@ -203,7 +203,8 @@ export class GoalEntriesService {
 
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
-    // TODOs: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
+
+    // TODOs #33: look into changing $queryRaw call to use $queryRawTyped https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
     const [rawResult] = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_summary_stats(${goalId}::INT, ${year}::INT);`;
 
     // Convert Prisma Decimal fields to JS numbers
@@ -231,7 +232,7 @@ export class GoalEntriesService {
       throw new BadRequestException("Goal type must be NUMERIC")
     }
     
-    // TODOs: as above for changing $queryRaw call
+    // TODOs #33: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_avgs(${goalId}::INT, ${year}::INT);`;
 
     // Convert Prisma Decimal fields to JS numbers
@@ -256,7 +257,7 @@ export class GoalEntriesService {
     assertFound(goal, 'Goal not found');
     assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
 
-    // TODOs: as above for changing $queryRaw call
+    // TODOs #33: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<any[]>`SELECT * FROM get_goal_year_monthly_counts(${goalId}::INT, ${year}::INT);`;
 
     // Convert Prisma Decimal fields to JS numbers
