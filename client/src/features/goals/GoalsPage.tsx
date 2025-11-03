@@ -14,15 +14,14 @@ import { useLogoutUserMutation } from "@/apis/UserApi";
 import { HTTPError } from "ky";
 
 
-// TODOss: Error display (fetch retry button?). Oops! Something went wrong. Please try again
-// TODOss: lazy loading/ infinite scroll results
+// TODOs #17: investigate if lazy loading will help with initial render speed of goals page
 export const GoalsPage = () => {
   const navigate = useNavigate()
   const [selectedYear, setSelectedYear] = useState<number>(2025)
 
   const { data, isLoading, error } = useGoals();
   const displayedData = data?.filter((d) => d.visibility).sort((a, b) => a.order - b.order);
-  // TODOsss: handle filtering on backend? how to fit with infinite scroll vs. pagination?
+  // TODOs #16: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation();
 
@@ -36,7 +35,8 @@ export const GoalsPage = () => {
           onError: (error: Error) => {
             if (error instanceof HTTPError) {
               // Open generic error component
-              console.log("ERROR COMPONENT OPEN TODOss")
+              // TODOs #12 Improve loading display + error display
+              console.log("Error on logout")
             }
           }
         }
@@ -63,7 +63,7 @@ export const GoalsPage = () => {
 
             <DropdownMenuOptions title="Profile Options" itemsConfig={profileMenuItems}>
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.pn" alt="@shadcn" />
+                {/* <AvatarImage src="https://github.com/shadcn.pn" alt="@shadcn" /> */}
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </DropdownMenuOptions>
@@ -92,7 +92,8 @@ export const GoalsPage = () => {
       {/* Error component */}
       {(error) && <ErrorBodyComponent
         error={error}
-        onRefreshClick={() => { console.log("TODOsss have refresh do something") }}
+        // TODOs #15: Have refresh click do something across all error body components
+        onRefreshClick={() => { console.log("Have refresh do something") }}
       />}
     </div>
   );

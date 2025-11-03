@@ -20,7 +20,7 @@ import { type UniqueIdentifier } from '@dnd-kit/core';
 import {SortableItem} from './SortableItem';
 // import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
 
-// TODOsss need to generalize this...
+// TODOs #3 need to generalize this...
 // items passed in could be anything... goals, etc. Pass in set and item arrays?
 // rendered item could also be anything... pass in as React Node?
 

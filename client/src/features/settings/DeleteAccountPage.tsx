@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/custom/DialogComponents';
 import z from 'zod';
 
-// TODOss:
+// TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface DeleteAccountFormProps {
@@ -56,7 +56,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
     onSubmit: ({ value }) => {
       deleteUserMutateFn(undefined, {
         onSuccess: () => {
-          // TODOssss: Fix ERROR [ExceptionsHandler] TypeError: Converting circular structure to JSON, upon successful delete function (deleted in DB, but errors out)
+          // TODOs #10: Fix ERROR [ExceptionsHandler] TypeError: Converting circular structure to JSON, upon successful delete function (deleted in DB, but errors out)
           navigate({ to: '/' }); ///< Navigate to landing upon successful delete
         },
         onError: (error) => setDisplayedError({

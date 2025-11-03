@@ -51,6 +51,7 @@ export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardPro
 
 export function GoalOrderPage() {
   const navigate = useNavigate();
+  
   const { data: goalsRaw, isLoading, error } = useGoals();
   const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation();
 
@@ -70,7 +71,7 @@ export function GoalOrderPage() {
   // Update displayed goals data from goals raw 
   // (from backend) data once available
   useEffect(() => {
-    // TODOs: Fix bug where upon pressing save, flicker of old order
+    // TODOs #9: Fix bug where upon pressing save, flicker of old order
     setGoals(goalsRaw?.sort((a, b) => a.order - b.order))
   }, [goalsRaw])
 
@@ -143,23 +144,24 @@ export function GoalOrderPage() {
     const reorderData: ReorderGoalDto = goals.map((goal, idx) => ({ id: goal.id, order: idx + 1 }));
     const result = ReorderGoalSchema.safeParse(reorderData);
     if (result.error?.issues) {
-      console.log("TODOsss display these issues");
+      console.log("Error on validation", result.error?.issues);
+      // TODOs #8 Display validation error
     } else {
       // No issues during parsing, hence send to backend
       reorderGoalsMutateFn(reorderData, 
         {
           onSuccess: navigateBack,
-          onError: (error) => console.log("TODOsss error on reordering, to display", error)
-          // TODOss toast? Error modal?
+          onError: (error) => console.log("Error on reordering", error)
+          // TODOs #8 toast? Error modal?
+          // TODOs #12 Improve loading display + error display
         }
       );
     }
   }
 
 
-  // TODOsss DND:
-  // - Fix bug where goal order card can be dragged out of bounds and resizes entire window
-  // - Add drag-item styling to show which item is currently being dragged (darker bg)
+  // TODOs #6 Fix DnD bug where goal order card can be dragged out of bounds and resizes entire window
+  // TODOs #7 Add drag-item styling to show which item is currently being dragged (darker bg)
 
   return (
     <div className="flex flex-col gap-3">

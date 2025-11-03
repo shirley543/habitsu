@@ -19,12 +19,12 @@ export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {
   const onEyeButtonClick = () => {
     if (isPending) {
       // Only send update if there's no update pending.
-      // TODOssss add debounce with setTimeout?
+      // TODOs #4 add debounce with setTimeout?
       return;
     }
 
     updateGoalMutateFn({ id: goal.id, update: {
-      ...goal, ///< TODOsss: fix this hack (and other places where goal is updated; shouldn't need to send entire goal obj to satisfy discriminated union, just to toggle visibility... update zod schemas to try and split out common vs. discriminated update schemas)
+      ...goal, ///< TODOs #5: fix this hack (and other places where goal is updated; shouldn't need to send entire goal obj to satisfy discriminated union, just to toggle visibility... update zod schemas to try and split out common vs. discriminated update schemas)
       visibility: !isVisible, ///< Toggle visible flag
     } }, {
       onError: (error) => console.log(error),

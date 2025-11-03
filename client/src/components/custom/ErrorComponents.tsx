@@ -51,7 +51,7 @@ interface ErrorDialogComponentProps extends ErrorBaseProps {
   onClose: () => void,
 }
 
-// TODOs: fix bug where clicking x does not close dialog, and clicking 'close' does not fade out dialog (sudden close)
+// TODOs #22: fix bug where clicking x does not close dialog, and clicking 'close' does not fade out dialog (sudden close)
 function ErrorDialogComponent({ error, category, isShow, onClose }: ErrorDialogComponentProps) {
   const descriptionText = (() => {
     if (error instanceof HTTPError) {

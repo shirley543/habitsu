@@ -387,9 +387,8 @@ export function RadioGroup({ label, values }: {
   )
 }
 
-// TODOss:
-// - consolidate ColourSelect and IconSelect to be more generic (a lot of similarities)
-// - plus add abiliy to select a custom one via button to open popup (custom icon select, custom colour select)
+// - TODOs #20: consolidate ColourSelect and IconSelect to be more generic (a lot of similarities)
+// - TODOs #21: add abiliy to select a custom one via button to open popup (custom icon select, custom colour select)
 export function ColourSelect({ label }: { label: string }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
@@ -438,7 +437,7 @@ export function IconSelect({ label }: { label: string }) {
       <div className="flex flex-row flex-wrap gap-1.5">
         {StandardIcons.map((standardIcon) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
-          // TODOs: check for more accessible alternatives to `hidden`/ `display: none`
+          // TODOs #19: check for more accessible alternatives to `hidden`/ `display: none`
           return <label key={standardIcon}>
             <input type="radio" name="icon" value={standardIcon} className="peer hidden"
               onChange={handleChange} readOnly={false}

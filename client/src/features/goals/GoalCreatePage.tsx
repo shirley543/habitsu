@@ -8,7 +8,7 @@ import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/E
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/custom/DialogComponents';
 
-// TODOss:
+// TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface GoalFormProps {

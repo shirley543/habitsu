@@ -12,7 +12,6 @@ import {
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
-// TODOss: have value type be assigned at creation
 export interface DropdownMenuCheckboxesItemConfig<T> {
   label: string,
   value: T,

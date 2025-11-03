@@ -119,8 +119,6 @@ const Cell = React.memo(forwardRef<HTMLDivElement, CellProps & VariantProps<type
           }}
         />
       }
-      // TODOs:
-      // - Add fade in/ out animation to make display less jarring
       contentElem={
         <div className={'flex flex-col justify-start bg-white text-black p-3 rounded-md shadow-xl border-1 border-solid border-neutral-100 max-w-[262px] z-10'}>
           <h2 className="text-sm font-semibold">{labelText}</h2>

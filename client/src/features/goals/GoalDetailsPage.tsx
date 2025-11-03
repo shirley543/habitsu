@@ -14,7 +14,7 @@ export const GoalDetailsPage = () => {
   const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId')
 
-  // TODOs: loading state + error handling on frontend
+  // TODOs #12 Improve loading display + error display
   const { goalId } = route.useParams();
   const [selectedYear, setSelectedYear] = useState<number>(2025);
 
@@ -55,7 +55,7 @@ export const GoalDetailsPage = () => {
       {(goalIsLoading) && <div>Goal Loading...</div>}
       {(goalError) && <ErrorBodyComponent
         error={goalError}
-        onRefreshClick={() => { console.log("TODOsss have refresh do something") }}
+        onRefreshClick={() => { console.log("Have refresh do something") }}
         onBackClick={() => {
           navigate({ to: '/goals' })
         }}
@@ -91,8 +91,7 @@ export const GoalDetailsPage = () => {
                   <h3 className="w-full text-base font-semibold">{display.title}</h3>
                   <div className="icon-container w-9 h-9 flex items-center justify-center rounded-md" style={{
                     backgroundColor:
-                    // TODOs: fix bug where icon container width shorter than w-9
-                    // TODOs: light/ dark mode differing opacities. :dark selector?
+                    // TODOs #18: light/ dark mode differing opacities. :dark selector?
                       `#${goalData.colour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
                     color: `#${goalData.colour}`,
                     strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
