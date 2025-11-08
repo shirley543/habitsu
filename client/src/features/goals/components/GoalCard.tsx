@@ -52,6 +52,36 @@ const findExistingEntryAndTodayDate = (goalEntries: Array<GoalEntryResponse> | u
 }
 
 /**
+ * Goal Card Static-type:
+ * With inputted static data i.e. no hooks for requesting dynamic data,
+ * and no supporting buttons e.g. edit, log, see details
+ */
+interface GoalCardStaticProps extends GoalCardBaseProps {
+  title: string,
+  description: string,
+  iconName: IconName,
+  entriesData: Array<GoalEntryResponse>,
+}
+
+const GoalCardStatic: React.FC<GoalCardStaticProps> = ({ title, description, iconName, goalData, selectedYear, entriesData }) => {
+  const descriptionTypeContent = (() => {
+    return <>
+      <div className="header-container flex flex-row justify-between items-center">
+        <GoalIconText title={title} description={description} baseColour={goalData.colour} iconName={iconName} />
+      </div>
+    </>
+  })();
+  
+  return (
+    <div className="goal-card bg-white rounded-xl p-2.5 shadow-sm flex flex-col gap-3">
+      {descriptionTypeContent}
+      <Heatmap entriesData={entriesData} goalData={goalData} year={selectedYear}/>
+    </div>
+  )
+}
+
+
+/**
  * Goal Card Descriptive-type: 
  * With description, edit, log today
  */
@@ -169,4 +199,4 @@ const SkeletonGoalCard: React.FC = () => {
 
 
 
-export { GoalCardDescriptive, GoalCardControlled, SkeletonGoalCard };
+export { GoalCardDescriptive, GoalCardControlled, GoalCardStatic, SkeletonGoalCard };

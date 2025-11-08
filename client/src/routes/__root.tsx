@@ -33,7 +33,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     const isLoggedInUser = await checkAuthUser();
     
     // List of public paths that don't require auth
-    const publicPaths = ['/login', '/sign-up', '/forgot-password'];
+    const publicPaths = ['/', '/login', '/sign-up', '/forgot-password'];
 
     if (!isLoggedInUser && !publicPaths.includes(location.pathname)) {
       throw redirect({ to: '/login' })
