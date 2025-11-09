@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { GoalCardStatic } from '../goals/components/GoalCard';
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
 import { GoalPublicityType, GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from '@habit-tracker/shared';
@@ -6,6 +6,8 @@ import IconButton from '@/components/custom/IconButton';
 import { TopBarSlotted } from '@/components/custom/TopBar';
 import { fakeGoalEntriesData } from './fakeGoalEntriesData';
 import { ColourEnum } from '@/components/custom/FormComponents';
+import { Button } from '@/components/ui/button';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 
 
 interface InfoCardEntry {
@@ -77,53 +79,65 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
   ]
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-10 items-center w-full">
       {/* Topbar slotted */}
-      <TopBarSlotted
-        title="Habitsu"
-        rightSlotItems={
-          <>
-            <IconButton iconName="settings" tooltip="Login" onClickCallback={() => {
-              navigate({ to: '/login' })
-            }} />
-            <IconButton iconName="plus" tooltip="Sign Up" onClickCallback={() => {
-              navigate({ to: '/sign-up' })
-            }} />
-          </>
-        }
-      />
-      <div>
-        <h2>
-          Habit tracking made visual —
-        </h2>
-        <p>heatmaps that help you stay consistent.</p>
+      <div className="flex flex-row justify-between w-full">
+        <h1 className="text-2xl font-extrabold w-full">Habitsu</h1>
+        <div className="flex flex-row gap-1.5">
+          <Button asChild type="button" variant="secondary">
+            <Link to="/sign-up">Sign Up</Link>
+          </Button> 
+          <Button asChild type="button" variant="default">
+            <Link to="/login">Login</Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <GoalCardStatic
-            key={`goalCard_${homeGoalData.id}`}
-            title={homeGoalData.title}
-            description={homeGoalData.description}
-            iconName={homeGoalData.icon as IconName}
-            goalData={homeGoalData}
-            selectedYear={2025}
-            entriesData={homeEntriesData}
-        />
-        <div className="grid grid-cols-3 gap-4">
-        {
-          infoCardEntriesData.map((infoCardEntry) => {
-            return <div className="bg-white rounded-md p-4 flex flex-row gap-3 items-center">
-              <div className="min-w-9 min-h-9 w-9 h-9 rounded-md flex items-center justify-center bg-violet-100 text-violet-400">
-                <DynamicIcon name={infoCardEntry.icon} />
-              </div>
-              <div className="header-container flex flex-col gap-1.5">
-                <h2 className="text-base font-semibold">{infoCardEntry.title}</h2>
-                <h2 className="text-xs font-regular">{infoCardEntry.description}</h2>
-              </div>
-            </div>
-          })
-        }
+      {/* Description */}
+      <div className="flex flex-col gap-4 items-center">
+        <div>
+          <h2 className="text-2xl font-extrabold">
+            Habit tracking made visual —
+          </h2>
+          <p className="text-2xl font-semibold">heatmaps that help you stay consistent.</p>
         </div>
+        <Button asChild type="button" variant="default" className="w-fit" size="lg">
+          <Link to="/login">
+            <ArrowRight/>
+            Get Started
+          </Link>
+        </Button>
+      </div>
+
+      {/* Heatmap example */}
+      <div className="flex flex-col gap-3 w-full">
+        <GoalCardStatic
+          key={`goalCard_${homeGoalData.id}`}
+          title={homeGoalData.title}
+          description={homeGoalData.description}
+          iconName={homeGoalData.icon as IconName}
+          goalData={homeGoalData}
+          selectedYear={2025}
+          entriesData={homeEntriesData}
+        />
+      </div>
+
+      {/* Info cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {
+        infoCardEntriesData.map((infoCardEntry) => {
+          // TODOs card styling refactor to shared
+          return <div className="bg-white rounded-lg p-2.5 flex flex-row gap-3 items-center">
+            <div className="min-w-9 min-h-9 w-9 h-9 rounded-lg flex items-center justify-center bg-violet-100 text-violet-400">
+              <DynamicIcon name={infoCardEntry.icon} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <h2 className="text-base font-semibold">{infoCardEntry.title}</h2>
+              <h2 className="text-xs font-regular">{infoCardEntry.description}</h2>
+            </div>
+          </div>
+        })
+      }
       </div>
     </div>
   )
