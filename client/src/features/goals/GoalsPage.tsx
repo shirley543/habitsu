@@ -26,6 +26,8 @@ export const GoalsPage = () => {
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation();
 
   const profileMenuItems: DropdownMenuOptionsItemConfig[] = [
+    // TODOs #30: have navigate of profile name be to logged in user's username
+    { label: "View Profile", onClick: () => navigate({ to: '/profile/$profileName', params: { profileName: "me" } }) },
     { label: "Settings", onClick: () => navigate({ to: '/settings' })},
     { label: "Log Out", onClick: () => {
       console.log("Log out requested");
@@ -63,7 +65,6 @@ export const GoalsPage = () => {
 
             <DropdownMenuOptions title="Profile Options" itemsConfig={profileMenuItems}>
               <Avatar>
-                {/* <AvatarImage src="https://github.com/shadcn.pn" alt="@shadcn" /> */}
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </DropdownMenuOptions>
