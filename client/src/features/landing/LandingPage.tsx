@@ -127,7 +127,7 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
       {
         infoCardEntriesData.map((infoCardEntry) => {
           // TODOs card styling refactor to shared
-          return <div className="bg-white rounded-lg p-2.5 flex flex-row gap-3 items-center">
+          return <div className="bg-white rounded-lg p-2.5 flex flex-row gap-3">
             <div className="min-w-9 min-h-9 w-9 h-9 rounded-lg flex items-center justify-center bg-violet-100 text-violet-400">
               <DynamicIcon name={infoCardEntry.icon} />
             </div>
