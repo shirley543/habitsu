@@ -1,9 +1,12 @@
-import { User } from '@prisma/client';
+import { ProfilePublicity, User } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserEntity implements User {
   @ApiProperty()
   id: number;
+
+  @ApiProperty()
+  createdAt: Date;
 
   @ApiProperty()
   username: string;
@@ -15,5 +18,5 @@ export class UserEntity implements User {
   password: string;
 
   @ApiProperty()
-  title: string;
+  profilePublicity: ProfilePublicity;
 }

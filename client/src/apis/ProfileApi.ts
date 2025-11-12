@@ -16,7 +16,7 @@ const api = ky.create({
  * /profile
  */
 async function fetchProfileByUsername(username: string): Promise<ProfileResponseDto> {
-  return api.get(`profile/${username}`).json();
+  return api.get(`profiles/${username}`).json();
 }
 
 export function useProfile(username: string) {
