@@ -17,12 +17,19 @@ enum GoalPublicity {
   PRIVATE
 }
 
+enum ProfilePublicity {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
-  id       Int     @id @default(autoincrement())
-  username String  @db.VarChar(255) @unique
-  email    String  @db.VarChar(255) @unique
-  password String  @db.VarChar(255)
-  goals Goal[]
+  id                Int       @id @default(autoincrement())
+  createdAt         DateTime  @default(now())
+  username          String    @db.VarChar(255) @unique
+  email             String    @db.VarChar(255) @unique
+  password          String    @db.VarChar(255)
+  goals             Goal[]
+  profilePublicity  ProfilePublicity @default(PRIVATE)
 }
 
 model Goal {
@@ -57,8 +64,5 @@ model GoalEntry {
 
   @@unique([goalId, entryDate])
 }
-
-// TODOs #26: Figure out if a Profile model is necessary (what summary stats to show)
-// Activity log? Number of days filled out a goal? Number of filled out gridcells total?
 
 // TODOs #27: add db indexes for faster querying
