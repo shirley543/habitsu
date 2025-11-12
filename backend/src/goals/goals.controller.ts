@@ -19,6 +19,7 @@ import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -50,14 +51,14 @@ export class GoalsController {
     return this.goalsService.findAll(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('user/:username')
   @ApiOkResponse({ type: GoalEntity, isArray: true })
   findManyByUsername(
     @Req() req,
     @Param('username') username: string
   ) {
-    const userId = req.user.id;
+    const userId = req?.user?.id;
     return this.goalsService.findManyByUsername(username, userId);
   }
 
