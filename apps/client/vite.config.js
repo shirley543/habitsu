@@ -30,8 +30,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@habit-tracker/validation-schemas': resolve(__dirname, '../shared/src'),
-      '@habit-tracker/validation-schemas/*': resolve(__dirname, '../shared/src/*'),
+      '@habit-tracker/validation-schemas': resolve(__dirname, '../../packages/validation-schemas/src'),
+      '@habit-tracker/validation-schemas/*': resolve(__dirname, '../../packages/validation-schemas/src/*'),
     },
   }
 });

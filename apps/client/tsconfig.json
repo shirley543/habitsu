@@ -24,8 +24,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@habit-tracker/validation-schemas": ["../shared/src"],
-      "@habit-tracker/validation-schemas/*": ["../shared/src/*"]
+      "@habit-tracker/validation-schemas": ["../../packages/validation-schemas/src"],
+      "@habit-tracker/validation-schemas/*": ["../../packages/validation-schemas/src/*"]
     },
   }
 }
