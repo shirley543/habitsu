@@ -6,8 +6,7 @@
     "zod": "^3.25.67"
   },
   "workspaces": [
-    "client",
-    "backend",
-    "shared"
+    "apps/*",
+    "packages/*"
   ]
 }
