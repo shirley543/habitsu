@@ -8,8 +8,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "devDependencies": {
-    "eslint": "^9.39.2"
-  }
+  ]
 }
