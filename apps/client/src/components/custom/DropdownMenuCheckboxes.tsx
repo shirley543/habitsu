@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { type DropdownMenuCheckboxItemProps } from '@radix-ui/react-dropdown-menu'
+import type {DropdownMenuCheckboxItemProps} from '@radix-ui/react-dropdown-menu';
 
 import {
   DropdownMenu,
@@ -20,7 +20,7 @@ export interface DropdownMenuCheckboxesItemConfig<T> {
 interface DropdownMenuCheckboxesProps<T> {
   title?: string
   initialCheckedValue: T
-  itemsConfig: DropdownMenuCheckboxesItemConfig<T>[]
+  itemsConfig: Array<DropdownMenuCheckboxesItemConfig<T>>
   selectionChangeCallback: (itemValue: T) => void
   children: React.ReactNode
 }

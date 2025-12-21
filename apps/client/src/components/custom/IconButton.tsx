@@ -1,7 +1,8 @@
-import { Button } from '../ui/button'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import { DynamicIcon  } from 'lucide-react/dynamic'
 import React from 'react'
+import { Button } from '../ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import type {IconName} from 'lucide-react/dynamic';
 
 interface IconButtonProps {
   iconName: IconName

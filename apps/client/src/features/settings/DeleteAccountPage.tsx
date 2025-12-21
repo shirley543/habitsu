@@ -1,24 +1,25 @@
-import { useAppForm } from '../../hooks/form'
 import { useState } from 'react'
-import { TopBarClose } from '@/components/custom/TopBar'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import {
-  type UserResponseDto,
-  CreateUserSchema,
+  CreateUserSchema
+  
 } from '@habit-tracker/validation-schemas'
+import z from 'zod'
+import { useAppForm } from '../../hooks/form'
 import {
   useCreateUserMutation,
   useDeleteUserMutation,
-  useUser,
   useUpdateUserMutation,
+  useUser,
 } from '../../apis/UserApi'
+import type {UserResponseDto} from '@habit-tracker/validation-schemas';
+import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
-import z from 'zod'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -71,7 +72,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
       deleteUserMutateFn(undefined, {
         onSuccess: () => {
           // TODOs #10: Fix ERROR [ExceptionsHandler] TypeError: Converting circular structure to JSON, upon successful delete function (deleted in DB, but errors out)
-          navigate({ to: '/' }) ///< Navigate to landing upon successful delete
+          navigate({ to: '/' }) // /< Navigate to landing upon successful delete
         },
         onError: (error) =>
           setDisplayedError({

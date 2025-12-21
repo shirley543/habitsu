@@ -5,7 +5,7 @@
 import type { GoalEntryResponse } from '@habit-tracker/validation-schemas'
 
 export const getEntryDataForDate = (
-  entriesData: GoalEntryResponse[],
+  entriesData: Array<GoalEntryResponse>,
   findDate: Date,
 ) => {
   return entriesData.find((entry) => {

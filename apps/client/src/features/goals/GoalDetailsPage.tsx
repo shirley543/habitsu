@@ -1,22 +1,24 @@
-import { GoalCardControlled } from './components/GoalCard'
 import { useState } from 'react'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
-import { GoalIconText } from './components/GoalIconText'
-import MonthAreaChart from './components/MonthAreaChart'
-import IconButton from '@/components/custom/IconButton'
-import { TopBarBack } from '@/components/custom/TopBar'
+import { DynamicIcon  } from 'lucide-react/dynamic'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import {
+  GoalQuantifyType
+  
+  
+} from '@habit-tracker/validation-schemas'
 import {
   useGoal,
   useGoalMonthlyAvgs,
   useGoalMonthlyCounts,
   useGoalStatistics,
 } from '../../apis/GoalApi'
-import {
-  GoalQuantifyType,
-  type GoalResponse,
-  type GoalStatisticsReponse,
-} from '@habit-tracker/validation-schemas'
+import { GoalCardControlled } from './components/GoalCard'
+import { GoalIconText } from './components/GoalIconText'
+import MonthAreaChart from './components/MonthAreaChart'
+import type {IconName} from 'lucide-react/dynamic';
+import type {GoalResponse, GoalStatisticsReponse} from '@habit-tracker/validation-schemas';
+import IconButton from '@/components/custom/IconButton'
+import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 
 export const GoalDetailsPage = () => {
@@ -164,9 +166,9 @@ export const GoalDetailsPage = () => {
                         style={{
                           backgroundColor:
                             // TODOs #18: light/ dark mode differing opacities. :dark selector?
-                            `#${goalData.colour}1A`, ///< 66 - 40% for dark mode, 1A - 10% for light mode
+                            `#${goalData.colour}1A`, // /< 66 - 40% for dark mode, 1A - 10% for light mode
                           color: `#${goalData.colour}`,
-                          strokeOpacity: 0.8, ///< 1.0 for dark mode, 0.8 for light mode
+                          strokeOpacity: 0.8, // /< 1.0 for dark mode, 0.8 for light mode
                         }}
                       >
                         <DynamicIcon name={display.icon} />

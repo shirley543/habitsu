@@ -10,7 +10,7 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint",
+    "lint": "eslint --fix",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix"
   },
@@ -61,6 +61,8 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint-import-resolver-node": "^0.3.9",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
     "typescript": "^5.7.2",

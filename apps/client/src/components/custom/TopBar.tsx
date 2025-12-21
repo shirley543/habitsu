@@ -1,5 +1,5 @@
-import type { IconName } from 'lucide-react/dynamic'
 import IconButton from './IconButton'
+import type { IconName } from 'lucide-react/dynamic'
 
 interface TopBarSlottedProps {
   title: string
@@ -90,8 +90,8 @@ interface TopBarButtonConfig {
 
 interface TopBarConfigProps {
   title: string
-  leftConfig?: TopBarButtonConfig[]
-  rightConfig?: TopBarButtonConfig[]
+  leftConfig?: Array<TopBarButtonConfig>
+  rightConfig?: Array<TopBarButtonConfig>
 }
 
 /**
@@ -102,7 +102,7 @@ const TopBarConfig: React.FC<TopBarConfigProps> = ({
   leftConfig,
   rightConfig,
 }) => {
-  const createSlotFromConfig = (configArr: TopBarButtonConfig[]) => {
+  const createSlotFromConfig = (configArr: Array<TopBarButtonConfig>) => {
     return (
       <>
         {configArr?.map((item) => {

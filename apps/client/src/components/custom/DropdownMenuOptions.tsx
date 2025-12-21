@@ -15,7 +15,7 @@ export interface DropdownMenuOptionsItemConfig {
 
 interface DropdownMenuOptionsProps {
   title?: string
-  itemsConfig: DropdownMenuOptionsItemConfig[]
+  itemsConfig: Array<DropdownMenuOptionsItemConfig>
   children: React.ReactNode
 }
 

@@ -1,24 +1,25 @@
 import * as React from 'react'
 
-import { Calendar } from '@/components/ui/calendar'
-import { useGoalEntries, useGoal } from '../../../apis/GoalApi'
 import {
-  GoalQuantifyType,
-  type GoalEntryResponse,
-  type SearchParamsGoalEntryDto,
+  
+  GoalQuantifyType
+  
 } from '@habit-tracker/validation-schemas'
-import { computeBinAndColorArrays } from '@/lib/colourUtils'
-import { navigateToCreateOrEdit } from './NavigateUtils'
-import { getEntryDataForDate } from '../EntryUtils'
 import { useNavigate } from '@tanstack/react-router'
+import { useGoal, useGoalEntries } from '../../../apis/GoalApi'
+import { getEntryDataForDate } from '../EntryUtils'
+import { navigateToCreateOrEdit } from './NavigateUtils'
+import type {GoalEntryResponse, SearchParamsGoalEntryDto} from '@habit-tracker/validation-schemas';
+import { Calendar } from '@/components/ui/calendar'
+import { computeBinAndColorArrays } from '@/lib/colourUtils'
 
 /**
  * Modifier config, for grouping modifier-related properties
  */
 interface ModifierConfig {
-  name: string ///< Name key for modifiers struct, e.g. `modifier0` = low entry progress modifier, `modifierFull`
-  dates: Date[] ///< Dates associated with the modifier e.g. dates with low entry progress
-  colour: string ///< Colour to represent/ indicate the modifier e.g. colour shade to denote low entry progress dates (border colour of Calendar's Day Button)
+  name: string // /< Name key for modifiers struct, e.g. `modifier0` = low entry progress modifier, `modifierFull`
+  dates: Array<Date> // /< Dates associated with the modifier e.g. dates with low entry progress
+  colour: string // /< Colour to represent/ indicate the modifier e.g. colour shade to denote low entry progress dates (border colour of Calendar's Day Button)
 }
 
 interface EntryCalendarProps {
@@ -44,7 +45,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
   let modifiersClassNames = {}
   if (goalData) {
     // Compute modifier configs
-    let modifierConfigs: ModifierConfig[] = []
+    let modifierConfigs: Array<ModifierConfig> = []
     switch (goalData.goalType) {
       case GoalQuantifyType.Numeric:
         {

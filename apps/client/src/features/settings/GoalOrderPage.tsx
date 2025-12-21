@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import {
-  closestCenter,
   DndContext,
+  
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
-  useSensors,
-  type DragEndEvent,
+  useSensors
 } from '@dnd-kit/core'
 import {
-  arrayMove,
   SortableContext,
+  arrayMove,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
@@ -19,11 +19,13 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 import {
-  ReorderGoalSchema,
-  type GoalResponse,
-  type ReorderGoalDto,
+  
+  
+  ReorderGoalSchema
 } from '@habit-tracker/validation-schemas'
 import { useGoals, useReorderGoalsMutation } from '../../apis/GoalApi'
+import type {GoalResponse, ReorderGoalDto} from '@habit-tracker/validation-schemas';
+import type {DragEndEvent} from '@dnd-kit/core';
 import IconButton from '@/components/custom/IconButton'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
@@ -89,7 +91,7 @@ export function GoalOrderPage() {
   const { data: goalsRaw, isLoading, error } = useGoals()
   const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation()
 
-  const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined)
+  const [goals, setGoals] = useState<Array<GoalResponse> | undefined>(undefined)
 
   const router = useRouter()
   const canGoBack = useCanGoBack()

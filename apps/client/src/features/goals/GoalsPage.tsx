@@ -1,19 +1,18 @@
-import { GoalCardDescriptive, SkeletonGoalCard } from './components/GoalCard'
-import type { IconName } from 'lucide-react/dynamic'
-import { TopBarSlotted } from '@/components/custom/TopBar'
 import { useNavigate } from '@tanstack/react-router'
-import IconButton from '@/components/custom/IconButton'
-import { YearDropdown } from './components/YearDropdown'
 import { useState } from 'react'
+import { HTTPError } from 'ky'
 import { useGoals } from '../../apis/GoalApi'
+import { GoalCardDescriptive, SkeletonGoalCard } from './components/GoalCard'
+import { YearDropdown } from './components/YearDropdown'
+import type { IconName } from 'lucide-react/dynamic'
+import type {DropdownMenuOptionsItemConfig} from '@/components/custom/DropdownMenuOptions';
+import { TopBarSlotted } from '@/components/custom/TopBar'
+import IconButton from '@/components/custom/IconButton'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 import { EmptyStateBodyComponent } from '@/components/custom/EmptyStateComponents'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import DropdownMenuOptions, {
-  type DropdownMenuOptionsItemConfig,
-} from '@/components/custom/DropdownMenuOptions'
+import DropdownMenuOptions from '@/components/custom/DropdownMenuOptions'
 import { useLogoutUserMutation } from '@/apis/UserApi'
-import { HTTPError } from 'ky'
 
 // TODOs #17: investigate if lazy loading will help with initial render speed of goals page
 export const GoalsPage = () => {
@@ -28,7 +27,7 @@ export const GoalsPage = () => {
 
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation()
 
-  const profileMenuItems: DropdownMenuOptionsItemConfig[] = [
+  const profileMenuItems: Array<DropdownMenuOptionsItemConfig> = [
     { label: 'Settings', onClick: () => navigate({ to: '/settings' }) },
     {
       label: 'Log Out',

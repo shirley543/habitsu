@@ -1,8 +1,15 @@
 import { useStore } from '@tanstack/react-form'
 
+import { DynamicIcon  } from 'lucide-react/dynamic'
+import {  useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
+import type {ChangeEvent} from 'react';
+import type {IconName} from 'lucide-react/dynamic';
 
-import { Button, buttonVariants } from '@/components/ui/button'
+import type { buttonVariants } from '@/components/ui/button';
+import type { VariantProps } from 'class-variance-authority'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea as ShadcnTextarea } from '@/components/ui/textarea'
 import * as ShadcnSelect from '@/components/ui/select'
@@ -13,13 +20,9 @@ import {
   RadioGroupItem as ShadcnRadioGroupItem,
 } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
-import { useState, type ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
-import type { VariantProps } from 'class-variance-authority'
-import { Eye, EyeOff } from 'lucide-react'
 
-export const StandardIcons: IconName[] = [
+export const StandardIcons: Array<IconName> = [
   'biceps-flexed',
   'apple',
   'droplet',

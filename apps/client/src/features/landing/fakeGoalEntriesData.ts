@@ -1,6 +1,6 @@
 import type { GoalEntryResponse } from '@habit-tracker/validation-schemas'
 
-export const fakeGoalEntriesData: GoalEntryResponse[] = [
+export const fakeGoalEntriesData: Array<GoalEntryResponse> = [
   {
     id: 1,
     entryDate: new Date('2025-01-01'),

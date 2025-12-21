@@ -1,18 +1,20 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { GoalCardStatic } from '../goals/components/GoalCard'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
+import { DynamicIcon  } from 'lucide-react/dynamic'
 import {
+  
   GoalPublicityType,
-  GoalQuantifyType,
-  type GoalEntryResponse,
-  type GoalResponse,
+  GoalQuantifyType
+  
 } from '@habit-tracker/validation-schemas'
+import { ArrowDown, ArrowRight } from 'lucide-react'
+import { GoalCardStatic } from '../goals/components/GoalCard'
+import { fakeGoalEntriesData } from './fakeGoalEntriesData'
+import type {GoalEntryResponse, GoalResponse} from '@habit-tracker/validation-schemas';
+import type {IconName} from 'lucide-react/dynamic';
 import IconButton from '@/components/custom/IconButton'
 import { TopBarSlotted } from '@/components/custom/TopBar'
-import { fakeGoalEntriesData } from './fakeGoalEntriesData'
 import { ColourEnum } from '@/components/custom/FormComponents'
 import { Button } from '@/components/ui/button'
-import { ArrowDown, ArrowRight } from 'lucide-react'
 
 interface InfoCardEntry {
   icon: IconName
@@ -40,9 +42,9 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
     numericTarget: 30,
     numericUnit: 'pages',
   }
-  const homeEntriesData: GoalEntryResponse[] = fakeGoalEntriesData
+  const homeEntriesData: Array<GoalEntryResponse> = fakeGoalEntriesData
 
-  const infoCardEntriesData: InfoCardEntry[] = [
+  const infoCardEntriesData: Array<InfoCardEntry> = [
     {
       icon: 'calendar-days',
       title: 'Habit Heatmaps',

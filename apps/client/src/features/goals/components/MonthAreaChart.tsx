@@ -1,10 +1,11 @@
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import type {ChartConfig} from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  type ChartConfig,
+  
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
+  ChartTooltipContent
 } from '@/components/ui/chart'
 import { capitalizeFirstLetter } from '@/lib/stringUtils'
 import { monthsOfYear } from '@/lib/dateUtils'
@@ -17,7 +18,7 @@ interface MonthAreaChartData {
 
 interface MonthAreaChartProps {
   baseColour: string
-  inputChartData: MonthAreaChartData[]
+  inputChartData: Array<MonthAreaChartData>
   valueLabel: string
 }
 

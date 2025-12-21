@@ -1,12 +1,13 @@
 import { CircleAlert } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 import { HTTPError } from 'ky'
 import {
   Dialog,
-  DialogTriggerSubtype,
-  type DialogTriggerConfig,
+  
+  DialogTriggerSubtype
 } from './DialogComponents'
+import type {DialogTriggerConfig} from './DialogComponents';
+import { Button } from '@/components/ui/button'
 
 interface ErrorBaseProps {
   error: Error | HTTPError

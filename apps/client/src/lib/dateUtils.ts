@@ -52,7 +52,7 @@ export const daysOfWeekShort = [
   'Sun',
 ]
 
-export const getPartialDaysOfWeekShort = (idxArray: number[]) => {
+export const getPartialDaysOfWeekShort = (idxArray: Array<number>) => {
   if (idxArray.every((idx) => idx < daysOfWeekShort.length && idx >= 0)) {
     const partialDaysOfWeekShort = idxArray.map((idx) => daysOfWeekShort[idx])
     return partialDaysOfWeekShort

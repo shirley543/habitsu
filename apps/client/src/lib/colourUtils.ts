@@ -4,11 +4,12 @@
  */
 
 import {
-  GoalQuantifyType,
-  type GoalEntryResponse,
-  type GoalResponse,
+  
+  GoalQuantifyType
+  
 } from '@habit-tracker/validation-schemas'
 import * as d3 from 'd3'
+import type {GoalEntryResponse, GoalResponse} from '@habit-tracker/validation-schemas';
 
 export type ColourGoalData = Pick<GoalResponse, 'id' | 'colour'> &
   (
@@ -42,7 +43,7 @@ export const computeBinAndColorArrays = (
   const BIN_COUNT = 3
   const binIncrement = threshold / BIN_COUNT
 
-  const binArray: number[] = []
+  const binArray: Array<number> = []
   for (let i = 1; i <= BIN_COUNT; i++) {
     binArray.push(binIncrement * i)
   }
@@ -52,7 +53,7 @@ export const computeBinAndColorArrays = (
   // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)',
   //  'rgba(255, 0, 0, 0.75)', 'rgb(255, 0, 0)']
   const COLOR_COUNT = BIN_COUNT + 1
-  const colorArray: string[] = []
+  const colorArray: Array<string> = []
   for (let i = 1; i <= COLOR_COUNT; i++) {
     const idx = i / COLOR_COUNT
     colorArray.push(colorInterpolate(idx))
@@ -115,7 +116,7 @@ export const computeCellColour = (
   goalData: ColourGoalData,
   entryData: GoalEntryResponse | undefined,
 ) => {
-  const NO_ENTRY_COLOUR = '#F5F5F5' ///< Neutral/100
+  const NO_ENTRY_COLOUR = '#F5F5F5' // /< Neutral/100
   switch (goalData.goalType) {
     case GoalQuantifyType.Numeric: {
       const color =

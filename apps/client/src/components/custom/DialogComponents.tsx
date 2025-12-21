@@ -1,5 +1,4 @@
 import {
-  Dialog as ShadcnDialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -7,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Dialog as ShadcnDialog,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 

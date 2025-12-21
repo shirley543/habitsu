@@ -1,6 +1,4 @@
-import { useAppForm } from '../../hooks/form'
 import { useState } from 'react'
-import { TopBarClose } from '@/components/custom/TopBar'
 import {
   getRouteApi,
   useCanGoBack,
@@ -8,18 +6,21 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import {
-  type UpdateUserDto,
-  type UserResponseDto,
-  UpdateUserSchema,
+  
+  UpdateUserSchema
+  
 } from '@habit-tracker/validation-schemas'
-import { useUser, useUpdateUserMutation } from '../../apis/UserApi'
+import z from 'zod'
+import { useAppForm } from '../../hooks/form'
+import { useUpdateUserMutation, useUser } from '../../apis/UserApi'
+import type {UpdateUserDto, UserResponseDto} from '@habit-tracker/validation-schemas';
+import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
-import z from 'zod'
 
 const UpdateUserFormSchema = z
   .object({

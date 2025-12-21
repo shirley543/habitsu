@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
-import type { GoalResponse } from '@habit-tracker/validation-schemas'
 import { useGoals, useUpdateGoalMutation } from '../../apis/GoalApi'
+import type { GoalResponse } from '@habit-tracker/validation-schemas'
 import IconButton from '@/components/custom/IconButton'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
@@ -31,8 +31,8 @@ export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {
       {
         id: goal.id,
         update: {
-          ...goal, ///< TODOs #5: fix this hack (and other places where goal is updated; shouldn't need to send entire goal obj to satisfy discriminated union, just to toggle visibility... update zod schemas to try and split out common vs. discriminated update schemas)
-          visibility: !isVisible, ///< Toggle visible flag
+          ...goal, // /< TODOs #5: fix this hack (and other places where goal is updated; shouldn't need to send entire goal obj to satisfy discriminated union, just to toggle visibility... update zod schemas to try and split out common vs. discriminated update schemas)
+          visibility: !isVisible, // /< Toggle visible flag
         },
       },
       {
@@ -65,7 +65,7 @@ export function GoalVisibilityPage() {
   const navigate = useNavigate()
   const { data: goalsRaw, isLoading, error } = useGoals()
 
-  const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined)
+  const [goals, setGoals] = useState<Array<GoalResponse> | undefined>(undefined)
 
   // Update displayed goals data from goals raw
   // (from backend) data once available

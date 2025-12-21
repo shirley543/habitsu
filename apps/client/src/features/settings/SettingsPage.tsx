@@ -1,12 +1,12 @@
+import { useNavigate } from '@tanstack/react-router'
+import { ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { TopBarClose } from '@/components/custom/TopBar'
-import { useNavigate } from '@tanstack/react-router'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight } from 'lucide-react'
 
 enum SettingGroupStyle {
   Default = 'default',
@@ -14,8 +14,8 @@ enum SettingGroupStyle {
 }
 
 interface SettingGroup {
-  groupName: string ///< e.g. Theme
-  settingItems: SettingItem[]
+  groupName: string // /< e.g. Theme
+  settingItems: Array<SettingItem>
   style?: SettingGroupStyle
 }
 
@@ -69,7 +69,7 @@ type SettingItem =
 export function SettingsPage() {
   const navigate = useNavigate()
 
-  const SETTING_GROUPS: SettingGroup[] = [
+  const SETTING_GROUPS: Array<SettingGroup> = [
     // Appearance
     {
       groupName: 'Appearance',

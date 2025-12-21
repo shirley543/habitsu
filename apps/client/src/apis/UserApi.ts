@@ -1,11 +1,12 @@
-import type {
-  UserResponseDto,
-  CreateUserDto,
-  UpdateUserDto,
-  LoginUserDto,
-} from '@habit-tracker/validation-schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import ky, { HTTPError } from 'ky'
+import ky from 'ky'
+import type { HTTPError } from 'ky';
+import type {
+  CreateUserDto,
+  LoginUserDto,
+  UpdateUserDto,
+  UserResponseDto,
+} from '@habit-tracker/validation-schemas'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0

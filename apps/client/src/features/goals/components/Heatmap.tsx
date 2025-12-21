@@ -1,23 +1,25 @@
-import { cn } from '@/lib/utils'
-import { cva, type VariantProps } from 'class-variance-authority'
-import HoverPopover from '@/components/custom/HoverPopup'
-import { forwardRef, useEffect, useMemo, useRef } from 'react'
+import {  cva } from 'class-variance-authority'
+import React, { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { CalendarDays } from 'lucide-react'
 import {
-  GoalQuantifyType,
-  type GoalEntryResponse,
+  
+  GoalQuantifyType
 } from '@habit-tracker/validation-schemas'
+import { useNavigate } from '@tanstack/react-router'
+import { getEntryDataForDate } from '../EntryUtils'
+import { navigateToCreateOrEdit } from './NavigateUtils'
+import type {GoalEntryResponse} from '@habit-tracker/validation-schemas';
+import type {ColourGoalData} from '@/lib/colourUtils';
+import type {VariantProps} from 'class-variance-authority';
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   daysOfWeekShort,
   getPartialDaysOfWeekShort,
   monthsOfYearShort,
 } from '@/lib/dateUtils'
-import { useNavigate } from '@tanstack/react-router'
-import { navigateToCreateOrEdit } from './NavigateUtils'
-import { computeCellColour, type ColourGoalData } from '@/lib/colourUtils'
-import { getEntryDataForDate } from '../EntryUtils'
-import React from 'react'
+import {  computeCellColour } from '@/lib/colourUtils'
+import HoverPopover from '@/components/custom/HoverPopup'
+import { cn } from '@/lib/utils'
 
 /**
  * Public types
@@ -214,7 +216,7 @@ const Heatmap: React.FC<HeatmapProps> = ({
       case HeatmapDisplayState.WITH_LABELS:
         {
           const a = cells.slice()
-          var arrays = [],
+          const arrays = [],
             size = 7
 
           while (a.length > 0) {

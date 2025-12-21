@@ -1,9 +1,8 @@
-import DropdownMenuCheckboxes, {
-  type DropdownMenuCheckboxesItemConfig,
-} from '@/components/custom/DropdownMenuCheckboxes'
+import { CalendarDays } from 'lucide-react'
+import type {DropdownMenuCheckboxesItemConfig} from '@/components/custom/DropdownMenuCheckboxes';
+import DropdownMenuCheckboxes from '@/components/custom/DropdownMenuCheckboxes'
 import IconButton from '@/components/custom/IconButton'
 import { Button } from '@/components/ui/button'
-import { CalendarDays } from 'lucide-react'
 
 interface YearDropdownProps {
   selectedYear: number
@@ -14,7 +13,7 @@ const YearDropdown: React.FC<YearDropdownProps> = ({
   selectedYear,
   onSelect,
 }) => {
-  const yearMenuConfig: DropdownMenuCheckboxesItemConfig<number>[] = [
+  const yearMenuConfig: Array<DropdownMenuCheckboxesItemConfig<number>> = [
     { label: '2025', value: 2025 },
     { label: '2024', value: 2024 },
   ]

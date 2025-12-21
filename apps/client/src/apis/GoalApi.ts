@@ -1,19 +1,20 @@
-import { queryClient } from '@/integrations/tanstack-query/root-provider'
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
+import ky from 'ky'
+import type { HTTPError } from 'ky';
 import type {
+  CreateGoalDto,
+  CreateGoalEntryDto,
   GoalEntryResponse,
-  GoalResponse,
-  SearchParamsGoalEntryDto,
-  GoalStatisticsReponse,
   GoalMonthlyAveragesResponse,
   GoalMonthlyCountsResponse,
-  CreateGoalDto,
-  UpdateGoalDto,
-  CreateGoalEntryDto,
-  UpdateGoalEntryDto,
+  GoalResponse,
+  GoalStatisticsReponse,
   ReorderGoalDto,
+  SearchParamsGoalEntryDto,
+  UpdateGoalDto,
+  UpdateGoalEntryDto,
 } from '@habit-tracker/validation-schemas'
-import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
-import ky, { HTTPError } from 'ky'
+import { queryClient } from '@/integrations/tanstack-query/root-provider'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0
@@ -88,7 +89,7 @@ export function useUpdateGoalMutation() {
       const previousGoals = queryClient.getQueryData(['goals'])
       const previousGoal = queryClient.getQueryData(['goal', id])
 
-      queryClient.setQueryData<GoalResponse[]>(['goals'], (oldGoals) => {
+      queryClient.setQueryData<Array<GoalResponse>>(['goals'], (oldGoals) => {
         if (!oldGoals) return oldGoals
         return oldGoals.map((goal) =>
           goal.id === id
@@ -165,9 +166,9 @@ export function useReorderGoalsMutation() {
       const previousGoals = queryClient.getQueryData(['goals'])
 
       function reorderGoals(
-        goals: GoalResponse[],
-        reorderData: { id: number; order: number }[],
-      ): GoalResponse[] {
+        goals: Array<GoalResponse>,
+        reorderData: Array<{ id: number; order: number }>,
+      ): Array<GoalResponse> {
         const orderMap = new Map<number, number>(
           reorderData.map(({ id, order }) => [id, order]),
         )
@@ -190,7 +191,7 @@ export function useReorderGoalsMutation() {
         })
       }
 
-      queryClient.setQueryData<GoalResponse[]>(['goals'], (oldGoals) => {
+      queryClient.setQueryData<Array<GoalResponse>>(['goals'], (oldGoals) => {
         if (!oldGoals) return oldGoals
         return reorderGoals(oldGoals, reorder)
       })
