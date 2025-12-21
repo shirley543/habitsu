@@ -165,7 +165,7 @@ export function useReorderGoalsMutation() {
 
       const previousGoals = queryClient.getQueryData(['goals'])
 
-      function reorderGoals(
+      function sortGoals(
         goals: Array<GoalResponse>,
         reorderData: Array<{ id: number; order: number }>,
       ): Array<GoalResponse> {
@@ -193,7 +193,7 @@ export function useReorderGoalsMutation() {
 
       queryClient.setQueryData<Array<GoalResponse>>(['goals'], (oldGoals) => {
         if (!oldGoals) return oldGoals
-        return reorderGoals(oldGoals, reorder)
+        return sortGoals(oldGoals, reorder)
       })
 
       // Return context for rollback on error
