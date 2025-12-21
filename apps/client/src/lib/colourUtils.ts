@@ -3,14 +3,21 @@
  * for e.g. determining Heatmap cell colour, Entry Calendar
  */
 
-import { GoalQuantifyType, type GoalEntryResponse, type GoalResponse } from "@habit-tracker/validation-schemas";
-import * as d3 from 'd3';
+import {
+  GoalQuantifyType,
+  type GoalEntryResponse,
+  type GoalResponse,
+} from '@habit-tracker/validation-schemas'
+import * as d3 from 'd3'
 
-export type ColourGoalData = Pick<GoalResponse, 'id' | 'colour'> & (
-  | ({ goalType: GoalQuantifyType.Numeric } & Pick<Extract<GoalResponse, { goalType: GoalQuantifyType.Numeric }>, 'numericTarget' | 'numericUnit'>)
-  | ({ goalType: GoalQuantifyType.Boolean })
-);
-
+export type ColourGoalData = Pick<GoalResponse, 'id' | 'colour'> &
+  (
+    | ({ goalType: GoalQuantifyType.Numeric } & Pick<
+        Extract<GoalResponse, { goalType: GoalQuantifyType.Numeric }>,
+        'numericTarget' | 'numericUnit'
+      >)
+    | { goalType: GoalQuantifyType.Boolean }
+  )
 
 /**
  * Computes bin and color arrays, given a base color and threshold (used as max value/ max color intensity)
@@ -18,59 +25,70 @@ export type ColourGoalData = Pick<GoalResponse, 'id' | 'colour'> & (
  * @param threshold - Threshold for value, used for representing full/ 100% progress
  * @returns - Bin array, and color array
  */
-export const computeBinAndColorArrays = (baseColor: string, threshold: number) => {
+export const computeBinAndColorArrays = (
+  baseColor: string,
+  threshold: number,
+) => {
   // Using threshold, compute 3 equal "bins"
   // e.g. if threshold is 30, then bin array would be:
   // [ 10, 20, 30 ]
-  const baseColorFullOpacity = `#${baseColor}FF`;
-  const baseColorNoOpacity = `#${baseColor}00`;
-  const colorInterpolate = d3.interpolate(baseColorNoOpacity, baseColorFullOpacity);
+  const baseColorFullOpacity = `#${baseColor}FF`
+  const baseColorNoOpacity = `#${baseColor}00`
+  const colorInterpolate = d3.interpolate(
+    baseColorNoOpacity,
+    baseColorFullOpacity,
+  )
 
-  const BIN_COUNT = 3;
-  const binIncrement = threshold / BIN_COUNT;
+  const BIN_COUNT = 3
+  const binIncrement = threshold / BIN_COUNT
 
-  const binArray: number[] = [];
+  const binArray: number[] = []
   for (let i = 1; i <= BIN_COUNT; i++) {
-    binArray.push(binIncrement * i);
+    binArray.push(binIncrement * i)
   }
 
   // Using base color, compute 4 colors for range with changing opacity
   // e.g. if base color is rgb(255, 0, 0), then color array would be:
-  // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)', 
+  // ['rgba(255, 0, 0, 0.25)', 'rgba(255, 0, 0, 0.5)',
   //  'rgba(255, 0, 0, 0.75)', 'rgb(255, 0, 0)']
-  const COLOR_COUNT = BIN_COUNT + 1;
-  const colorArray: string[] = [];
+  const COLOR_COUNT = BIN_COUNT + 1
+  const colorArray: string[] = []
   for (let i = 1; i <= COLOR_COUNT; i++) {
-    const idx = i / COLOR_COUNT;
-    colorArray.push(colorInterpolate(idx));
+    const idx = i / COLOR_COUNT
+    colorArray.push(colorInterpolate(idx))
   }
 
-  return { binArray, colorArray };
+  return { binArray, colorArray }
 }
-
 
 /**
  * Computes binned colour/ colour shade, given a base colour, value threshold, and current value
- * 
+ *
  * @param baseColor - Base color for representing full/ 100% progress on a gridcell
  * @param threshold - Threshold for value, used for representing full/ 100% progress
  * @param value - Value to convert
  * @return - Color shade for given value
  */
-export const computeBinnedColour = (baseColor: string, threshold: number, value: number) => {
-  const { binArray, colorArray } = computeBinAndColorArrays(baseColor, threshold);
+export const computeBinnedColour = (
+  baseColor: string,
+  threshold: number,
+  value: number,
+) => {
+  const { binArray, colorArray } = computeBinAndColorArrays(
+    baseColor,
+    threshold,
+  )
   // Convert value to color
-  const domain = binArray; // Thresholds
-  const range = colorArray; // Values for each threshold
-  const thresholdScale = d3.scaleThreshold(domain, range);
-  const colorShade = thresholdScale(value);
-  return colorShade;
+  const domain = binArray // Thresholds
+  const range = colorArray // Values for each threshold
+  const thresholdScale = d3.scaleThreshold(domain, range)
+  const colorShade = thresholdScale(value)
+  return colorShade
 }
-
 
 // /**
 //  * Computes binned colour/ colour shade, given a bin array, color array, and current value
-//  * 
+//  *
 //  * @param binArray - Bin array of numbers
 //  * @param colorArray - Color array of hex strings
 //  * @param value - Value to convert
@@ -85,34 +103,40 @@ export const computeBinnedColour = (baseColor: string, threshold: number, value:
 //   return colorShade;
 // }
 
-
 /**
  * Computes cell colour, based on goal data (base colour, quantify type, thresholds),
  * and given entry data (entry value, or presence of said entry)
- * 
+ *
  * @param goalData - Data associated with a goal
  * @param entryData - Data associated with a goal entry
  * @returns - String representation of cell colour shade (hex)
  */
-export const computeCellColour = (goalData: ColourGoalData, entryData: GoalEntryResponse | undefined) => {
+export const computeCellColour = (
+  goalData: ColourGoalData,
+  entryData: GoalEntryResponse | undefined,
+) => {
   const NO_ENTRY_COLOUR = '#F5F5F5' ///< Neutral/100
   switch (goalData.goalType) {
     case GoalQuantifyType.Numeric: {
-      const color = (goalData?.numericTarget && entryData?.numericValue) ? 
-        computeBinnedColour(goalData.colour, goalData.numericTarget, entryData?.numericValue) 
-        : NO_ENTRY_COLOUR;
-      return color;
+      const color =
+        goalData?.numericTarget && entryData?.numericValue
+          ? computeBinnedColour(
+              goalData.colour,
+              goalData.numericTarget,
+              entryData?.numericValue,
+            )
+          : NO_ENTRY_COLOUR
+      return color
     }
 
     case GoalQuantifyType.Boolean: {
       // const color = entryData ? computeBinnedColour(goalData.colour, 1, entryData ? 1 : 0)
       //  : NO_ENTRY_COLOUR;
-      const color = entryData ? `#${goalData.colour}` : NO_ENTRY_COLOUR;
-      return color;
+      const color = entryData ? `#${goalData.colour}` : NO_ENTRY_COLOUR
+      return color
     }
   }
 }
-
 
 // Input: goalData (colour and numeric target)
 // Output: numeric bins. for filters (>= or <=)

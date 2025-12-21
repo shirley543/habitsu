@@ -1,16 +1,16 @@
-import { BoxSelect } from "lucide-react";
-import { Button } from "@/components/ui/button"
+import { BoxSelect } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface EmptyStateBodyComponentProps {
-  onButtonClick: () => void,
-  headerText?: string,
-  descriptionText?: string,
+  onButtonClick: () => void
+  headerText?: string
+  descriptionText?: string
 }
 
 function EmptyStateBodyComponent({
   onButtonClick,
-  headerText="No goals yet",
-  descriptionText="Goals help you stay focused and track your progress over time."
+  headerText = 'No goals yet',
+  descriptionText = 'Goals help you stay focused and track your progress over time.',
 }: EmptyStateBodyComponentProps) {
   return (
     <div className="flex flex-col gap-4 pt-18 items-center">
@@ -23,7 +23,7 @@ function EmptyStateBodyComponent({
         <Button onClick={onButtonClick}>Create a Goal</Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export { EmptyStateBodyComponent };
+export { EmptyStateBodyComponent }

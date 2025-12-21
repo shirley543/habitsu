@@ -1,14 +1,25 @@
 import { useAppForm } from '../../hooks/form'
-import { useState } from "react";
-import { TopBarClose } from "@/components/custom/TopBar";
-import { getRouteApi, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
-import { type UpdateUserDto, type UserResponseDto, UpdateUserSchema } from '@habit-tracker/validation-schemas';
-import { useUser, useUpdateUserMutation } from '../../apis/UserApi';
-import { ErrorDialogCategory, ErrorDialogComponent } from '@/components/custom/ErrorComponents';
-import { Button } from '@/components/ui/button';
-import { DeleteDialog } from '@/components/custom/DialogComponents';
-import z from 'zod';
-
+import { useState } from 'react'
+import { TopBarClose } from '@/components/custom/TopBar'
+import {
+  getRouteApi,
+  useCanGoBack,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router'
+import {
+  type UpdateUserDto,
+  type UserResponseDto,
+  UpdateUserSchema,
+} from '@habit-tracker/validation-schemas'
+import { useUser, useUpdateUserMutation } from '../../apis/UserApi'
+import {
+  ErrorDialogCategory,
+  ErrorDialogComponent,
+} from '@/components/custom/ErrorComponents'
+import { Button } from '@/components/ui/button'
+import { DeleteDialog } from '@/components/custom/DialogComponents'
+import z from 'zod'
 
 const UpdateUserFormSchema = z
   .object({
@@ -23,33 +34,37 @@ const UpdateUserFormSchema = z
       (!data.newPassword && !data.confirmPassword) ||
       data.newPassword === data.confirmPassword,
     {
-      message: "New password and confirm password must match",
-      path: ["confirmPassword"],
-    }
-  );
+      message: 'New password and confirm password must match',
+      path: ['confirmPassword'],
+    },
+  )
 
-type UpdateUserFormType = z.infer<typeof UpdateUserFormSchema>;
+type UpdateUserFormType = z.infer<typeof UpdateUserFormSchema>
 
 interface AccountDetailsFormProps {
-  defaultValues: UserResponseDto;
+  defaultValues: UserResponseDto
 }
 
-const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }) => {
-  const navigate = useNavigate();
+const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
+  defaultValues,
+}) => {
+  const navigate = useNavigate()
   const router = useRouter()
   const canGoBack = useCanGoBack()
 
-  const initialValues: UpdateUserFormType = defaultValues;
+  const initialValues: UpdateUserFormType = defaultValues
 
-  const { mutate: updateUserMutateFn } = useUpdateUserMutation();
+  const { mutate: updateUserMutateFn } = useUpdateUserMutation()
 
-  const [displayedError, setDisplayedError] = useState<{ category: ErrorDialogCategory, error: Error }| undefined>(undefined);
+  const [displayedError, setDisplayedError] = useState<
+    { category: ErrorDialogCategory; error: Error } | undefined
+  >(undefined)
 
   const navigateBack = () => {
     if (canGoBack) {
-      router.history.back();
+      router.history.back()
     } else {
-      navigate({ to: "/settings"});
+      navigate({ to: '/settings' })
     }
   }
 
@@ -64,22 +79,24 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }
         email: value.email,
         password: value.newPassword,
       }
-      updateUserMutateFn({ update: updateValue }, {
-        onSuccess: navigateBack,
-        onError: (error) => setDisplayedError({
-          error: error,
-          category: ErrorDialogCategory.FormSubmissionFailed
-        }),
-      })
+      updateUserMutateFn(
+        { update: updateValue },
+        {
+          onSuccess: navigateBack,
+          onError: (error) =>
+            setDisplayedError({
+              error: error,
+              category: ErrorDialogCategory.FormSubmissionFailed,
+            }),
+        },
+      )
     },
-  });
+  })
 
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
-      <TopBarClose title="Account Details" 
-        closeCallback={navigateBack}
-      />
+      <TopBarClose title="Account Details" closeCallback={navigateBack} />
       {/* Form controls container */}
       <form
         onSubmit={(e) => {
@@ -114,32 +131,35 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({ defaultValues }
             <Button type="button" variant={'ghost'} onClick={navigateBack}>
               Cancel
             </Button>
-            <form.SubscribeButton label={"Save"} />
+            <form.SubscribeButton label={'Save'} />
           </form.AppForm>
         </div>
-
       </form>
-      {(displayedError) && <ErrorDialogComponent
-        error={displayedError.error}
-        category={displayedError.category}
-        isShow={displayedError !== undefined}
-        onClose={() => { 
-          setDisplayedError(undefined) 
-        }}
-      />}
+      {displayedError && (
+        <ErrorDialogComponent
+          error={displayedError.error}
+          category={displayedError.category}
+          isShow={displayedError !== undefined}
+          onClose={() => {
+            setDisplayedError(undefined)
+          }}
+        />
+      )}
     </div>
   )
 }
 
 export function AccountDetailsPage() {
-  const { data, isLoading, error } = useUser();
+  const { data, isLoading, error } = useUser()
 
   return (
     <>
       {isLoading && <div>Loading...</div>}
       {/* // TODOs #12 Improve loading display + error display */}
       {error && <div>{error.message}</div>}
-      {!isLoading && !error && data && <AccountDetailsForm defaultValues={data}/>}
+      {!isLoading && !error && data && (
+        <AccountDetailsForm defaultValues={data} />
+      )}
     </>
   )
 }

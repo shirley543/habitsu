@@ -1,48 +1,82 @@
-import { useEffect, useMemo, useState } from "react";
-import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from '@dnd-kit/utilities';
+import { useEffect, useMemo, useState } from 'react'
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
-import { ReorderGoalSchema, type GoalResponse, type ReorderGoalDto } from "@habit-tracker/validation-schemas";
-import { useGoals, useReorderGoalsMutation } from '../../apis/GoalApi';
-import IconButton from "@/components/custom/IconButton";
-import { TopBarClose } from "@/components/custom/TopBar";
-import { ErrorBodyComponent } from "@/components/custom/ErrorComponents";
-import { Button } from "@/components/ui/button";
-import { EmptyStateBodyComponent } from "@/components/custom/EmptyStateComponents";
+import {
+  ReorderGoalSchema,
+  type GoalResponse,
+  type ReorderGoalDto,
+} from '@habit-tracker/validation-schemas'
+import { useGoals, useReorderGoalsMutation } from '../../apis/GoalApi'
+import IconButton from '@/components/custom/IconButton'
+import { TopBarClose } from '@/components/custom/TopBar'
+import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
+import { Button } from '@/components/ui/button'
+import { EmptyStateBodyComponent } from '@/components/custom/EmptyStateComponents'
 
 interface GoalOrderCardProps {
-  goal: GoalResponse,
-  onUpClick: () => void,
-  onDownClick: () => void,
+  goal: GoalResponse
+  onUpClick: () => void
+  onDownClick: () => void
 }
 
-export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardProps) {  
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({
-    id: goal.id,
-    animateLayoutChanges: ({ wasDragging }) => !wasDragging,
-  });
-    
+export function GoalOrderCard({
+  goal,
+  onUpClick,
+  onDownClick,
+}: GoalOrderCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: goal.id,
+      animateLayoutChanges: ({ wasDragging }) => !wasDragging,
+    })
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
-  
+  }
+
   return (
-    <div className="orderItem bg-white rounded-md flex flex-row overflow-hidden shadow-sm" ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <div className="tab w-2" style={{backgroundColor: `#${goal.colour}`}}></div>
+    <div
+      className="orderItem bg-white rounded-md flex flex-row overflow-hidden shadow-sm"
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      <div
+        className="tab w-2"
+        style={{ backgroundColor: `#${goal.colour}` }}
+      ></div>
       <div className="titleButtons w-full px-2.5 py-2 flex flex-row gap-2 items-center">
         <h2 className="title w-full text-sm font-semibold">{goal.title}</h2>
         <div className="buttons flex flex-row gap-1">
-        <IconButton iconName="arrow-up" tooltip="Move Up" onClickCallback={onUpClick}/>
-        <IconButton iconName="arrow-down" tooltip="Move Down" onClickCallback={onDownClick}/>
+          <IconButton
+            iconName="arrow-up"
+            tooltip="Move Up"
+            onClickCallback={onUpClick}
+          />
+          <IconButton
+            iconName="arrow-down"
+            tooltip="Move Down"
+            onClickCallback={onDownClick}
+          />
         </div>
       </div>
     </div>
@@ -50,25 +84,25 @@ export function GoalOrderCard({ goal, onUpClick, onDownClick }: GoalOrderCardPro
 }
 
 export function GoalOrderPage() {
-  const navigate = useNavigate();
-  
-  const { data: goalsRaw, isLoading, error } = useGoals();
-  const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation();
+  const navigate = useNavigate()
 
-  const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined);
+  const { data: goalsRaw, isLoading, error } = useGoals()
+  const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation()
+
+  const [goals, setGoals] = useState<GoalResponse[] | undefined>(undefined)
 
   const router = useRouter()
   const canGoBack = useCanGoBack()
 
   const navigateBack = () => {
     if (canGoBack) {
-      router.history.back();
+      router.history.back()
     } else {
-      navigate({ to: "/settings"});
+      navigate({ to: '/settings' })
     }
   }
 
-  // Update displayed goals data from goals raw 
+  // Update displayed goals data from goals raw
   // (from backend) data once available
   useEffect(() => {
     // TODOs #9: Fix bug where upon pressing save, flicker of old order
@@ -76,7 +110,7 @@ export function GoalOrderPage() {
   }, [goalsRaw])
 
   const goalsIds = useMemo(() => {
-    return goals?.map((goal) => goal.id);
+    return goals?.map((goal) => goal.id)
   }, [goals])
 
   const sensors = useSensors(
@@ -84,81 +118,79 @@ export function GoalOrderPage() {
       coordinateGetter: sortableKeyboardCoordinates,
       activationConstraint: {
         distance: 8,
-      }
+      },
     }),
-    useSensor(KeyboardSensor, {
-    })
-  );
+    useSensor(KeyboardSensor, {}),
+  )
 
   function handleDragEnd(event: DragEndEvent): void {
-    const {active, over} = event;
-    
+    const { active, over } = event
+
     if (over && active.id !== over.id) {
       setGoals((items) => {
         if (items === undefined) {
-          return;
+          return
         }
 
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        
-        const newArray = arrayMove(items, oldIndex, newIndex);
-        console.log(newArray);
-        return newArray;
-      });
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+
+        const newArray = arrayMove(items, oldIndex, newIndex)
+        console.log(newArray)
+        return newArray
+      })
     }
   }
 
   function handleUpClick(goalId: number): void {
     setGoals((items) => {
       if (items === undefined) {
-        return;
+        return
       }
 
-      const oldIndex = items.findIndex((item) => item.id === goalId);
-      const newIndex = oldIndex === 0 ? (items.length - 1) : oldIndex - 1;
-      const newArray = arrayMove(items, oldIndex, newIndex);
-      return newArray;
+      const oldIndex = items.findIndex((item) => item.id === goalId)
+      const newIndex = oldIndex === 0 ? items.length - 1 : oldIndex - 1
+      const newArray = arrayMove(items, oldIndex, newIndex)
+      return newArray
     })
   }
-
 
   function handleDownClick(goalId: number): void {
     setGoals((items) => {
       if (items === undefined) {
-        return;
+        return
       }
 
-      const oldIndex = items.findIndex((item) => item.id === goalId);
-      const newIndex = oldIndex === (items.length - 1) ? 0 : oldIndex + 1;
-      const newArray = arrayMove(items, oldIndex, newIndex);
-      return newArray;
+      const oldIndex = items.findIndex((item) => item.id === goalId)
+      const newIndex = oldIndex === items.length - 1 ? 0 : oldIndex + 1
+      const newArray = arrayMove(items, oldIndex, newIndex)
+      return newArray
     })
   }
 
   function handleSave(): void {
     if (goals === undefined) {
-      return;
+      return
     }
 
-    const reorderData: ReorderGoalDto = goals.map((goal, idx) => ({ id: goal.id, order: idx + 1 }));
-    const result = ReorderGoalSchema.safeParse(reorderData);
+    const reorderData: ReorderGoalDto = goals.map((goal, idx) => ({
+      id: goal.id,
+      order: idx + 1,
+    }))
+    const result = ReorderGoalSchema.safeParse(reorderData)
     if (result.error?.issues) {
-      console.log("Error on validation", result.error?.issues);
+      console.log('Error on validation', result.error?.issues)
       // TODOs #8 Display validation error
     } else {
       // No issues during parsing, hence send to backend
-      reorderGoalsMutateFn(reorderData, 
-        {
-          onSuccess: navigateBack,
-          onError: (error) => console.log("Error on reordering", error)
-          // TODOs #8 toast? Error modal?
-          // TODOs #12 Improve loading display + error display
-        }
-      );
+      reorderGoalsMutateFn(reorderData, {
+        onSuccess: navigateBack,
+        onError: (error) => console.log('Error on reordering', error),
+        // TODOs #8 toast? Error modal?
+        // TODOs #12 Improve loading display + error display
+      })
     }
   }
-
 
   // TODOs #6 Fix DnD bug where goal order card can be dragged out of bounds and resizes entire window
   // TODOs #7 Add drag-item styling to show which item is currently being dragged (darker bg)
@@ -166,39 +198,55 @@ export function GoalOrderPage() {
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
-      <TopBarClose title="Goal Order" closeCallback={() => { navigate({ to: "/settings" })}} />
+      <TopBarClose
+        title="Goal Order"
+        closeCallback={() => {
+          navigate({ to: '/settings' })
+        }}
+      />
       {/* Error component */}
-      {error && <ErrorBodyComponent error={error} onRefreshClick={() => { console.log("on refresh click" )}}/>}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          onRefreshClick={() => {
+            console.log('on refresh click')
+          }}
+        />
+      )}
       {/* Order controls container */}
-      {(goals && goals.length > 0 && goalsIds && goalsIds.length > 0) &&
+      {goals && goals.length > 0 && goalsIds && goalsIds.length > 0 && (
         <>
-          <DndContext 
+          <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={goalsIds}
+            <SortableContext
+              items={goalsIds}
               strategy={verticalListSortingStrategy}
             >
               {goals.map((goal) => (
-                <GoalOrderCard key={goal.id} goal={goal} onUpClick={() => handleUpClick(goal.id)} onDownClick={() => handleDownClick(goal.id)}/>
+                <GoalOrderCard
+                  key={goal.id}
+                  goal={goal}
+                  onUpClick={() => handleUpClick(goal.id)}
+                  onDownClick={() => handleDownClick(goal.id)}
+                />
               ))}
             </SortableContext>
           </DndContext>
-          <Button onClick={handleSave}>
-            Save
-          </Button>
+          <Button onClick={handleSave}>Save</Button>
         </>
-      }
-      {(goals && goals.length === 0) &&
-        <EmptyStateBodyComponent 
+      )}
+      {goals && goals.length === 0 && (
+        <EmptyStateBodyComponent
           onButtonClick={() => {
-            navigate({ to: '/goals/create' });
+            navigate({ to: '/goals/create' })
           }}
           headerText="No goals to reorder"
           descriptionText="Tip: Once you have multiple goals, you can drag and drop them to change their home-screen order."
         />
-      }
+      )}
     </div>
   )
 }
