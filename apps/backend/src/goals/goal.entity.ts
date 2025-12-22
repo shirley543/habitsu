@@ -25,16 +25,16 @@ export class GoalEntity implements Goal {
 
   @ApiProperty()
   publicity: GoalPublicity;
-  
+
   @ApiProperty()
   goalType: GoalQuantify;
 
   @ApiProperty({ required: false, nullable: true })
   numericTarget: number | null;
-  
+
   @ApiProperty({ required: false, nullable: true })
   numericUnit: string | null;
-  
+
   @ApiProperty()
   visibility: boolean;
 

@@ -18,12 +18,12 @@ import { EnvModule } from 'src/env/env.module';
       useFactory: async (envConfigService: EnvService) => ({
         secret: envConfigService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: envConfigService.get('JWT_EXPIRY')
-        }
-      })
-    })
+          expiresIn: envConfigService.get('JWT_EXPIRY'),
+        },
+      }),
+    }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, EnvService],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}

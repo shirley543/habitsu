@@ -6,6 +6,6 @@ export const envSchema = z.object({
   JWT_EXPIRY: z.string().default('3600s'),
   SALT_ROUNDS: z.coerce.number().default(10),
   // TODOs #31: node env pass in as dev, prod, test? local? default to dev?
-})
+});
 
 export type Env = z.infer<typeof envSchema>;

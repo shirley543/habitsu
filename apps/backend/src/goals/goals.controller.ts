@@ -13,7 +13,14 @@ import {
   Req,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
-import { CreateGoalDto, CreateGoalSchema, ReorderGoalDto, ReorderGoalSchema, UpdateGoalDto, UpdateGoalSchema } from '@habit-tracker/validation-schemas';
+import {
+  CreateGoalDto,
+  CreateGoalSchema,
+  ReorderGoalDto,
+  ReorderGoalSchema,
+  UpdateGoalDto,
+  UpdateGoalSchema,
+} from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
@@ -31,7 +38,7 @@ export class GoalsController {
   // @ApiBody({}) // TODOs #34: update to format API body properly with Swagger/ OpenAPI.
   create(
     @Req() req,
-    @Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto
+    @Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto,
   ) {
     const userId = req.user.id;
     return this.goalsService.create(createGoalDto, userId);
@@ -43,9 +50,7 @@ export class GoalsController {
   // TODOs #35 how to align this with zod schema to avoid mismatches? zod schema implements goal entity?
   // No, should keep decoupled and have mapper functions between DTOs (zod) and Prisma entities.
   // Reason: decoupling (what if change Prisma to another ORM or do DB normalization so schema changes, but want DTOs/ contract between FE and BE to remain the same?)
-  findAll(
-    @Req() req,
-  ) {
+  findAll(@Req() req) {
     const userId = req.user.id;
     return this.goalsService.findAll(userId);
   }
@@ -53,10 +58,7 @@ export class GoalsController {
   @UseGuards(JwtAuthGuard)
   @Get('user/:username')
   @ApiOkResponse({ type: GoalEntity, isArray: true })
-  findManyByUsername(
-    @Req() req,
-    @Param('username') username: string
-  ) {
+  findManyByUsername(@Req() req, @Param('username') username: string) {
     const userId = req.user.id;
     return this.goalsService.findManyByUsername(username, userId);
   }
@@ -64,10 +66,7 @@ export class GoalsController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
-  findOne(
-    @Req() req,
-    @Param('id', ParseIntPipe) id: number
-  ) {
+  findOne(@Req() req, @Param('id', ParseIntPipe) id: number) {
     // TODOs #36: more error catching and mapping prisma errors to other errors.
     // if instance of error is other generic exception, keep error type the same.
     // revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
@@ -100,10 +99,7 @@ export class GoalsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOkResponse({ type: GoalEntity })
-  remove(
-    @Req() req,
-    @Param('id', ParseIntPipe) id: number
-  ) {
+  remove(@Req() req, @Param('id', ParseIntPipe) id: number) {
     const userId = req.user.id;
     return this.goalsService.remove(id, userId);
   }
@@ -113,8 +109,9 @@ export class GoalsController {
   @ApiOkResponse()
   reorder(
     @Req() req,
-    @Body(new ZodValidationPipe(ReorderGoalSchema)) reorderGoalDto: ReorderGoalDto)
-  {
+    @Body(new ZodValidationPipe(ReorderGoalSchema))
+    reorderGoalDto: ReorderGoalDto,
+  ) {
     const userId = req.user.id;
     return this.goalsService.reorder(reorderGoalDto, userId);
   }

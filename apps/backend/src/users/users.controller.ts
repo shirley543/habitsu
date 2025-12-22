@@ -9,8 +9,21 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, CreateUserSchema, UpdateUserSchema, UserResponseDto } from '@habit-tracker/validation-schemas';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  CreateUserSchema,
+  UpdateUserSchema,
+  UserResponseDto,
+} from '@habit-tracker/validation-schemas';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -25,7 +38,7 @@ class UserResponseDtoClass implements UserResponseDto {
   @ApiProperty({ example: 'alice' })
   username: string;
 
-  @ApiProperty({ example: 'alice@alice.com'})
+  @ApiProperty({ example: 'alice@alice.com' })
   email: string;
 }
 
@@ -52,7 +65,9 @@ export class UsersController {
   @Post()
   @ApiCreatedResponse({ type: UserResponseDtoClass })
   @ApiBody({ type: CreateUserDtoClass })
-  create(@Body(new ZodValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto) {
+  create(
+    @Body(new ZodValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
+  ) {
     return this.usersService.create(createUserDto);
   }
 

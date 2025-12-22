@@ -9,6 +9,6 @@ import { EnvModule } from 'src/env/env.module';
   controllers: [GoalsController],
   providers: [GoalsService, UsersService],
   imports: [PrismaModule, EnvModule],
-  exports: [GoalsService]
+  exports: [GoalsService],
 })
 export class GoalsModule {}

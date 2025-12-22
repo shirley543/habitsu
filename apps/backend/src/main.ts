@@ -21,7 +21,7 @@ async function bootstrap() {
   //     - Store refresh token in HttpOnly cookie
   //     - Shorten access JWT expiry (e.g., 10 mins), refresh token expiry longer (e.g., 1 week)
   app.use(cookieParser());
-  
+
   const config = new DocumentBuilder()
     .setTitle('Median')
     .setDescription('The Median API description')

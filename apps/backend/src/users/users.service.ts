@@ -3,9 +3,12 @@ import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto, UpdateUserDto, UserResponseDto } from '@habit-tracker/validation-schemas';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UserResponseDto,
+} from '@habit-tracker/validation-schemas';
 import { EnvService } from 'src/env/env.service';
-
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
@@ -21,12 +24,15 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, this.envService.get('SALT_ROUNDS'));
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      this.envService.get('SALT_ROUNDS'),
+    );
     const prismaInput: Prisma.UserCreateInput = {
       username: createUserDto.username,
       email: createUserDto.email,
       password: hashedPassword,
-    }
+    };
     return this.prisma.user.create({
       data: prismaInput,
       select: userResponseSelect,
@@ -44,27 +50,27 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { username },
       select: userResponseSelect,
-    })
+    });
   }
 
   findOneByEmail(email: string): Promise<UserResponseDto | null> {
     return this.prisma.user.findUnique({
       where: { email },
       select: userResponseSelect,
-    })
+    });
   }
 
   findOneByEmailFull(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { email },
-    })
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
     const prismaInput: Prisma.UserUpdateInput = {
       username: updateUserDto.username,
-      email: updateUserDto.email
-    }
+      email: updateUserDto.email,
+    };
     return this.prisma.user.update({
       where: { id },
       data: prismaInput,
