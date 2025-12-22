@@ -147,7 +147,7 @@ export function useDeleteGoalMutation() {
   })
 }
 
-async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<{}> {
+async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<void> {
   return api.post('goals/reorder', { json: reorderGoal }).json()
 }
 
@@ -205,7 +205,7 @@ export function useReorderGoalsMutation() {
         queryClient.setQueryData(['goals'], context.previousGoals)
       }
     },
-    onSettled: (_data, _error, _variables) => {
+    onSettled: () => {
       // Invalidate queries to ensure fresh data next time
       queryClient.invalidateQueries({ queryKey: ['goals'] })
     },
@@ -360,7 +360,7 @@ export function useUpdateGoalEntryMutation() {
   })
 }
 
-async function deleteGoalEntry(goalId: number, entryId: number): Promise<{}> {
+async function deleteGoalEntry(goalId: number, entryId: number): Promise<GoalEntryResponse> {
   return api.delete(`goals/${goalId}/entries/${entryId}`).json()
 }
 
