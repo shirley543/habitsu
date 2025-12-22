@@ -1,15 +1,9 @@
 import { useState } from 'react'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
-import {
-  CreateUserSchema
-  
-} from '@habit-tracker/validation-schemas'
 import z from 'zod'
 import { useAppForm } from '../../hooks/form'
 import {
-  useCreateUserMutation,
   useDeleteUserMutation,
-  useUpdateUserMutation,
   useUser,
 } from '../../apis/UserApi'
 import type {UserResponseDto} from '@habit-tracker/validation-schemas';
@@ -19,7 +13,6 @@ import {
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
-import { DeleteDialog } from '@/components/custom/DialogComponents'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -68,7 +61,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
     validators: {
       onSubmit: DeleteFormSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: () => {
       deleteUserMutateFn(undefined, {
         onSuccess: () => {
           // TODOs #10: Fix ERROR [ExceptionsHandler] TypeError: Converting circular structure to JSON, upon successful delete function (deleted in DB, but errors out)

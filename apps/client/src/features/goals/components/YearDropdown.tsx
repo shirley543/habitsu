@@ -1,8 +1,6 @@
-import { CalendarDays } from 'lucide-react'
 import type {DropdownMenuCheckboxesItemConfig} from '@/components/custom/DropdownMenuCheckboxes';
 import DropdownMenuCheckboxes from '@/components/custom/DropdownMenuCheckboxes'
 import IconButton from '@/components/custom/IconButton'
-import { Button } from '@/components/ui/button'
 
 interface YearDropdownProps {
   selectedYear: number

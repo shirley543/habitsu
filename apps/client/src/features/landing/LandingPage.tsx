@@ -1,18 +1,14 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { DynamicIcon  } from 'lucide-react/dynamic'
 import {
-  
   GoalPublicityType,
   GoalQuantifyType
-  
 } from '@habit-tracker/validation-schemas'
-import { ArrowDown, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { GoalCardStatic } from '../goals/components/GoalCard'
 import { fakeGoalEntriesData } from './fakeGoalEntriesData'
 import type {GoalEntryResponse, GoalResponse} from '@habit-tracker/validation-schemas';
 import type {IconName} from 'lucide-react/dynamic';
-import IconButton from '@/components/custom/IconButton'
-import { TopBarSlotted } from '@/components/custom/TopBar'
 import { ColourEnum } from '@/components/custom/FormComponents'
 import { Button } from '@/components/ui/button'
 
@@ -23,11 +19,7 @@ interface InfoCardEntry {
   colour: ColourEnum
 }
 
-interface LandingPageProps {}
-
-export const LandingPage: React.FC<LandingPageProps> = () => {
-  const navigate = useNavigate()
-
+export const LandingPage: React.FC = () => {
   const homeGoalIcon: IconName = 'palette'
   const homeGoalData: GoalResponse = {
     id: 1,

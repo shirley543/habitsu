@@ -37,7 +37,7 @@ const GoalCardBase: React.FC<
     goalId: goalData.id,
     year: selectedYear,
   }
-  const { data: entriesData, isLoading, error } = useGoalEntries(searchParams)
+  const { data: entriesData, isLoading } = useGoalEntries(searchParams)
 
   return (
     // TODOs #14: pull styles "bg-white rounded-xl p-2.5 shadow-sm" into it's own component. "CardWrapper?" Use shadcn "Card" component since styling same/ similar?

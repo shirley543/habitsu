@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import ky from 'ky'
 import type { HTTPError } from 'ky';
 import type {
@@ -118,7 +118,7 @@ export function useUpdateGoalMutation() {
       // Return context for rollback on error
       return { previousGoals, previousGoal }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, variables, context) => {
       // Rollback to previous cache on error
       if (context?.previousGoals) {
         queryClient.setQueryData(['goals'], context.previousGoals)
@@ -127,7 +127,7 @@ export function useUpdateGoalMutation() {
         queryClient.setQueryData(['goal', variables.id], context.previousGoal)
       }
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       // Invalidate queries to ensure fresh data next time
       queryClient.invalidateQueries({ queryKey: ['goals'] })
       queryClient.invalidateQueries({ queryKey: ['goal', variables.id] })
@@ -135,7 +135,7 @@ export function useUpdateGoalMutation() {
   })
 }
 
-async function deleteGoal(goalId: number): Promise<{}> {
+async function deleteGoal(goalId: number): Promise<GoalResponse> {
   return api.delete(`goals/${goalId}`).json()
 }
 
@@ -199,13 +199,13 @@ export function useReorderGoalsMutation() {
       // Return context for rollback on error
       return { previousGoals }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback to previous cache on error
       if (context?.previousGoals) {
         queryClient.setQueryData(['goals'], context.previousGoals)
       }
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, _variables) => {
       // Invalidate queries to ensure fresh data next time
       queryClient.invalidateQueries({ queryKey: ['goals'] })
     },

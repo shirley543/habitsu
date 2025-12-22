@@ -6,7 +6,6 @@ import {
   
   DialogTriggerSubtype
 } from './DialogComponents'
-import type {DialogTriggerConfig} from './DialogComponents';
 import { Button } from '@/components/ui/button'
 
 interface ErrorBaseProps {

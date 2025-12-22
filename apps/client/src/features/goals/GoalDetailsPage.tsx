@@ -3,8 +3,6 @@ import { DynamicIcon  } from 'lucide-react/dynamic'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import {
   GoalQuantifyType
-  
-  
 } from '@habit-tracker/validation-schemas'
 import {
   useGoal,
@@ -15,8 +13,8 @@ import {
 import { GoalCardControlled } from './components/GoalCard'
 import { GoalIconText } from './components/GoalIconText'
 import MonthAreaChart from './components/MonthAreaChart'
-import type {IconName} from 'lucide-react/dynamic';
-import type {GoalResponse, GoalStatisticsReponse} from '@habit-tracker/validation-schemas';
+import type { IconName } from 'lucide-react/dynamic';
+import type { GoalStatisticsReponse} from '@habit-tracker/validation-schemas';
 import IconButton from '@/components/custom/IconButton'
 import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
@@ -29,6 +27,7 @@ export const GoalDetailsPage = () => {
   const { goalId } = route.useParams()
   const [selectedYear, setSelectedYear] = useState<number>(2025)
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     data: goalData,
     isLoading: goalIsLoading,
@@ -55,6 +54,7 @@ export const GoalDetailsPage = () => {
     { goalId: parseInt(goalId), year: selectedYear },
     goalData?.goalType === GoalQuantifyType.Boolean,
   )
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   type GoalStatsKeys = keyof GoalStatisticsReponse
   interface GoalStatsDisplay {

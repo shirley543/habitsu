@@ -1,15 +1,9 @@
 import { useState } from 'react'
 import {
-  getRouteApi,
   useCanGoBack,
   useNavigate,
   useRouter,
 } from '@tanstack/react-router'
-import {
-  
-  UpdateUserSchema
-  
-} from '@habit-tracker/validation-schemas'
 import z from 'zod'
 import { useAppForm } from '../../hooks/form'
 import { useUpdateUserMutation, useUser } from '../../apis/UserApi'
@@ -20,7 +14,6 @@ import {
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
-import { DeleteDialog } from '@/components/custom/DialogComponents'
 
 const UpdateUserFormSchema = z
   .object({

@@ -63,7 +63,7 @@ export function GoalVisibilityCard({ goal }: GoalVisibilityCardProps) {
 
 export function GoalVisibilityPage() {
   const navigate = useNavigate()
-  const { data: goalsRaw, isLoading, error } = useGoals()
+  const { data: goalsRaw, error } = useGoals()
 
   const [goals, setGoals] = useState<Array<GoalResponse> | undefined>(undefined)
 

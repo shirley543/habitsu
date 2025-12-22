@@ -10,9 +10,8 @@ import { useCreateUserMutation, useLoginUserMutation } from '../../apis/UserApi'
 import { useAppForm } from '../../hooks/form'
 import type {CreateUserDto, LoginUserDto} from '@habit-tracker/validation-schemas';
 
-interface LoginPageProps {}
 
-export const LoginPage: React.FC<LoginPageProps> = () => {
+export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
 
   const { mutate: loginUserMutateFn } = useLoginUserMutation()
@@ -79,9 +78,7 @@ export const LoginPage: React.FC<LoginPageProps> = () => {
   )
 }
 
-interface SignUpPageProps {}
-
-export const SignUpPage: React.FC<SignUpPageProps> = () => {
+export const SignUpPage: React.FC = () => {
   const navigate = useNavigate()
 
   const { mutate: createUserMutateFn } = useCreateUserMutation()
@@ -103,10 +100,10 @@ export const SignUpPage: React.FC<SignUpPageProps> = () => {
         onSuccess: () => {
           loginUserMutateFn(value, {
             onSuccess: () => navigate({ to: '/goals' }),
-            onError: (error: any) => console.log(error),
+            onError: (error: unknown) => console.log(error),
           })
         },
-        onError: (error: any) => console.log(error),
+        onError: (error: unknown) => console.log(error),
       })
     },
   })

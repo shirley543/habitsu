@@ -27,10 +27,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <div className="max-w-[1024px] w-full">
         <Outlet />
       </div>
-
-      {/* <TanStackRouterDevtools />
-
-      <TanStackQueryLayout /> */}
+      <TanStackRouterDevtools />
+      <TanStackQueryLayout />
     </div>
   ),
   beforeLoad: async ({ location }) => {

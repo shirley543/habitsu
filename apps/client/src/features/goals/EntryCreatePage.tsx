@@ -232,6 +232,7 @@ export function EntryCreatePage() {
           entryDate={date}
         />
       )}
+      {goalError && "Goal Error"}
     </>
   )
 }

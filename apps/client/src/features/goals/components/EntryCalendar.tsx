@@ -38,7 +38,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
   )
 
   const { data: goalData } = useGoal(goalId.toString())
-  const { data: entriesData, isLoading, error } = useGoalEntries(searchParams)
+  const { data: entriesData } = useGoalEntries(searchParams)
 
   let modifiers = {}
   let modifiersStyles = {}

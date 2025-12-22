@@ -88,7 +88,7 @@ export function GoalOrderCard({
 export function GoalOrderPage() {
   const navigate = useNavigate()
 
-  const { data: goalsRaw, isLoading, error } = useGoals()
+  const { data: goalsRaw, error } = useGoals()
   const { mutate: reorderGoalsMutateFn } = useReorderGoalsMutation()
 
   const [goals, setGoals] = useState<Array<GoalResponse> | undefined>(undefined)

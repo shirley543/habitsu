@@ -10,7 +10,7 @@ import { TopBarSlotted } from '@/components/custom/TopBar'
 import IconButton from '@/components/custom/IconButton'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 import { EmptyStateBodyComponent } from '@/components/custom/EmptyStateComponents'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuOptions from '@/components/custom/DropdownMenuOptions'
 import { useLogoutUserMutation } from '@/apis/UserApi'
 

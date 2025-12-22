@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import ky from 'ky'
-import type { HTTPError } from 'ky';
+import ky, { HTTPError } from 'ky'
 import type {
   CreateUserDto,
   LoginUserDto,
@@ -25,9 +24,14 @@ const api = ky.create({
 export async function fetchUser(): Promise<UserResponseDto | null> {
   try {
     return await api.get('users/me').json()
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      return null
+  } catch (err: unknown) {
+    if (err instanceof HTTPError) {
+      const errorJson = await err.response.json();
+      console.error('HTTP Error:', err.response.status, errorJson);
+    } else if (err instanceof Error) {
+      console.error('General Error:', err.message);
+    } else {
+      console.error('An unknown error occurred', err);
     }
     throw err
   }
