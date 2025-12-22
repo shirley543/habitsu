@@ -11,7 +11,8 @@
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check": "prettier --check . && eslint"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

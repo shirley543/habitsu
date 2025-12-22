@@ -17,5 +17,9 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.1",
     "husky": "^9.1.7"
+  },
+  "scripts": {
+    "check": "npm run --workspaces check",
+    "prepare": "husky"
   }
 }
