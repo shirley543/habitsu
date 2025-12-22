@@ -181,13 +181,13 @@ export function GoalOrderPage() {
     }))
     const result = ReorderGoalSchema.safeParse(reorderData)
     if (result.error?.issues) {
-      console.log('Error on validation', result.error?.issues)
+      console.log('Error on validation', result.error.issues)
       // TODOs #8 Display validation error
     } else {
       // No issues during parsing, hence send to backend
       reorderGoalsMutateFn(reorderData, {
         onSuccess: navigateBack,
-        onError: (error) => console.log('Error on reordering', error),
+        onError: (err) => console.log('Error on reordering', err),
         // TODOs #8 toast? Error modal?
         // TODOs #12 Improve loading display + error display
       })

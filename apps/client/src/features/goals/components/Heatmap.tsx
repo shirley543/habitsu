@@ -97,7 +97,7 @@ const Cell = React.memo(
         switch (goalData.goalType) {
           case GoalQuantifyType.Numeric:
             return entryData?.numericValue
-              ? `${entryData?.numericValue} ${goalData.numericUnit}`
+              ? `${entryData.numericValue} ${goalData.numericUnit}`
               : NO_ENTRY_TEXT
           case GoalQuantifyType.Boolean:
             return entryData ? 'Completed' : NO_ENTRY_TEXT
@@ -224,8 +224,8 @@ const Heatmap: React.FC<HeatmapProps> = ({
           }
 
           // Iterate over week-grouped arrays and add month label
-          for (let i = 0; i < arrays.length; i++) {
-            const firstDayOfMonthElem = arrays[i].find((elem) => {
+          for (const array of arrays) {
+            const firstDayOfMonthElem = array.find((elem) => {
               if (elem.type === Cell) {
                 const elDate = elem.props.date as Date
                 return elDate.getDate() === 1

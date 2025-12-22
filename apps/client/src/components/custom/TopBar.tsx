@@ -105,7 +105,7 @@ const TopBarConfig: React.FC<TopBarConfigProps> = ({
   const createSlotFromConfig = (configArr: Array<TopBarButtonConfig>) => {
     return (
       <>
-        {configArr?.map((item) => {
+        {configArr.map((item) => {
           return (
             <IconButton
               iconName={item.iconName}

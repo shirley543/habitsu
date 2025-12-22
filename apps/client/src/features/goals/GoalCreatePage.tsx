@@ -88,7 +88,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       } else {
         if (defaultValues?.id) {
           updateGoalMutateFn(
-            { id: defaultValues?.id, update: value },
+            { id: defaultValues.id, update: value },
             {
               onSuccess: navigateBack,
               onError: (error) =>
@@ -238,7 +238,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
         <ErrorDialogComponent
           error={displayedError.error}
           category={displayedError.category}
-          isShow={displayedError !== undefined}
           onClose={() => {
             setDisplayedError(undefined)
           }}

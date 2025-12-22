@@ -62,7 +62,7 @@ export enum ErrorDialogCategory {
 
 interface ErrorDialogComponentProps extends ErrorBaseProps {
   category: ErrorDialogCategory
-  isShow: boolean
+  isShow?: boolean
   onClose: () => void
 }
 
@@ -70,7 +70,7 @@ interface ErrorDialogComponentProps extends ErrorBaseProps {
 function ErrorDialogComponent({
   error,
   category,
-  isShow,
+  isShow = true,
   onClose,
 }: ErrorDialogComponentProps) {
   const descriptionText = (() => {

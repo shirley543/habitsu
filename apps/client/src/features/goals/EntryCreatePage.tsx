@@ -116,7 +116,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
       } else {
         if (defaultValues?.id) {
           updateGoalEntryMutateFn(
-            { goalId: goalId, entryId: defaultValues?.id, updateDto: parsed },
+            { goalId: goalId, entryId: defaultValues.id, updateDto: parsed },
             {
               onSuccess: () => navigate({ to: '/goals' }),
               onError: (error) =>
@@ -194,7 +194,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
         <ErrorDialogComponent
           error={displayedError.error}
           category={displayedError.category}
-          isShow={displayedError !== undefined}
           onClose={() => {
             setDisplayedError(undefined)
           }}
@@ -209,7 +208,7 @@ export function EntryCreatePage() {
   const { goalId: goalId } = route.useParams()
 
   const locationState = useRouterState({ select: (s) => s.location.state })
-  const dateStr = locationState?.date
+  const dateStr = locationState.date
   const date = dateStr ? new Date(dateStr) : undefined
 
   const {

@@ -131,7 +131,6 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
         <ErrorDialogComponent
           error={displayedError.error}
           category={displayedError.category}
-          isShow={displayedError !== undefined}
           onClose={() => {
             setDisplayedError(undefined)
           }}

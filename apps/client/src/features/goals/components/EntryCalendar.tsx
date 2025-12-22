@@ -125,20 +125,20 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
     }, {})
   }
 
-  const calendarYear = searchParams?.year || new Date().getFullYear()
+  const calendarYear = searchParams.year || new Date().getFullYear()
   return (
     <Calendar
       mode="single"
       defaultMonth={date}
       selected={date}
-      onSelect={(date) => {
-        setDate(date)
+      onSelect={(selectedDate) => {
+        setDate(selectedDate)
 
-        if (goalData && date) {
+        if (goalData && selectedDate) {
           const goalEntryForDate = entriesData
-            ? getEntryDataForDate(entriesData, date)
+            ? getEntryDataForDate(entriesData, selectedDate)
             : undefined
-          navigateToCreateOrEdit(goalData.id, goalEntryForDate, date, navigate)
+          navigateToCreateOrEdit(goalData.id, goalEntryForDate, selectedDate, navigate)
         }
       }}
       modifiers={modifiers}

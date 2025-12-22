@@ -10,7 +10,7 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint --fix",
+    "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix"
   },

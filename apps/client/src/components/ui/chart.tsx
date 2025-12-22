@@ -69,6 +69,7 @@ function ChartContainer({
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
+    // eslint-disable-next-line no-shadow
     ([, config]) => config.theme || config.color,
   )
 
@@ -136,6 +137,7 @@ function ChartTooltipContent({
     const itemConfig = getPayloadConfigFromPayload(config, item, key)
     const value =
       !labelKey && typeof label === 'string'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         ? config[label]?.label || label
         : itemConfig?.label
 

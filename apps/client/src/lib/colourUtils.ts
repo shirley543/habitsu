@@ -120,11 +120,11 @@ export const computeCellColour = (
   switch (goalData.goalType) {
     case GoalQuantifyType.Numeric: {
       const color =
-        goalData?.numericTarget && entryData?.numericValue
+        goalData.numericTarget && entryData?.numericValue
           ? computeBinnedColour(
               goalData.colour,
               goalData.numericTarget,
-              entryData?.numericValue,
+              entryData.numericValue,
             )
           : NO_ENTRY_COLOUR
       return color
