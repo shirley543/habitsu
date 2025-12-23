@@ -11,9 +11,15 @@
   "scripts": {
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:cjs": "tsc --project tsconfig.cjs.json",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "lint": "eslint --fix",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.50.1"
   }
 }
