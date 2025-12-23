@@ -4,5 +4,5 @@
   // Clear paths when building
   "compilerOptions": {
     "paths": {}
-  },
+  }
 }

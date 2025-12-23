@@ -28,5 +28,5 @@
       "@habit-tracker/validation-schemas": ["../shared/src"],
       "@habit-tracker/validation-schemas/*": ["../shared/src/*"]
     }
-  },
+  }
 }
