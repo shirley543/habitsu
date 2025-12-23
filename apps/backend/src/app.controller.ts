@@ -1,9 +1,8 @@
 import {
   Controller,
-  Get,
   HttpCode,
   Post,
-  Request,
+  Request as Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -19,7 +18,7 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+  async login(@Req() req, @Res({ passthrough: true }) res: Response) {
     // Return JWT access token via cookie upon successful login
     const { access_token } = await this.authService.login(req.user);
     res.cookie('jwt', access_token, {
@@ -35,9 +34,8 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(200)
-  async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+  logout(@Req() req, @Res({ passthrough: true }) res: Response) {
     // TODOs #28 invalidate refresh token, if refresh tokens implemented
-
     // Clear the JWT cookie
     res.clearCookie('jwt', {
       secure: process.env.NODE_ENV === 'production',

@@ -20,7 +20,6 @@ import {
   SearchParamsGoalEntrySchema,
   UpdateGoalEntryDto,
   UpdateGoalEntrySchema,
-  GoalStatisticsReponse,
 } from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';

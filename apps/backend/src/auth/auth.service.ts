@@ -1,9 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
 import { UserResponseDto } from '@habit-tracker/validation-schemas';
 import { JwtPayload } from './jwt-auth.types';
 
@@ -23,7 +22,8 @@ export class AuthService {
       ? await bcrypt.compare(password, user.password)
       : false;
     if (user && passwordValid) {
-      const { password, ...result } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _password, ...result } = user;
       return result;
     }
     return null;
@@ -35,7 +35,7 @@ export class AuthService {
    * @param user - user to generate JWT with
    * @returns - obj with `access_token`
    */
-  async login(user: UserResponseDto) {
+  login(user: UserResponseDto) {
     const payload: JwtPayload = {
       email: user.email,
       username: user.username,

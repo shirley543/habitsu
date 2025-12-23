@@ -17,9 +17,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "lint": "eslint --fix",
-    "format": "prettier --write .",
-    "check": "prettier --check . && eslint"
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" && eslint \"{src,test}/**/*.ts\""
   },
   "dependencies": {
     "@habit-tracker/validation-schemas": "*",
