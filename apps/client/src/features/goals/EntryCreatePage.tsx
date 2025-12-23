@@ -6,8 +6,7 @@ import {
 } from '@tanstack/react-router'
 import {
   CreateGoalEntrySchema,
-  
-  GoalQuantifyType
+  GoalQuantifyType,
 } from '@habit-tracker/validation-schemas'
 import { useAppForm } from '../../hooks/form'
 import {
@@ -17,7 +16,7 @@ import {
   useGoalEntry,
   useUpdateGoalEntryMutation,
 } from '../../apis/GoalApi'
-import type {GoalEntryResponse} from '@habit-tracker/validation-schemas';
+import type { GoalEntryResponse } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,
@@ -232,7 +231,7 @@ export function EntryCreatePage() {
           entryDate={date}
         />
       )}
-      {goalError && "Goal Error"}
+      {goalError && 'Goal Error'}
     </>
   )
 }

@@ -1,13 +1,13 @@
 import { useStore } from '@tanstack/react-form'
 
-import { DynamicIcon  } from 'lucide-react/dynamic'
-import {  useState } from 'react'
+import { DynamicIcon } from 'lucide-react/dynamic'
+import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
-import type {ChangeEvent} from 'react';
-import type {IconName} from 'lucide-react/dynamic';
+import type { ChangeEvent } from 'react'
+import type { IconName } from 'lucide-react/dynamic'
 
-import type { buttonVariants } from '@/components/ui/button';
+import type { buttonVariants } from '@/components/ui/button'
 import type { VariantProps } from 'class-variance-authority'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

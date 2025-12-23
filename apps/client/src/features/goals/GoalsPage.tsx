@@ -5,7 +5,7 @@ import { useGoals } from '../../apis/GoalApi'
 import { GoalCardDescriptive, SkeletonGoalCard } from './components/GoalCard'
 import { YearDropdown } from './components/YearDropdown'
 import type { IconName } from 'lucide-react/dynamic'
-import type {DropdownMenuOptionsItemConfig} from '@/components/custom/DropdownMenuOptions';
+import type { DropdownMenuOptionsItemConfig } from '@/components/custom/DropdownMenuOptions'
 import { TopBarSlotted } from '@/components/custom/TopBar'
 import IconButton from '@/components/custom/IconButton'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'

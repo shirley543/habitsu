@@ -1,23 +1,20 @@
-import {  cva } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 import React, { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { CalendarDays } from 'lucide-react'
-import {
-  
-  GoalQuantifyType
-} from '@habit-tracker/validation-schemas'
+import { GoalQuantifyType } from '@habit-tracker/validation-schemas'
 import { useNavigate } from '@tanstack/react-router'
 import { getEntryDataForDate } from '../EntryUtils'
 import { navigateToCreateOrEdit } from './NavigateUtils'
-import type {GoalEntryResponse} from '@habit-tracker/validation-schemas';
-import type {ColourGoalData} from '@/lib/colourUtils';
-import type {VariantProps} from 'class-variance-authority';
+import type { GoalEntryResponse } from '@habit-tracker/validation-schemas'
+import type { ColourGoalData } from '@/lib/colourUtils'
+import type { VariantProps } from 'class-variance-authority'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   daysOfWeekShort,
   getPartialDaysOfWeekShort,
   monthsOfYearShort,
 } from '@/lib/dateUtils'
-import {  computeCellColour } from '@/lib/colourUtils'
+import { computeCellColour } from '@/lib/colourUtils'
 import HoverPopover from '@/components/custom/HoverPopup'
 import { cn } from '@/lib/utils'
 

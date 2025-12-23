@@ -1,7 +1,7 @@
 //  @ts-check
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import js from '@eslint/js';
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import js from '@eslint/js'
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 
@@ -22,7 +22,12 @@ export default [
   },
   // Exclude config files
   {
-    files: ['vite.config.js', 'eslint.config.js', 'prettier.config.js', '*.config.js'],
+    files: [
+      'vite.config.js',
+      'eslint.config.js',
+      'prettier.config.js',
+      '*.config.js',
+    ],
     ...js.configs.recommended,
-  }
-];
+  },
+]

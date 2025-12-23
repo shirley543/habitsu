@@ -26,12 +26,12 @@ export async function fetchUser(): Promise<UserResponseDto | null> {
     return await api.get('users/me').json()
   } catch (err: unknown) {
     if (err instanceof HTTPError) {
-      const errorJson = await err.response.json();
-      console.error('HTTP Error:', err.response.status, errorJson);
+      const errorJson = await err.response.json()
+      console.error('HTTP Error:', err.response.status, errorJson)
     } else if (err instanceof Error) {
-      console.error('General Error:', err.message);
+      console.error('General Error:', err.message)
     } else {
-      console.error('An unknown error occurred', err);
+      console.error('An unknown error occurred', err)
     }
     throw err
   }

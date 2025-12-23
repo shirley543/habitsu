@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import {
   DndContext,
-  
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
-  useSensors
+  useSensors,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -18,14 +17,13 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-import {
-  
-  
-  ReorderGoalSchema
-} from '@habit-tracker/validation-schemas'
+import { ReorderGoalSchema } from '@habit-tracker/validation-schemas'
 import { useGoals, useReorderGoalsMutation } from '../../apis/GoalApi'
-import type {GoalResponse, ReorderGoalDto} from '@habit-tracker/validation-schemas';
-import type {DragEndEvent} from '@dnd-kit/core';
+import type {
+  GoalResponse,
+  ReorderGoalDto,
+} from '@habit-tracker/validation-schemas'
+import type { DragEndEvent } from '@dnd-kit/core'
 import IconButton from '@/components/custom/IconButton'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'

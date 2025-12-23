@@ -3,13 +3,12 @@
  * for e.g. determining Heatmap cell colour, Entry Calendar
  */
 
-import {
-  
-  GoalQuantifyType
-  
-} from '@habit-tracker/validation-schemas'
+import { GoalQuantifyType } from '@habit-tracker/validation-schemas'
 import * as d3 from 'd3'
-import type {GoalEntryResponse, GoalResponse} from '@habit-tracker/validation-schemas';
+import type {
+  GoalEntryResponse,
+  GoalResponse,
+} from '@habit-tracker/validation-schemas'
 
 export type ColourGoalData = Pick<GoalResponse, 'id' | 'colour'> &
   (

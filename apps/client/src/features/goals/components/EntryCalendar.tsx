@@ -1,15 +1,14 @@
 import * as React from 'react'
 
-import {
-  
-  GoalQuantifyType
-  
-} from '@habit-tracker/validation-schemas'
+import { GoalQuantifyType } from '@habit-tracker/validation-schemas'
 import { useNavigate } from '@tanstack/react-router'
 import { useGoal, useGoalEntries } from '../../../apis/GoalApi'
 import { getEntryDataForDate } from '../EntryUtils'
 import { navigateToCreateOrEdit } from './NavigateUtils'
-import type {GoalEntryResponse, SearchParamsGoalEntryDto} from '@habit-tracker/validation-schemas';
+import type {
+  GoalEntryResponse,
+  SearchParamsGoalEntryDto,
+} from '@habit-tracker/validation-schemas'
 import { Calendar } from '@/components/ui/calendar'
 import { computeBinAndColorArrays } from '@/lib/colourUtils'
 
@@ -138,7 +137,12 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
           const goalEntryForDate = entriesData
             ? getEntryDataForDate(entriesData, selectedDate)
             : undefined
-          navigateToCreateOrEdit(goalData.id, goalEntryForDate, selectedDate, navigate)
+          navigateToCreateOrEdit(
+            goalData.id,
+            goalEntryForDate,
+            selectedDate,
+            navigate,
+          )
         }
       }}
       modifiers={modifiers}

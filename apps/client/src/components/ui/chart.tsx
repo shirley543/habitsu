@@ -137,8 +137,8 @@ function ChartTooltipContent({
     const itemConfig = getPayloadConfigFromPayload(config, item, key)
     const value =
       !labelKey && typeof label === 'string'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        ? config[label]?.label || label
+        ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          config[label]?.label || label
         : itemConfig?.label
 
     if (labelFormatter) {
@@ -338,9 +338,7 @@ function getPayloadConfigFromPayload(
     ] as string
   }
 
-  return configLabelKey in config
-    ? config[configLabelKey]
-    : config[key]
+  return configLabelKey in config ? config[configLabelKey] : config[key]
 }
 
 export {

@@ -1,15 +1,15 @@
 import { useNavigate } from '@tanstack/react-router'
 import {
-  
   CreateUserSchema,
-  
-  LoginUserSchema
+  LoginUserSchema,
 } from '@habit-tracker/validation-schemas'
 import { HTTPError } from 'ky'
 import { useCreateUserMutation, useLoginUserMutation } from '../../apis/UserApi'
 import { useAppForm } from '../../hooks/form'
-import type {CreateUserDto, LoginUserDto} from '@habit-tracker/validation-schemas';
-
+import type {
+  CreateUserDto,
+  LoginUserDto,
+} from '@habit-tracker/validation-schemas'
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()

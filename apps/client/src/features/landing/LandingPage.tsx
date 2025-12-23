@@ -1,14 +1,17 @@
 import { Link } from '@tanstack/react-router'
-import { DynamicIcon  } from 'lucide-react/dynamic'
+import { DynamicIcon } from 'lucide-react/dynamic'
 import {
   GoalPublicityType,
-  GoalQuantifyType
+  GoalQuantifyType,
 } from '@habit-tracker/validation-schemas'
 import { ArrowRight } from 'lucide-react'
 import { GoalCardStatic } from '../goals/components/GoalCard'
 import { fakeGoalEntriesData } from './fakeGoalEntriesData'
-import type {GoalEntryResponse, GoalResponse} from '@habit-tracker/validation-schemas';
-import type {IconName} from 'lucide-react/dynamic';
+import type {
+  GoalEntryResponse,
+  GoalResponse,
+} from '@habit-tracker/validation-schemas'
+import type { IconName } from 'lucide-react/dynamic'
 import { ColourEnum } from '@/components/custom/FormComponents'
 import { Button } from '@/components/ui/button'
 

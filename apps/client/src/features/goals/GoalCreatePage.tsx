@@ -6,11 +6,9 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import {
-  
   CreateGoalSchema,
   GoalPublicityType,
-  GoalQuantifyType
-  
+  GoalQuantifyType,
 } from '@habit-tracker/validation-schemas'
 import { useAppForm } from '../../hooks/form'
 import {
@@ -19,7 +17,10 @@ import {
   useGoal,
   useUpdateGoalMutation,
 } from '../../apis/GoalApi'
-import type {CreateGoalDto, GoalResponse} from '@habit-tracker/validation-schemas';
+import type {
+  CreateGoalDto,
+  GoalResponse,
+} from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,

@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { DynamicIcon  } from 'lucide-react/dynamic'
+import { DynamicIcon } from 'lucide-react/dynamic'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import {
-  GoalQuantifyType
-} from '@habit-tracker/validation-schemas'
+import { GoalQuantifyType } from '@habit-tracker/validation-schemas'
 import {
   useGoal,
   useGoalMonthlyAvgs,
@@ -13,8 +11,8 @@ import {
 import { GoalCardControlled } from './components/GoalCard'
 import { GoalIconText } from './components/GoalIconText'
 import MonthAreaChart from './components/MonthAreaChart'
-import type { IconName } from 'lucide-react/dynamic';
-import type { GoalStatisticsReponse} from '@habit-tracker/validation-schemas';
+import type { IconName } from 'lucide-react/dynamic'
+import type { GoalStatisticsReponse } from '@habit-tracker/validation-schemas'
 import IconButton from '@/components/custom/IconButton'
 import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'

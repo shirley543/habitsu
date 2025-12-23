@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import ky from 'ky'
-import type { HTTPError } from 'ky';
+import type { HTTPError } from 'ky'
 import type {
   CreateGoalDto,
   CreateGoalEntryDto,
@@ -360,7 +360,10 @@ export function useUpdateGoalEntryMutation() {
   })
 }
 
-async function deleteGoalEntry(goalId: number, entryId: number): Promise<GoalEntryResponse> {
+async function deleteGoalEntry(
+  goalId: number,
+  entryId: number,
+): Promise<GoalEntryResponse> {
   return api.delete(`goals/${goalId}/entries/${entryId}`).json()
 }
 

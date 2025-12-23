@@ -5,7 +5,7 @@ import { GoalIconText, SkeletonGoalIconText } from './GoalIconText'
 import { Heatmap, SkeletonHeatmap } from './Heatmap'
 import { navigateToCreateOrEdit } from './NavigateUtils'
 import EntryCalendar from './EntryCalendar'
-import type {IconName} from 'lucide-react/dynamic';
+import type { IconName } from 'lucide-react/dynamic'
 import type {
   GoalEntryResponse,
   SearchParamsGoalEntryDto,

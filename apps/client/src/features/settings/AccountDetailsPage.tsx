@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import {
-  useCanGoBack,
-  useNavigate,
-  useRouter,
-} from '@tanstack/react-router'
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import z from 'zod'
 import { useAppForm } from '../../hooks/form'
 import { useUpdateUserMutation, useUser } from '../../apis/UserApi'
-import type {UpdateUserDto, UserResponseDto} from '@habit-tracker/validation-schemas';
+import type {
+  UpdateUserDto,
+  UserResponseDto,
+} from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,

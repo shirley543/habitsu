@@ -1,5 +1,5 @@
-import { DynamicIcon  } from 'lucide-react/dynamic'
-import type {IconName} from 'lucide-react/dynamic';
+import { DynamicIcon } from 'lucide-react/dynamic'
+import type { IconName } from 'lucide-react/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface GoalIconTextProps {

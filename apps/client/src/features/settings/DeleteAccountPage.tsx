@@ -2,11 +2,8 @@ import { useState } from 'react'
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import z from 'zod'
 import { useAppForm } from '../../hooks/form'
-import {
-  useDeleteUserMutation,
-  useUser,
-} from '../../apis/UserApi'
-import type {UserResponseDto} from '@habit-tracker/validation-schemas';
+import { useDeleteUserMutation, useUser } from '../../apis/UserApi'
+import type { UserResponseDto } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
   ErrorDialogCategory,
