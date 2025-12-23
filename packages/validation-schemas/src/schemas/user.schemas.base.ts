@@ -30,7 +30,7 @@ export type LoginUserDto = z.infer<typeof LoginUserSchema>;
 /**
  * Output Schemas
  */
-const UserResponseSchema = z.object({
+export const UserResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
   email: z.string(),
