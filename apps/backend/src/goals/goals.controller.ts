@@ -26,6 +26,7 @@ import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthenticatedRequest } from 'src/auth/jwt-auth.types';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -37,7 +38,7 @@ export class GoalsController {
   @ApiCreatedResponse({ type: GoalEntity })
   // @ApiBody({}) // TODOs #34: update to format API body properly with Swagger/ OpenAPI.
   create(
-    @Req() req,
+    @Req() req: JwtAuthenticatedRequest,
     @Body(new ZodValidationPipe(CreateGoalSchema)) createGoalDto: CreateGoalDto,
   ) {
     const userId = req.user.id;
