@@ -16,6 +16,8 @@ jobs:
       matrix:
         workspace: [apps/client, apps/backend, packages/validation-schemas]
       fail-fast: false
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096 --enable-source-maps"
 
     steps:
       - name: Checkout repository
