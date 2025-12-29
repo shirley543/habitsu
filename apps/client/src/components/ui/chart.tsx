@@ -6,13 +6,16 @@ import { cn } from '@/lib/utils'
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const
 
-export type ChartConfig = Record<string, {
+export type ChartConfig = Record<
+  string,
+  {
     label?: React.ReactNode
     icon?: React.ComponentType
   } & (
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  )>
+  )
+>
 
 interface ChartContextProps {
   config: ChartConfig
@@ -67,7 +70,7 @@ function ChartContainer({
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
-     
+    /* eslint-disable no-shadow */
     ([, config]) => config.theme || config.color,
   )
 
@@ -135,7 +138,7 @@ function ChartTooltipContent({
     const itemConfig = getPayloadConfigFromPayload(config, item, key)
     const value =
       !labelKey && typeof label === 'string'
-        ?  
+        ? /* eslint-disable @typescript-eslint/no-unnecessary-condition */
           config[label]?.label || label
         : itemConfig?.label
 

@@ -60,12 +60,11 @@ const findExistingEntryAndTodayDate = (
 ) => {
   const todayDate = new Date()
   const todayDateStr = todayDate.toDateString()
-  const existingEntryToday =
-    goalEntries?.find((entry) => {
-      const entryDate = new Date(entry.entryDate)
-      const entryDateStr = entryDate.toDateString()
-      return entryDateStr === todayDateStr
-    })
+  const existingEntryToday = goalEntries?.find((entry) => {
+    const entryDate = new Date(entry.entryDate)
+    const entryDateStr = entryDate.toDateString()
+    return entryDateStr === todayDateStr
+  })
   return { existingEntryToday, todayDate }
 }
 

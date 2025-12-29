@@ -91,17 +91,17 @@ export const GoalsPage = () => {
       {(displayedData || isLoading) && (
         <div className="flex flex-col gap-3">
           {displayedData?.map((d) => {
-              return (
-                <GoalCardDescriptive
-                  key={`goalCard_${d.id}`}
-                  title={d.title}
-                  description={d.description}
-                  iconName={d.icon as IconName}
-                  goalData={d}
-                  selectedYear={selectedYear}
-                />
-              )
-            })}
+            return (
+              <GoalCardDescriptive
+                key={`goalCard_${d.id}`}
+                title={d.title}
+                description={d.description}
+                iconName={d.icon as IconName}
+                goalData={d}
+                selectedYear={selectedYear}
+              />
+            )
+          })}
           {isLoading &&
             [...Array(3)].map((_, idx) => {
               return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`} />

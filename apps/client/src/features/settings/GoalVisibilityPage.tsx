@@ -92,7 +92,9 @@ export function GoalVisibilityPage() {
         />
       )}
       {/* Visibility controls container */}
-      {goals?.map((goal) => <GoalVisibilityCard key={goal.id} goal={goal} />)}
+      {goals?.map((goal) => (
+        <GoalVisibilityCard key={goal.id} goal={goal} />
+      ))}
       {goals?.length === 0 && (
         <EmptyStateBodyComponent
           onButtonClick={() => {
