@@ -22,7 +22,8 @@ export class AuthService {
       ? await bcrypt.compare(password, user.password)
       : false;
     if (user && passwordValid) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // Password deliberately destructured and un-used, to remove it from the returned result
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { password: _password, ...result } = user;
       return result;
     }

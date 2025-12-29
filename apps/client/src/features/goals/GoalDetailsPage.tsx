@@ -25,6 +25,7 @@ export const GoalDetailsPage = () => {
   const { goalId } = route.useParams()
   const [selectedYear, setSelectedYear] = useState<number>(2025)
 
+  // Un-used variables to be addressed in #12
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     data: goalData,

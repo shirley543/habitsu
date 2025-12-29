@@ -11,6 +11,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req) => {
+          // `cookie-parser` middleware injects `cookies` dynamically at runtime
+          /* eslint-disable @typescript-eslint/no-unsafe-return */
           return req.cookies.jwt; ///< Get token from cookie
         },
       ]),

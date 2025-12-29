@@ -124,7 +124,8 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        /* eslint-disable no-shadow */
+        // Lint rule disabled to keep shadcn/ui component close to upstream source, to simplify future updates
+        /* eslint-disable-next-line no-shadow */
         Root: ({ className, rootRef, ...props }) => {
           return (
             <div
@@ -135,7 +136,7 @@ function Calendar({
             />
           )
         },
-        /* eslint-disable no-shadow */
+        /* eslint-disable-next-line no-shadow */
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === 'left') {
             return (
@@ -157,7 +158,7 @@ function Calendar({
           )
         },
         DayButton: CalendarDayButton,
-        /* eslint-disable no-shadow */
+        /* eslint-disable-next-line no-shadow */
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>

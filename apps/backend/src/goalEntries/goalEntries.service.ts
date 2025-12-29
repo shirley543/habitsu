@@ -6,7 +6,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGoalEntryDto,
   UpdateGoalEntryDto,
-  GoalQuantifyType,
   SearchParamsGoalEntryDto,
   GoalStatisticsReponse,
   GoalMonthlyAveragesResponse,
@@ -48,13 +47,14 @@ export class GoalEntriesService {
           connect: { id: goalId },
         },
       };
+
       switch (goal.goalType) {
-        case GoalQuantifyType.Boolean:
+        case GoalQuantify.BOOLEAN:
         default:
           return {
             ...baseGoalEntry,
           };
-        case GoalQuantifyType.Numeric:
+        case GoalQuantify.NUMERIC:
           return {
             ...baseGoalEntry,
             numericValue: createGoalEntryDto.numericValue,
@@ -159,13 +159,14 @@ export class GoalEntriesService {
         entryDate: updateGoalEntryDto.entryDate,
         note: updateGoalEntryDto.note,
       };
+
       switch (entry.goal.goalType) {
-        case GoalQuantifyType.Boolean:
+        case GoalQuantify.BOOLEAN:
         default:
           return {
             ...baseGoalEntry,
           };
-        case GoalQuantifyType.Numeric:
+        case GoalQuantify.NUMERIC:
           return {
             ...baseGoalEntry,
             numericValue: updateGoalEntryDto.numericValue,
@@ -213,6 +214,7 @@ export class GoalEntriesService {
    */
 
   private convertDecimalToNumber = (value: any) => {
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
     return value instanceof Decimal ? value.toNumber() : value;
   };
 
