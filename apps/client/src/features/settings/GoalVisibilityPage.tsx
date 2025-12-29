@@ -92,9 +92,8 @@ export function GoalVisibilityPage() {
         />
       )}
       {/* Visibility controls container */}
-      {goals &&
-        goals.map((goal) => <GoalVisibilityCard key={goal.id} goal={goal} />)}
-      {goals && goals.length === 0 && (
+      {goals?.map((goal) => <GoalVisibilityCard key={goal.id} goal={goal} />)}
+      {goals?.length === 0 && (
         <EmptyStateBodyComponent
           onButtonClick={() => {
             navigate({ to: '/goals/create' })

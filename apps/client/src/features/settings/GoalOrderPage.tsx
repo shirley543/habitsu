@@ -238,7 +238,7 @@ export function GoalOrderPage() {
           <Button onClick={handleSave}>Save</Button>
         </>
       )}
-      {goals && goals.length === 0 && (
+      {goals?.length === 0 && (
         <EmptyStateBodyComponent
           onButtonClick={() => {
             navigate({ to: '/goals/create' })

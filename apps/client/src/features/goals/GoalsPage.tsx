@@ -90,8 +90,7 @@ export const GoalsPage = () => {
       {/* Heatmaps container */}
       {(displayedData || isLoading) && (
         <div className="flex flex-col gap-3">
-          {displayedData &&
-            displayedData.map((d) => {
+          {displayedData?.map((d) => {
               return (
                 <GoalCardDescriptive
                   key={`goalCard_${d.id}`}
@@ -109,7 +108,7 @@ export const GoalsPage = () => {
             })}
         </div>
       )}
-      {displayedData && displayedData.length === 0 && (
+      {displayedData?.length === 0 && (
         <EmptyStateBodyComponent
           onButtonClick={() => {
             navigate({ to: '/goals/create' })

@@ -1,40 +1,22 @@
 //  @ts-check
+import { defineConfig } from "eslint/config";
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
-import js from '@eslint/js'
-
 import { tanstackConfig } from '@tanstack/eslint-config'
 
-export default [
-  // Base configs
+export default defineConfig(
   eslint.configs.recommended,
-  // JS files (configs)
+  tseslint.configs.recommended,
+  tanstackConfig,
   {
-    files: [
-      '**/*.config.js',
-      'vite.config.js',
-      'eslint.config.mjs',
-      'prettier.config.js',
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: null,
-      },
-    },
-  },
-
-
-  ...tseslint.configs.recommended,
-  ...tanstackConfig,
-  // TS files
-  {
-    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.json'],
       },
     },
   },
-
-
-]
+  {
+    files: ['**/*.js'],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
+);
