@@ -1,8 +1,4 @@
-import {
-  Outlet,
-  createRootRouteWithContext,
-  redirect,
-} from '@tanstack/react-router'
+import { Outlet, createRootRouteWithContext, redirect } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import type { QueryClient } from '@tanstack/react-query'
@@ -32,12 +28,15 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     </div>
   ),
   beforeLoad: async ({ location }) => {
-    const isLoggedInUser = await checkAuthUser()
+    const isLoggedInUser = await checkAuthUser();
+    
+    // List of public paths/ whitelisted paths that don't require auth
+    const publicPaths = ['/', '/login', '/sign-up', '/forgot-password'];
+    
+    // Allow /profile and anything under it
+    const isProfilePath = location.pathname.startsWith('/profile');
 
-    // List of public paths that don't require auth
-    const publicPaths = ['/', '/login', '/sign-up', '/forgot-password']
-
-    if (!isLoggedInUser && !publicPaths.includes(location.pathname)) {
+    if (!isLoggedInUser && !publicPaths.includes(location.pathname) && !isProfilePath) {
       throw redirect({ to: '/login' })
     }
   },

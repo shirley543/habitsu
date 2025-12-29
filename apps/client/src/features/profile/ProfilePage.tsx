@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { useState } from "react";
 import { YearDropdown } from "../goals/components/YearDropdown";
-import { useGoals } from "@/apis/GoalApi";
+import { useGoals, useProfileGoals } from "@/apis/GoalApi";
 import { GoalCardDescriptive, SkeletonGoalCard } from "../goals/components/GoalCard";
 
 export const ProfilePage = () => {
@@ -17,11 +17,13 @@ export const ProfilePage = () => {
   const { profileName } = route.useParams();
 
   const { data: profileData, isLoading: profileIsLoading, error: profileError } = useProfile(profileName);
+  const isProfilePrivate = profileData?.joinedAt === undefined && profileData?.daysTrackedTotal === undefined;
 
-  const { data: goalsData, isLoading: goalsIsLoading, error: goalsError } = useGoals();
+  const { data: goalsData, isLoading: goalsIsLoading, error: goalsError } = useProfileGoals(profileName);
+  // TODOs #30: don't bother calling useGoals if profile is private, pass in to hook as disabled
 
-  const formatDateToString = (date: Date) => {
-    return `${date}`;
+  const formatDateToString = (date: Date | undefined) => {
+    return date ? `${date}` : undefined;
   }
 
   return (
@@ -52,22 +54,21 @@ export const ProfilePage = () => {
             <div className="flex flex-row gap-1.5">
               <DynamicIcon name="clock"/>
               {/* <p>Joined <b>25 May 2025</b></p> */}
-              <p>Joined <b>{ formatDateToString(profileData.joinedAt) }</b></p>
+              <p>Joined <b>{ formatDateToString(profileData.joinedAt) || "-" }</b></p>
             </div>
             <div className="flex flex-row gap-1.5">
               <DynamicIcon name="calendar-days"/>
-              <p><b>{profileData.daysTrackedTotal}</b> days tracked</p>
+              <p><b>{profileData.daysTrackedTotal || "-"}</b> days tracked</p>
             </div>
           </div>
         </div>
       </div>
       }
 
-
       {/* Year selection */}
-      <YearDropdown selectedYear={selectedYear} onSelect={(year) => {
+      {(!isProfilePrivate) &&<YearDropdown selectedYear={selectedYear} onSelect={(year) => {
         setSelectedYear(year)
-      }} />
+      }} />}
 
       {/* Goals data/ heatmaps container */}
       {/* TODOs #30: Replace these goals data with actual profile user's goal data */}
