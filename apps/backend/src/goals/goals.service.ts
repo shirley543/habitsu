@@ -7,7 +7,7 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { GoalPublicity, GoalQuantify, Prisma, ProfilePublicity } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
-import { assertCanModify, assertCanView, assertCanViewProfile, assertFound } from 'src/common/assert/assertions';
+import { assertCanModify, assertCanView, assertFound } from 'src/common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 
 @Injectable()
@@ -71,7 +71,6 @@ export class GoalsService {
       where: { username: targetUsername },
     });
     assertFound(user, 'User not found');
-    assertCanViewProfile(user, requestingUserId);
 
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
