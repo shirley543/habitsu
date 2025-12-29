@@ -14,7 +14,9 @@
     "build": "tsc --build",
     "lint": "eslint --fix",
     "format": "prettier --write .",
-    "check": "prettier --check . && eslint"
+    "lint:check": "eslint",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint:check"
   },
   "devDependencies": {
     "globals": "^16.5.0"
