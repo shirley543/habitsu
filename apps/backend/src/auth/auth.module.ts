@@ -15,7 +15,7 @@ import { EnvModule } from 'src/env/env.module';
     JwtModule.registerAsync({
       imports: [EnvModule],
       inject: [EnvService],
-      useFactory: async (envConfigService: EnvService) => ({
+      useFactory: (envConfigService: EnvService) => ({
         secret: envConfigService.get('JWT_SECRET'),
         signOptions: {
           expiresIn: envConfigService.get('JWT_EXPIRY'),
