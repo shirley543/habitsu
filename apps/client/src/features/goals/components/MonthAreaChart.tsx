@@ -1,35 +1,36 @@
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import type { ChartConfig } from '@/components/ui/chart'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { capitalizeFirstLetter } from "@/lib/stringUtils"
-import { monthsOfYear } from "@/lib/dateUtils"
+} from '@/components/ui/chart'
+import { capitalizeFirstLetter } from '@/lib/stringUtils'
+import { monthsOfYear } from '@/lib/dateUtils'
 
 interface MonthAreaChartData {
-  year: number,
-  month: number,
-  value: number,
+  year: number
+  month: number
+  value: number
 }
 
 interface MonthAreaChartProps {
-  baseColour: string,
-  inputChartData: MonthAreaChartData[],
-  valueLabel: string,
+  baseColour: string
+  inputChartData: Array<MonthAreaChartData>
+  valueLabel: string
 }
 
-const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartData, valueLabel }) => {
+const MonthAreaChart: React.FC<MonthAreaChartProps> = ({
+  baseColour,
+  inputChartData,
+  valueLabel,
+}) => {
   const chartData = monthsOfYear.map((monthEnum, idx) => {
-    const foundInputChartData = inputChartData.find((data) => data.month === (idx + 1));
-    return { month: monthEnum, value: foundInputChartData?.value || 0 };
+    const foundInputChartData = inputChartData.find(
+      (data) => data.month === idx + 1,
+    )
+    return { month: monthEnum, value: foundInputChartData?.value || 0 }
   })
 
   const chartConfig = {
@@ -37,7 +38,7 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
       label: valueLabel,
       color: `#${baseColour}`,
     },
-  } satisfies ChartConfig;
+  } satisfies ChartConfig
 
   return (
     <Card>
@@ -80,4 +81,4 @@ const MonthAreaChart: React.FC<MonthAreaChartProps> = ({ baseColour, inputChartD
   )
 }
 
-export default MonthAreaChart;
+export default MonthAreaChart

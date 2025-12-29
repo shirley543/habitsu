@@ -32,7 +32,7 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
   interface HistoryState {
-    date?: string,
+    date?: string
   }
 }
 

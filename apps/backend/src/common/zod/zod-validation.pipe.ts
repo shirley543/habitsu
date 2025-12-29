@@ -1,5 +1,5 @@
-import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
-import { ZodSchema } from "zod";
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
+import { ZodSchema } from 'zod';
 
 /**
  * Pipe to apply a Zod schema to the request body
@@ -15,6 +15,9 @@ export class ZodValidationPipe implements PipeTransform {
     if (!result.success) {
       throw new BadRequestException(result.error.format());
     }
+    // ZodValidationPipe returns data whose runtime shape is guaranteed by the Zod schema,
+    // but TypeScript cannot infer the validated type from ZodSchema<any>.
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
     return result.data;
   }
 }

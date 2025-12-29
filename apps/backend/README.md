@@ -55,22 +55,23 @@ $ mkdir -p prisma/migrations/0_init
 ```
 
 2. Generate migration file, after modifying Prisma schema, with `prisma migrate diff`
-Arguments below:
-`--from-empty`: assumes the data model you're migrating from is empty
-`--to-schema-datamodel`: the current database state using the URL in the datasource block
-`--script`: output a SQL script
+   Arguments below:
+   `--from-empty`: assumes the data model you're migrating from is empty
+   `--to-schema-datamodel`: the current database state using the URL in the datasource block
+   `--script`: output a SQL script
 
 ```bash
 $ npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql
 ```
 
 3. Mark migration as applied, which will add migration `0_init` to the `_prisma_migrations` table
+
 ```bash
 $ npx prisma migrate resolve --applied 0_init
 ```
 
 4. To make further changes to database schema (after baselining), can update Prisma schema and then use
-`prisma migrate dev` to apply the changes to the database
+   `prisma migrate dev` to apply the changes to the database
 
 ## Prisma Client Generate
 

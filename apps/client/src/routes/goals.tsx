@@ -1,5 +1,5 @@
-import { GoalsPage } from '@/features/goals/GoalsPage'
 import { createFileRoute } from '@tanstack/react-router'
+import { GoalsPage } from '@/features/goals/GoalsPage'
 
 export const Route = createFileRoute('/goals')({
   component: GoalsPage,

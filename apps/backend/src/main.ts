@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { EnvService } from './env/env.service';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -21,7 +20,7 @@ async function bootstrap() {
   //     - Store refresh token in HttpOnly cookie
   //     - Shorten access JWT expiry (e.g., 10 mins), refresh token expiry longer (e.g., 1 week)
   app.use(cookieParser());
-  
+
   const config = new DocumentBuilder()
     .setTitle('Median')
     .setDescription('The Median API description')

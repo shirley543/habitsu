@@ -1,8 +1,16 @@
-import { Controller, Get, HttpCode, Post, Request, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  Post,
+  Request as Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Response } from 'express';
+import { JwtAuthenticatedRequest } from './auth/jwt-auth.types';
 
 @Controller('auth')
 export class AppController {
@@ -11,9 +19,12 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+  login(
+    @Req() req: JwtAuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // Return JWT access token via cookie upon successful login
-    const { access_token } = await this.authService.login(req.user);
+    const { access_token } = this.authService.login(req.user);
     res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -27,9 +38,11 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(200)
-  async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+  logout(
+    @Req() req: JwtAuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // TODOs #28 invalidate refresh token, if refresh tokens implemented
-
     // Clear the JWT cookie
     res.clearCookie('jwt', {
       secure: process.env.NODE_ENV === 'production',
@@ -37,7 +50,7 @@ export class AppController {
       path: '/',
     });
 
-    console.log(`User ${req.user['email']} logged out`);
+    console.log(`User ${req.user.email} logged out`);
     return { message: 'Logged out' };
   }
 }

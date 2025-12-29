@@ -1,21 +1,26 @@
-import { Button } from "../ui/button"
-import { DynamicIcon, type IconName } from "lucide-react/dynamic"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import React from "react";
+import { DynamicIcon } from 'lucide-react/dynamic'
+import React from 'react'
+import { Button } from '../ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import type { IconName } from 'lucide-react/dynamic'
 
 interface IconButtonProps {
-  iconName: IconName,
-  tooltip?: string,
-  onClickCallback?: () => void;
+  iconName: IconName
+  tooltip?: string
+  onClickCallback?: () => void
 }
 
 /**
  * Icon button: displays icon within a secondary-coloured button, and optional tooltip text
- * @returns 
+ * @returns
  */
-const IconButton: React.ForwardRefRenderFunction<HTMLButtonElement, IconButtonProps> = ({ iconName, tooltip, onClickCallback, ...props }, ref) => {
+const IconButton: React.ForwardRefRenderFunction<
+  HTMLButtonElement,
+  IconButtonProps
+> = ({ iconName, tooltip, onClickCallback, ...props }, ref) => {
   const buttonComponent = (
-    <Button variant="secondary"
+    <Button
+      variant="secondary"
       size="icon"
       onClick={onClickCallback}
       ref={ref}
@@ -25,17 +30,14 @@ const IconButton: React.ForwardRefRenderFunction<HTMLButtonElement, IconButtonPr
     </Button>
   )
 
-  return (tooltip ? 
+  return tooltip ? (
     <Tooltip>
-      <TooltipTrigger asChild>
-        {buttonComponent}
-      </TooltipTrigger>
-      <TooltipContent>
-        {tooltip}
-      </TooltipContent>
-    </Tooltip> 
-    : buttonComponent
+      <TooltipTrigger asChild>{buttonComponent}</TooltipTrigger>
+      <TooltipContent>{tooltip}</TooltipContent>
+    </Tooltip>
+  ) : (
+    buttonComponent
   )
 }
 
-export default React.forwardRef(IconButton);
+export default React.forwardRef(IconButton)

@@ -13,7 +13,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GoalEntriesService } from './goalEntries.service';
-import { CreateGoalEntryDto, CreateGoalEntrySchema, SearchParamsGoalEntryDto, SearchParamsGoalEntrySchema, UpdateGoalEntryDto, UpdateGoalEntrySchema, GoalStatisticsReponse } from '@habit-tracker/validation-schemas';
+import {
+  CreateGoalEntryDto,
+  CreateGoalEntrySchema,
+  SearchParamsGoalEntryDto,
+  SearchParamsGoalEntrySchema,
+  UpdateGoalEntryDto,
+  UpdateGoalEntrySchema,
+} from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
@@ -35,7 +42,7 @@ export class GoalEntriesController {
   getStatistics(
     @Req() req,
     @Query('goalId', ParseIntPipe) goalId: number,
-    @Query('year', ParseIntPipe) year: number
+    @Query('year', ParseIntPipe) year: number,
   ) {
     const userId = req.user.id;
     return this.goalEntriesService.getStatistics(goalId, year, userId);
@@ -46,7 +53,7 @@ export class GoalEntriesController {
   getMonthlyAverages(
     @Req() req,
     @Query('goalId', ParseIntPipe) goalId: number,
-    @Query('year', ParseIntPipe) year: number
+    @Query('year', ParseIntPipe) year: number,
   ) {
     const userId = req.user.id;
     return this.goalEntriesService.getMonthlyAverages(goalId, year, userId);
@@ -57,32 +64,33 @@ export class GoalEntriesController {
   getMonthlyCounts(
     @Req() req,
     @Query('goalId', ParseIntPipe) goalId: number,
-    @Query('year', ParseIntPipe) year: number
+    @Query('year', ParseIntPipe) year: number,
   ) {
     const userId = req.user.id;
     return this.goalEntriesService.getMonthlyCounts(goalId, year, userId);
   }
 
-  
   /**
    * General
    */
 
   /**
    * Get entries from search params (goal ID and year)
-   * @param searchParamsGoalEntryDto 
-   * @returns 
+   * @param searchParamsGoalEntryDto
+   * @returns
    */
   @Get('entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyBySearchParams(
     @Req() req,
-    @Query() searchParamsGoalEntryDto: SearchParamsGoalEntryDto
+    @Query() searchParamsGoalEntryDto: SearchParamsGoalEntryDto,
   ) {
     const userId = req.user.id;
 
     // TODOs #32: refactor this to use Zod validation pipe instead of manual call to .safeParse
-    const parsed = SearchParamsGoalEntrySchema.safeParse(searchParamsGoalEntryDto);
+    const parsed = SearchParamsGoalEntrySchema.safeParse(
+      searchParamsGoalEntryDto,
+    );
     if (!parsed.success) {
       throw new BadRequestException(parsed.error.flatten());
     }
@@ -92,46 +100,44 @@ export class GoalEntriesController {
 
   /**
    * Get entries from goal ID (year undefined)
-   * @param searchParamsGoalEntryDto 
-   * @returns 
+   * @param searchParamsGoalEntryDto
+   * @returns
    */
   @Get('entries/:entryId')
   @ApiOkResponse({ type: GoalEntryEntity })
-  findOne(
-    @Req() req,
-    @Param('entryId', ParseIntPipe) entryId: number,
-  ) {
+  findOne(@Req() req, @Param('entryId', ParseIntPipe) entryId: number) {
     const userId = req.user.id;
     return this.goalEntriesService.findOne(entryId, userId);
   }
 
   /**
    * Get entries from goal ID (year undefined)
-   * @param searchParamsGoalEntryDto 
-   * @returns 
+   * @param searchParamsGoalEntryDto
+   * @returns
    */
   @Get('goals/:goalId/entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
-  findManyByGoalId(
-    @Req() req,
-    @Param('goalId', ParseIntPipe) goalId: number,) 
-  {
+  findManyByGoalId(@Req() req, @Param('goalId', ParseIntPipe) goalId: number) {
     const userId = req.user.id;
-    return this.goalEntriesService.findMany({ goalId: goalId, year: undefined }, userId);
+    return this.goalEntriesService.findMany(
+      { goalId: goalId, year: undefined },
+      userId,
+    );
   }
 
   /**
    * Create a goal entry for a given goal
-   * @param goalId 
-   * @param createGoalEntryDto 
-   * @returns 
+   * @param goalId
+   * @param createGoalEntryDto
+   * @returns
    */
   @Post('goals/:goalId/entries')
   @ApiCreatedResponse({ type: GoalEntryEntity })
   create(
     @Req() req,
     @Param('goalId', ParseIntPipe) goalId: number,
-    @Body(new ZodValidationPipe(CreateGoalEntrySchema)) createGoalEntryDto: CreateGoalEntryDto
+    @Body(new ZodValidationPipe(CreateGoalEntrySchema))
+    createGoalEntryDto: CreateGoalEntryDto,
   ) {
     const userId = req.user.id;
     return this.goalEntriesService.create(goalId, createGoalEntryDto, userId);
@@ -139,9 +145,9 @@ export class GoalEntriesController {
 
   /**
    * Edit a goal entry
-   * @param id 
-   * @param updateGoalEntryDto 
-   * @returns 
+   * @param id
+   * @param updateGoalEntryDto
+   * @returns
    */
   @Patch('goals/:goalId/entries/:entryId')
   @ApiCreatedResponse({ type: GoalEntryEntity })
@@ -149,10 +155,16 @@ export class GoalEntriesController {
     @Req() req,
     @Param('goalId', ParseIntPipe) goalId: number,
     @Param('entryId', ParseIntPipe) entryId: number,
-    @Body(new ZodValidationPipe(UpdateGoalEntrySchema)) updateGoalEntryDto: UpdateGoalEntryDto,
+    @Body(new ZodValidationPipe(UpdateGoalEntrySchema))
+    updateGoalEntryDto: UpdateGoalEntryDto,
   ) {
     const userId = req.user.id;
-    return this.goalEntriesService.update(goalId, entryId, updateGoalEntryDto, userId);
+    return this.goalEntriesService.update(
+      goalId,
+      entryId,
+      updateGoalEntryDto,
+      userId,
+    );
   }
 
   @Delete('goals/:goalId/entries/:entryId')

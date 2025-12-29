@@ -28,7 +28,6 @@ Working through DB structure:
 - Q: How to store numerical and boolean goal; shared goal but with optional fields? i.e. unit is not necessary for boolean, but present for value.
 - Q: Does this struct work for all types of goals?
 
-
 - Adding/ editing/ deleting a goal
 - Adding/ editing/ deleting a goal entry
 - Authentication of retrieving goals for a particular user (401 unauth if attempting to retrieve goals/ goal entries that aren't public)

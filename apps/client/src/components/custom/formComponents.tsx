@@ -1,59 +1,64 @@
 import { useStore } from '@tanstack/react-form'
 
+import { DynamicIcon } from 'lucide-react/dynamic'
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
+import type { ChangeEvent } from 'react'
+import type { IconName } from 'lucide-react/dynamic'
 
-import { Button, buttonVariants } from '@/components/ui/button'
+import type { buttonVariants } from '@/components/ui/button'
+import type { VariantProps } from 'class-variance-authority'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea as ShadcnTextarea } from '@/components/ui/textarea'
 import * as ShadcnSelect from '@/components/ui/select'
 import { Slider as ShadcnSlider } from '@/components/ui/slider'
 import { Switch as ShadcnSwitch } from '@/components/ui/switch'
-import { RadioGroup as ShadcnRadioGroup, RadioGroupItem as ShadcnRadioGroupItem } from '@/components/ui/radio-group'
+import {
+  RadioGroup as ShadcnRadioGroup,
+  RadioGroupItem as ShadcnRadioGroupItem,
+} from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
-import { useState, type ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
-import type { VariantProps } from 'class-variance-authority'
-import { Eye, EyeOff } from 'lucide-react'
 
-
-export const StandardIcons: IconName[] = [
-  "biceps-flexed",
-  "apple",
-  "droplet",
-  "book",
-  "alarm-clock",
-  "bed",
-  "brain",
-  "banknote",
-  "paintbrush",
-  "hourglass",
-  "palette",
-  "calendar",
-  "pencil-line",
+export const StandardIcons: Array<IconName> = [
+  'biceps-flexed',
+  'apple',
+  'droplet',
+  'book',
+  'alarm-clock',
+  'bed',
+  'brain',
+  'banknote',
+  'paintbrush',
+  'hourglass',
+  'palette',
+  'calendar',
+  'pencil-line',
 ]
 
 /**
  * From TailwindCSS hues for e.g. red/400
  */
 export enum ColourEnum {
-  Red = "F87171",
-  Orange = "FB923C",
-  Amber = "FBBF24",
-  Yellow = "FACC15",
-  Lime = "A3E635",
-  Green = "4ADE80",
-  Emerald = "34D399",
-  Teal = "2DD4BF",
-  Cyan = "22D3EE",
-  Sky = "38BDF8",
-  Blue = "60A5FA",
-  Indigo = "818CF8",
-  Violet = "A78BFA",
-  Purple = "C084FC",
-  Fuschia = "E879F9",
-  Pink = "F472B6",
-  Rose = "FB7185",
+  Red = 'F87171',
+  Orange = 'FB923C',
+  Amber = 'FBBF24',
+  Yellow = 'FACC15',
+  Lime = 'A3E635',
+  Green = '4ADE80',
+  Emerald = '34D399',
+  Teal = '2DD4BF',
+  Cyan = '22D3EE',
+  Sky = '38BDF8',
+  Blue = '60A5FA',
+  Indigo = '818CF8',
+  Violet = 'A78BFA',
+  Purple = 'C084FC',
+  Fuschia = 'E879F9',
+  Pink = 'F472B6',
+  Rose = 'FB7185',
 }
 
 /**
@@ -61,31 +66,25 @@ export enum ColourEnum {
  * @param label: Label string to display
  * @returns: Form label component
  */
-function StyledLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
-  return (
-    <Label
-      className={cn("mb-2", className)}
-      {...props}
-    />
-  )
+function StyledLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof Label>) {
+  return <Label className={cn('mb-2', className)} {...props} />
 }
 
-const StyledInputClassName = "px-3 py-2 h-10 box-border bg-white border-none shadow-none w-full";
-function StyledInput({ className, ...props }: React.ComponentProps<typeof Input>) {
-  return (
-    <Input
-      className={cn(
-        StyledInputClassName,
-        className
-      )}
-      {...props}
-    />
-  );
+const StyledInputClassName =
+  'px-3 py-2 h-10 box-border bg-white border-none shadow-none w-full'
+function StyledInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof Input>) {
+  return <Input className={cn(StyledInputClassName, className)} {...props} />
 }
 
 type SubscribeButtonProps = {
-  label: string,
-} & VariantProps<typeof buttonVariants>;
+  label: string
+} & VariantProps<typeof buttonVariants>
 
 export function SubscribeButton({ label, variant }: SubscribeButtonProps) {
   const form = useFormContext()
@@ -132,12 +131,10 @@ export function NumberField({
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <StyledInput
         type="number"
-        inputMode='numeric'
+        inputMode="numeric"
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
@@ -157,18 +154,17 @@ export function PasswordField({
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
-  const [isView, setIsView] = useState(false);
+  const [isView, setIsView] = useState(false)
 
-  const eyeButtonStyleClassNames = "absolute top-[50%] right-0 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-gray-500";
+  const eyeButtonStyleClassNames =
+    'absolute top-[50%] right-0 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-gray-500'
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <div className="relative">
         <StyledInput
-          type={isView ? "text" : "password"}
+          type={isView ? 'text' : 'password'}
           value={field.state.value}
           placeholder={placeholder}
           onBlur={field.handleBlur}
@@ -194,7 +190,7 @@ export function PasswordField({
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
   )
-};
+}
 
 export function TextField({
   label,
@@ -208,9 +204,7 @@ export function TextField({
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <StyledInput
         value={field.state.value}
         placeholder={placeholder}
@@ -237,9 +231,7 @@ export function TextArea({
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <ShadcnTextarea
         id={label}
         value={field.state.value}
@@ -265,9 +257,7 @@ export function DateField({
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <StyledInput
         type="date"
         value={field.state.value}
@@ -295,9 +285,7 @@ export function Select({
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <ShadcnSelect.Select
         name={field.name}
         value={field.state.value}
@@ -328,9 +316,7 @@ export function Slider({ label }: { label: string }) {
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <ShadcnSlider
         id={label}
         onBlur={field.handleBlur}
@@ -355,16 +341,17 @@ export function Switch({ label }: { label: string }) {
           checked={field.state.value}
           onCheckedChange={(checked) => field.handleChange(checked)}
         />
-        <StyledLabel htmlFor={label}>
-          {label}
-        </StyledLabel>
+        <StyledLabel htmlFor={label}>{label}</StyledLabel>
       </div>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
   )
 }
 
-export function RadioGroup({ label, values }: {
+export function RadioGroup({
+  label,
+  values,
+}: {
   label: string
   values: Array<{ label: string; value: string }>
 }) {
@@ -372,10 +359,12 @@ export function RadioGroup({ label, values }: {
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
-      <ShadcnRadioGroup defaultValue={values[0].value} className="grid-cols-2" onValueChange={(value) => field.handleChange(value)}>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
+      <ShadcnRadioGroup
+        defaultValue={values[0].value}
+        className="grid-cols-2"
+        onValueChange={(value) => field.handleChange(value)}
+      >
         {values.map((value) => (
           <div key={value.value} className="flex items-center space-x-2">
             <ShadcnRadioGroupItem key={value.value} value={value.value} />
@@ -395,25 +384,33 @@ export function ColourSelect({ label }: { label: string }) {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.handleChange(event.target.value)
-  };
+  }
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <div className="flex flex-row flex-wrap gap-1.5">
         {Object.values(ColourEnum).map((colourEnum) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
-          return <label key={colourEnum}>
-            <input type="radio" name="color" value={colourEnum} className="peer hidden" 
-              onChange={handleChange} readOnly={false} 
-              checked={field.state.value === colourEnum}
-            />
-            <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
-              <div className="w-6 h-6 rounded-lg" style={{backgroundColor: `#${colourEnum}`}}></div>
-            </div>
-          </label>
+          return (
+            <label key={colourEnum}>
+              <input
+                type="radio"
+                name="color"
+                value={colourEnum}
+                className="peer hidden"
+                onChange={handleChange}
+                readOnly={false}
+                checked={field.state.value === colourEnum}
+              />
+              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+                <div
+                  className="w-6 h-6 rounded-lg"
+                  style={{ backgroundColor: `#${colourEnum}` }}
+                ></div>
+              </div>
+            </label>
+          )
         })}
       </div>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
@@ -427,26 +424,31 @@ export function IconSelect({ label }: { label: string }) {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.handleChange(event.target.value)
-  };
+  }
 
   return (
     <div>
-      <StyledLabel htmlFor={label}>
-        {label}
-      </StyledLabel>
+      <StyledLabel htmlFor={label}>{label}</StyledLabel>
       <div className="flex flex-row flex-wrap gap-1.5">
         {StandardIcons.map((standardIcon) => {
           // Note: wrapped with label so that whole displayed div is clickable as part of the radio button
           // TODOs #19: check for more accessible alternatives to `hidden`/ `display: none`
-          return <label key={standardIcon}>
-            <input type="radio" name="icon" value={standardIcon} className="peer hidden"
-              onChange={handleChange} readOnly={false}
-              checked={field.state.value === standardIcon}
-            />
-            <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
-              <DynamicIcon name={standardIcon} />
-            </div>
-          </label>
+          return (
+            <label key={standardIcon}>
+              <input
+                type="radio"
+                name="icon"
+                value={standardIcon}
+                className="peer hidden"
+                onChange={handleChange}
+                readOnly={false}
+                checked={field.state.value === standardIcon}
+              />
+              <div className="w-9 h-9 rounded-xl shadow-xs bg-white border-2 border-white flex items-center justify-center peer-checked:border-black cursor-pointer">
+                <DynamicIcon name={standardIcon} />
+              </div>
+            </label>
+          )
         })}
       </div>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}

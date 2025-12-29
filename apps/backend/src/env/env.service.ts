@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { Env } from "./env";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Env } from './env';
 
 /**
- * Wrapper for Config Service to provide type-safety when 
+ * Wrapper for Config Service to provide type-safety when
  * accessing environment variables
  */
 

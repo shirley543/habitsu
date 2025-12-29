@@ -1,11 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGoalDto, ReorderGoalDto, UpdateGoalDto } from '@habit-tracker/validation-schemas';
+import {
+  CreateGoalDto,
+  ReorderGoalDto,
+  UpdateGoalDto,
+} from '@habit-tracker/validation-schemas';
 import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import { assertCanModify, assertFound } from 'src/common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
-
 
 @Injectable()
 export class GoalsService {
@@ -23,9 +26,11 @@ export class GoalsService {
       },
       where: {
         userId: userId,
-      }
+      },
     });
-    const nextOrderNum = maxOrderNum._max.order ? maxOrderNum._max.order + 1 : 1;
+    const nextOrderNum = maxOrderNum._max.order
+      ? maxOrderNum._max.order + 1
+      : 1;
 
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalCreateInput = {
@@ -37,19 +42,19 @@ export class GoalsService {
         goalType: createGoalDto.goalType as GoalQuantify,
         order: nextOrderNum,
         user: {
-          connect: { id: userId }
-        }
-      }
+          connect: { id: userId },
+        },
+      };
       switch (createGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
         default:
-          return {...baseGoal};
+          return { ...baseGoal };
         case GoalQuantifyType.Numeric:
           return {
             ...baseGoal,
             numericTarget: createGoalDto.numericTarget,
             numericUnit: createGoalDto.numericUnit,
-          }
+          };
       }
     })();
 
@@ -86,7 +91,7 @@ export class GoalsService {
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
     // Find goal to update and validate ownership
     const goalToUpdate = await this.prisma.goal.findUniqueOrThrow({
-      where: { id }
+      where: { id },
     });
     assertFound(goalToUpdate);
     assertCanModify(goalToUpdate, userId);
@@ -100,17 +105,17 @@ export class GoalsService {
         publicity: updateGoalDto.publicity,
         goalType: updateGoalDto.goalType as GoalQuantify,
         visibility: updateGoalDto.visibility,
-      }
+      };
       switch (updateGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
         default:
-          return {...baseGoal};
+          return { ...baseGoal };
         case GoalQuantifyType.Numeric:
           return {
             ...baseGoal,
             numericTarget: updateGoalDto.numericTarget,
             numericUnit: updateGoalDto.numericUnit,
-          }
+          };
       }
     })();
 
@@ -123,7 +128,7 @@ export class GoalsService {
   async remove(id: number, userId: number) {
     // Find goal to delete and validate ownership
     const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
-      where: { id }
+      where: { id },
     });
     assertFound(goalToDelete);
     assertCanModify(goalToDelete, userId);
@@ -132,8 +137,8 @@ export class GoalsService {
     // to prevent e.g. delete failing but previous order updates
     // were already completed
     return await this.prisma.$transaction(async (tx) => {
-      // Ordering: determine goals to update based on 
-      // current goal being removed (e.g. goal with order 4 being removed, 
+      // Ordering: determine goals to update based on
+      // current goal being removed (e.g. goal with order 4 being removed,
       // hence goal with order 5 becomes 4, 6 becomes 5, etc)
 
       // Get goals with order greater than goal to delete's order
@@ -142,21 +147,21 @@ export class GoalsService {
           userId,
           order: {
             gt: goalToDelete.order,
-          }
+          },
         },
-        orderBy: { order: 'asc' }
+        orderBy: { order: 'asc' },
       });
 
       // Update each goal's order by decreasing by one
       for (const goal of goalsToUpdate) {
         await tx.goal.update({
           where: { id: goal.id },
-          data: { order: goal.order - 1 }
-        })
+          data: { order: goal.order - 1 },
+        });
       }
 
       // Delete the goal
-      return tx.goal.delete({ where: { id }})
+      return tx.goal.delete({ where: { id } });
     });
   }
 
@@ -166,23 +171,29 @@ export class GoalsService {
     // Expect orders to be sequential (i.e. no gaps)
     const usersGoals = await this.prisma.goal.findMany({
       where: { userId },
-      orderBy: { 
-        id: 'asc'
-      }
+      orderBy: {
+        id: 'asc',
+      },
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new BadRequestException('Bad Request: Reorder goals length does not match goals length');
+      throw new BadRequestException(
+        'Bad Request: Reorder goals length does not match goals length',
+      );
     }
 
     // Check IDs to reorder are the same as in users (existing) goals
     // Note: ordering starts at 1
-    const usersGoalIds = usersGoals.map((goal) => goal.id).sort((a, b) => a - b);
-    const reorderGoalIds = reorderGoalDto.map((entry) => entry.id).sort((a, b) => a - b);
+    const usersGoalIds = usersGoals
+      .map((goal) => goal.id)
+      .sort((a, b) => a - b);
+    const reorderGoalIds = reorderGoalDto
+      .map((entry) => entry.id)
+      .sort((a, b) => a - b);
     const areIdsEqual = (() => {
       for (let i = 0; i < usersGoalIds.length; i++) {
         if (usersGoalIds[i] !== reorderGoalIds[i]) {
-          return false
+          return false;
         }
       }
       return true;
@@ -193,21 +204,23 @@ export class GoalsService {
     }
 
     // Check orders are sequential
-    const reorderOrders = reorderGoalDto.map((entry) => entry.order).sort((a, b) => a - b);
+    const reorderOrders = reorderGoalDto
+      .map((entry) => entry.order)
+      .sort((a, b) => a - b);
     const areOrdersSequential = (() => {
       if (reorderOrders.length === 1) {
         return true;
       }
       for (let i = 1; i < reorderOrders.length; i++) {
         if (reorderOrders[i] - reorderOrders[i - 1] !== 1) {
-          return false
+          return false;
         }
       }
       return true;
     })();
 
     if (!areOrdersSequential) {
-      throw new BadRequestException('Bad Request: Invalid Goal Orders')
+      throw new BadRequestException('Bad Request: Invalid Goal Orders');
     }
 
     // Use transaction to update order of all given entries
@@ -219,7 +232,7 @@ export class GoalsService {
         await tx.goal.update({
           where: { id: entry.id },
           data: { order: entry.order },
-        })
+        });
       }
     });
   }

@@ -1,5 +1,4 @@
 import {
-  Dialog as ShadcnDialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -7,55 +6,76 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+  Dialog as ShadcnDialog,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 enum DialogTriggerSubtype {
   Slot = 'slot',
-  Flag = 'flag'
+  Flag = 'flag',
 }
 
-type DialogTriggerConfig = {
-  subtype: DialogTriggerSubtype.Slot,
-  triggerSlot: React.ReactNode,
-} | {
-  subtype: DialogTriggerSubtype.Flag,
-  triggerFlag: boolean,
-  onClose: () => void,
-}
+type DialogTriggerConfig =
+  | {
+      subtype: DialogTriggerSubtype.Slot
+      triggerSlot: React.ReactNode
+    }
+  | {
+      subtype: DialogTriggerSubtype.Flag
+      triggerFlag: boolean
+      onClose: () => void
+    }
 
 interface DialogComponentProps {
-  title: string,
-  description: string,
-  config: DialogTriggerConfig, 
-  contentSlot?: React.ReactNode,
-  buttonsSlot?: React.ReactNode,
+  title: string
+  description: string
+  config: DialogTriggerConfig
+  contentSlot?: React.ReactNode
+  buttonsSlot?: React.ReactNode
 }
 
-function Dialog({ title, description, config, contentSlot, buttonsSlot }: DialogComponentProps) {
+function Dialog({
+  title,
+  description,
+  config,
+  contentSlot,
+  buttonsSlot,
+}: DialogComponentProps) {
   return (
-    <ShadcnDialog open={config.subtype === DialogTriggerSubtype.Flag ? config.triggerFlag : undefined}>
-      {config.subtype === DialogTriggerSubtype.Slot && <DialogTrigger asChild>
-        {config.triggerSlot}
-      </DialogTrigger>}
+    <ShadcnDialog
+      open={
+        config.subtype === DialogTriggerSubtype.Flag
+          ? config.triggerFlag
+          : undefined
+      }
+    >
+      {config.subtype === DialogTriggerSubtype.Slot && (
+        <DialogTrigger asChild>{config.triggerSlot}</DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            {description}
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         {contentSlot}
         <DialogFooter className="sm:justify-end">
-          {
-            buttonsSlot ? 
-              buttonsSlot : 
-              <DialogClose asChild>
-                <Button type="button" variant="secondary" onClick={config.subtype === DialogTriggerSubtype.Flag ? config.onClose : undefined}>
-                  Close
-                </Button>
-              </DialogClose>
-          }
+          {buttonsSlot ? (
+            buttonsSlot
+          ) : (
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={
+                  config.subtype === DialogTriggerSubtype.Flag
+                    ? config.onClose
+                    : undefined
+                }
+              >
+                Close
+              </Button>
+            </DialogClose>
+          )}
         </DialogFooter>
       </DialogContent>
     </ShadcnDialog>
@@ -63,13 +83,18 @@ function Dialog({ title, description, config, contentSlot, buttonsSlot }: Dialog
 }
 
 interface DeleteDialogComponentProps {
-  title: string,
-  description: string,
-  onDelete: () => void,
-  children: React.ReactNode,
+  title: string
+  description: string
+  onDelete: () => void
+  children: React.ReactNode
 }
 
-function DeleteDialog({ title, description, onDelete, children }: DeleteDialogComponentProps) {
+function DeleteDialog({
+  title,
+  description,
+  onDelete,
+  children,
+}: DeleteDialogComponentProps) {
   const buttonsSlot = (
     <div className="flex flex-row gap-1.5">
       <DialogClose asChild>
@@ -83,15 +108,17 @@ function DeleteDialog({ title, description, onDelete, children }: DeleteDialogCo
     </div>
   )
 
-  return <Dialog
-    title={title}
-    description={description}
-    buttonsSlot={buttonsSlot}
-    config={{
-      subtype: DialogTriggerSubtype.Slot,
-      triggerSlot: children
-    }}
-  />
+  return (
+    <Dialog
+      title={title}
+      description={description}
+      buttonsSlot={buttonsSlot}
+      config={{
+        subtype: DialogTriggerSubtype.Slot,
+        triggerSlot: children,
+      }}
+    />
+  )
 }
 
-export { Dialog, DeleteDialog, type DialogTriggerConfig, DialogTriggerSubtype };
+export { Dialog, DeleteDialog, type DialogTriggerConfig, DialogTriggerSubtype }

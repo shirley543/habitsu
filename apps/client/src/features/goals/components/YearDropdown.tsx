@@ -1,18 +1,19 @@
-import DropdownMenuCheckboxes, { type DropdownMenuCheckboxesItemConfig } from "@/components/custom/DropdownMenuCheckboxes";
-import IconButton from "@/components/custom/IconButton";
-import { Button } from "@/components/ui/button";
-import { CalendarDays } from "lucide-react";
-
+import type { DropdownMenuCheckboxesItemConfig } from '@/components/custom/DropdownMenuCheckboxes'
+import DropdownMenuCheckboxes from '@/components/custom/DropdownMenuCheckboxes'
+import IconButton from '@/components/custom/IconButton'
 
 interface YearDropdownProps {
-  selectedYear: number,
-  onSelect: (year: number) => void;
+  selectedYear: number
+  onSelect: (year: number) => void
 }
 
-const YearDropdown: React.FC<YearDropdownProps> = ({ selectedYear, onSelect }) => {
-  const yearMenuConfig: DropdownMenuCheckboxesItemConfig<number>[] = [
-    { label: "2025", value: 2025 },
-    { label: "2024", value: 2024 },
+const YearDropdown: React.FC<YearDropdownProps> = ({
+  selectedYear,
+  onSelect,
+}) => {
+  const yearMenuConfig: Array<DropdownMenuCheckboxesItemConfig<number>> = [
+    { label: '2025', value: 2025 },
+    { label: '2024', value: 2024 },
   ]
 
   return (
@@ -22,10 +23,14 @@ const YearDropdown: React.FC<YearDropdownProps> = ({ selectedYear, onSelect }) =
         initialCheckedValue={selectedYear}
         itemsConfig={yearMenuConfig}
         selectionChangeCallback={(itemValue) => {
-          onSelect(itemValue); 
+          onSelect(itemValue)
         }}
       >
-        <IconButton iconName="calendar-days" tooltip="Select Year"  onClickCallback={() => {}}/>
+        <IconButton
+          iconName="calendar-days"
+          tooltip="Select Year"
+          onClickCallback={() => {}}
+        />
         {/* <Button variant="secondary" size="icon">
           <CalendarDays />
         </Button> */}

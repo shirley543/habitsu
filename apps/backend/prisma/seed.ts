@@ -1,10 +1,10 @@
-import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client'
+import { PrismaClient, GoalQuantify, GoalPublicity } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { config as loadEnv } from 'dotenv';
 import { envSchema } from '../src/env/env';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
   // Parse environment variables
@@ -17,9 +17,9 @@ async function main() {
   const env = parsed.data;
 
   // Clear existing data
-  await prisma.goalEntry.deleteMany()
-  await prisma.goal.deleteMany()
-  await prisma.user.deleteMany()
+  await prisma.goalEntry.deleteMany();
+  await prisma.goal.deleteMany();
+  await prisma.user.deleteMany();
 
   // Create a user
   const hashedPassword = await bcrypt.hash('alicespassword', env.SALT_ROUNDS);
@@ -219,16 +219,16 @@ async function main() {
         },
       },
     },
-  })
+  });
 
-  console.log('Seeded user with goals:', JSON.stringify(user, null, 2))
+  console.log('Seeded user with goals:', JSON.stringify(user, null, 2));
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
