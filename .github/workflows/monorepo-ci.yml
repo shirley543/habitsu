@@ -34,14 +34,18 @@ jobs:
 
       - name: Generate Prisma Client
         if: ${{ matrix.workspace == 'apps/backend' }}
+        working-directory: ${{ matrix.workspace }}
         run: npx prisma generate
 
       - name: Run linting
-        run: npm run lint:check -w ${{ matrix.workspace }}
+        working-directory: ${{ matrix.workspace }}
+        run: npm run lint:check
 
       - name: Run formatting
-        run: npm run format:check -w ${{ matrix.workspace }}
+        working-directory: ${{ matrix.workspace }}
+        run: npm run format:check
 
       - name: Run tests
-        run: npm run test -w ${{ matrix.workspace }}
+        working-directory: ${{ matrix.workspace }}
+        run: npm run test
         continue-on-error: true
