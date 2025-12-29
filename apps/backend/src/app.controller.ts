@@ -19,7 +19,10 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  login(@Req() req: JwtAuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+  login(
+    @Req() req: JwtAuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // Return JWT access token via cookie upon successful login
     const { access_token } = this.authService.login(req.user);
     res.cookie('jwt', access_token, {
@@ -35,7 +38,10 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(200)
-  logout(@Req() req: JwtAuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+  logout(
+    @Req() req: JwtAuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     // TODOs #28 invalidate refresh token, if refresh tokens implemented
     // Clear the JWT cookie
     res.clearCookie('jwt', {
