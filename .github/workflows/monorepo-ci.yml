@@ -33,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Generate Prisma Client
-        if: ${{ matrix.workspace == 'app/backend' }}
+        if: ${{ matrix.workspace == 'apps/backend' }}
         run: npx prisma generate
 
       - name: Run linting
