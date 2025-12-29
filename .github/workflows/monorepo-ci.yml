@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Prisma Client
+        if: ${{ matrix.workspace == 'app/backend' }}
+        run: npx prisma generate
+
       - name: Run linting
         run: npm run lint:check -w ${{ matrix.workspace }}
 
