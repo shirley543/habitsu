@@ -19,7 +19,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" && eslint \"{src,test}/**/*.ts\""
+    "lint:check": "eslint \"{src,test}/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "check": "npm run format:check && npm run lint:check"
   },
   "dependencies": {
     "@habit-tracker/validation-schemas": "*",
