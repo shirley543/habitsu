@@ -1,5 +1,5 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { GoalPublicity } from '@prisma/client';
+import { GoalPublicity, ProfilePublicity } from "@prisma/client";
 
 /**
  * Various common helper assert functions, for asserting e.g.
@@ -27,7 +27,7 @@ export function assertFound<T>(
 }
 
 /**
- * Asserts that the resource can be viewed by the given user,
+ * Asserts that the resource (goal, goal entry) can be viewed by the given user,
  * given said resource's publicity type
  *
  * @param resource - The resource to check
@@ -44,6 +44,28 @@ export function assertCanView<
 ) {
   const isOwner = resource.userId === userId;
   const isPublic = resource.publicity === GoalPublicity.PUBLIC;
+
+  if (!isOwner && !isPublic) {
+    throw new UnauthorizedException(message);
+  }
+}
+
+/**
+ * Asserts that the resource (user data) can be viewed by the given user,
+ * given said resource's publicity type
+ * 
+ * @param resource - The resource to check
+ * @param userId - The user ID who is requesting to view
+ * @param message - Optional custom not viewable (unauthorized) message
+ * @throws UnauthorizedException if resource cannot be viewed by the inputted user ID
+ */
+export function assertCanViewProfile<T extends { id: number; profilePublicity: ProfilePublicity }>(
+  resource: T,
+  requestingUserId: number,
+  message = 'Resource cannot be viewed: Unauthorized'
+) {
+  const isOwner = resource.id === requestingUserId;
+  const isPublic = resource.profilePublicity === ProfilePublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
     throw new UnauthorizedException(message);

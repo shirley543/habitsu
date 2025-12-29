@@ -5,9 +5,9 @@ import {
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
+import { GoalPublicity, GoalQuantify, Prisma, ProfilePublicity } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
-import { assertCanModify, assertFound } from 'src/common/assert/assertions';
+import { assertCanModify, assertCanView, assertCanViewProfile, assertFound } from 'src/common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 
 @Injectable()
@@ -66,11 +66,12 @@ export class GoalsService {
   }
 
   async findManyByUsername(targetUsername: string, requestingUserId: number) {
-    // Fetch user to get their userId (optional optimization if you already have it)
+    // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
     assertFound(user, 'User not found');
+    assertCanViewProfile(user, requestingUserId);
 
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({

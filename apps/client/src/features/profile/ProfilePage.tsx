@@ -20,6 +20,10 @@ export const ProfilePage = () => {
 
   const { data: goalsData, isLoading: goalsIsLoading, error: goalsError } = useGoals();
 
+  const formatDateToString = (date: Date) => {
+    return `${date}`;
+  }
+
   return (
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
@@ -38,24 +42,27 @@ export const ProfilePage = () => {
       ]}/>
 
       {/* Profile data */}
-      <div className="bg-white rounded-xl p-2.5 flex flex-row gap-3">
+      {(profileData) && <div className="bg-white rounded-xl p-2.5 flex flex-row gap-3">
         <Avatar className="size-20">
           <AvatarFallback className="text-2xl">CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col gap-1.5">
-          <h2>Lana</h2>
+          <h2>{profileData.username}</h2>
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-1.5">
               <DynamicIcon name="clock"/>
-              <p>Joined <b>25 May 2025</b></p>
+              {/* <p>Joined <b>25 May 2025</b></p> */}
+              <p>Joined <b>{ formatDateToString(profileData.joinedAt) }</b></p>
             </div>
             <div className="flex flex-row gap-1.5">
               <DynamicIcon name="calendar-days"/>
-              <p><b>365</b> days tracked</p>
+              <p><b>{profileData.daysTrackedTotal}</b> days tracked</p>
             </div>
           </div>
         </div>
       </div>
+      }
+
 
       {/* Year selection */}
       <YearDropdown selectedYear={selectedYear} onSelect={(year) => {
