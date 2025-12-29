@@ -178,7 +178,3 @@ export class GoalEntriesController {
     return this.goalEntriesService.remove(goalId, entryId, userId);
   }
 }
-
-// TODOs feature/#52-husky
-// - Fix various BE linting errors (unsafe assignment due to lack of typing of req (simply any))
-// - Fix various FE linting errors (issue with .js config files and project paths)
