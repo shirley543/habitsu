@@ -6,28 +6,35 @@ import js from '@eslint/js'
 import { tanstackConfig } from '@tanstack/eslint-config'
 
 export default [
-  // General JS/TS configuration
+  // Base configs
   eslint.configs.recommended,
+  // JS files (configs)
+  {
+    files: [
+      '**/*.config.js',
+      'vite.config.js',
+      'eslint.config.mjs',
+      'prettier.config.js',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: null,
+      },
+    },
+  },
+
+
   ...tseslint.configs.recommended,
   ...tanstackConfig,
-  // Override for TypeScript files specifically
+  // TS files
   {
     files: ['**/*.ts', '**/*.tsx'],
-
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.json'],
       },
     },
   },
-  // Exclude config files
-  {
-    files: [
-      'vite.config.js',
-      'eslint.config.js',
-      'prettier.config.js',
-      '*.config.js',
-    ],
-    ...js.configs.recommended,
-  },
+
+
 ]
