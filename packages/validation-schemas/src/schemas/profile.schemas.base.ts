@@ -4,11 +4,9 @@ import { z } from "zod";
  * Input Schemas
  */
 
-
 /**
  * Input DTOs
  */
-
 
 /**
  * Output Schemas
@@ -18,7 +16,6 @@ const ProfileResponseSchema = z.object({
   joinedAt: z.date(),
   daysTrackedTotal: z.number(),
 });
-
 
 /**
  * Output DTOs
