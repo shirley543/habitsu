@@ -9,6 +9,6 @@ import { EnvModule } from 'src/env/env.module';
   controllers: [ProfilesController],
   providers: [ProfilesService, UsersService],
   imports: [PrismaModule, EnvModule],
-  exports: [ProfilesService]
+  exports: [ProfilesService],
 })
 export class ProfilesModule {}

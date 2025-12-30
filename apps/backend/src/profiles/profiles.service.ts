@@ -4,34 +4,39 @@ import { GoalPublicity, ProfilePublicity } from '@prisma/client';
 import { assertFound } from 'src/common/assert/assertions';
 import { ProfileEntity } from './profiles.entity';
 
-
 enum TrackedDaysType {
-  AllGoals = "all-goals",
-  PublicGoalsOnly = "public-goals-only"
+  AllGoals = 'all-goals',
+  PublicGoalsOnly = 'public-goals-only',
 }
 
 @Injectable()
 export class ProfilesService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  private async computeDaysTracked(username: string, trackedDaysType: TrackedDaysType) {
+  private async computeDaysTracked(
+    username: string,
+    trackedDaysType: TrackedDaysType,
+  ) {
     const trackedDays = await this.prisma.goalEntry.groupBy({
       by: ['entryDate'],
       where: {
         goal: {
           user: { username: username },
-          ...(trackedDaysType === TrackedDaysType.AllGoals ? {} : { publicity: GoalPublicity.PUBLIC })
-        }
+          ...(trackedDaysType === TrackedDaysType.AllGoals
+            ? {}
+            : { publicity: GoalPublicity.PUBLIC }),
+        },
       },
       _count: true,
     });
     const daysTracked = trackedDays.length;
-    return daysTracked
+    return daysTracked;
   }
 
-  async findByUsername(targetUsername: string, requestingUserId: number): Promise<ProfileEntity> {
+  async findByUsername(
+    targetUsername: string,
+    requestingUserId: number,
+  ): Promise<ProfileEntity> {
     // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
@@ -42,22 +47,25 @@ export class ProfilesService {
     const isProfilePublic = user.profilePublicity === ProfilePublicity.PUBLIC;
 
     const profileEntity: ProfileEntity = await (async () => {
-      if (isOwner)
-      {
+      if (isOwner) {
         // Return all data, with days tracked based on ALL goals regardless of goal-publicity
-        const daysTracked = await this.computeDaysTracked(targetUsername, TrackedDaysType.AllGoals)
+        const daysTracked = await this.computeDaysTracked(
+          targetUsername,
+          TrackedDaysType.AllGoals,
+        );
         return {
           username: user.username,
           joinedAt: user.createdAt,
           daysTrackedTotal: daysTracked,
         };
-      }
-      else {
+      } else {
         // Non-owner
-        if (isProfilePublic)
-        {
+        if (isProfilePublic) {
           // Return all data, with days tracked based off all public goals
-          const daysTracked = await this.computeDaysTracked(targetUsername, TrackedDaysType.PublicGoalsOnly)
+          const daysTracked = await this.computeDaysTracked(
+            targetUsername,
+            TrackedDaysType.PublicGoalsOnly,
+          );
           return {
             username: user.username,
             joinedAt: user.createdAt,

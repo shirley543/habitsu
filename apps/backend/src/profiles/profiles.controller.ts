@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ProfileEntity } from './profiles.entity';
@@ -18,10 +12,7 @@ export class ProfilesController {
   @UseGuards(OptionalJwtAuthGuard)
   @Get(':username')
   @ApiOkResponse({ type: ProfileEntity })
-  findByUsername(
-    @Req() req,
-    @Param('username') username: string
-  ) {
+  findByUsername(@Req() req, @Param('username') username: string) {
     const userId = req?.user?.id;
     return this.profilesService.findByUsername(username, userId);
   }
