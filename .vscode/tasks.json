@@ -26,9 +26,33 @@
       }
     },
     {
-      "label": "Start NestJS Backend",
+      "label": "Start NestJS Backend (Dev)",
       "type": "shell",
       "command": "npm run start:dev",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/backend"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting",
+          "endsPattern": "Nest application successfully started"
+        }
+      }
+    },
+    {
+      "label": "Start NestJS Backend (Debug)",
+      "type": "shell",
+      "command": "npm run start:debug",
       "options": {
         "cwd": "${workspaceFolder}/apps/backend"
       },
