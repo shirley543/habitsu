@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "npm run dev",
       "options": {
-        "cwd": "${workspaceFolder}/client"
+        "cwd": "${workspaceFolder}/apps/client"
       },
       "isBackground": true,
       "problemMatcher": {
@@ -30,7 +30,7 @@
       "type": "shell",
       "command": "npm run start:dev",
       "options": {
-        "cwd": "${workspaceFolder}/backend"
+        "cwd": "${workspaceFolder}/apps/backend"
       },
       "isBackground": true,
       "problemMatcher": {

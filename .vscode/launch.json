@@ -5,7 +5,7 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Backend (NestJS)",
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}/apps/backend",
       "runtimeExecutable": "node",
       "runtimeArgs": [
         "--experimental-specifier-resolution=node",
@@ -22,7 +22,7 @@
       "request": "launch",
       "name": "Debug Client (Vite)",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/client/src",
+      "webRoot": "${workspaceFolder}/apps/client/src",
       "preLaunchTask": "Start Vite Dev Server"
     }
   ],
