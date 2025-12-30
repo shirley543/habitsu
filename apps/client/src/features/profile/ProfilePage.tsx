@@ -1,12 +1,12 @@
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { DynamicIcon  } from 'lucide-react/dynamic'
+import { DynamicIcon } from 'lucide-react/dynamic'
 import { useState } from 'react'
 import { YearDropdown } from '../goals/components/YearDropdown'
 import {
   GoalCardDescriptive,
   SkeletonGoalCard,
 } from '../goals/components/GoalCard'
-import type {IconName} from 'lucide-react/dynamic';
+import type { IconName } from 'lucide-react/dynamic'
 import { useProfileGoals } from '@/apis/GoalApi'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useProfile } from '@/apis/ProfileApi'
