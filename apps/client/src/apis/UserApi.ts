@@ -28,8 +28,8 @@ export async function fetchUser(): Promise<UserResponseDto | null> {
     if (err instanceof HTTPError) {
       const errorJson = await err.response.json()
       console.error('HTTP Error:', err.response.status, errorJson)
-      if (err.response?.status === 401) {
-        return null;
+      if (err.response.status === 401) {
+        return null
       }
     } else if (err instanceof Error) {
       console.error('General Error:', err.message)
