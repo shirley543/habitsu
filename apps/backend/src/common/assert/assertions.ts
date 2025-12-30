@@ -1,5 +1,5 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { GoalPublicity, ProfilePublicity } from '@prisma/client';
+import { GoalPublicity } from '@prisma/client';
 
 /**
  * Various common helper assert functions, for asserting e.g.

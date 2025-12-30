@@ -5,18 +5,9 @@ import {
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import {
-  GoalPublicity,
-  GoalQuantify,
-  Prisma,
-  ProfilePublicity,
-} from '@prisma/client';
+import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
-import {
-  assertCanModify,
-  assertCanView,
-  assertFound,
-} from 'src/common/assert/assertions';
+import { assertCanModify, assertFound } from 'src/common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 
 @Injectable()

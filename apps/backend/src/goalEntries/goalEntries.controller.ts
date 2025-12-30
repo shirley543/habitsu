@@ -20,8 +20,7 @@ import {
   SearchParamsGoalEntrySchema,
   UpdateGoalEntryDto,
   UpdateGoalEntrySchema,
-  GoalStatisticsReponse,
-} from '@habit-tracker/shared';
+} from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
