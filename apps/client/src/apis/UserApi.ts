@@ -28,11 +28,15 @@ export async function fetchUser(): Promise<UserResponseDto | null> {
     if (err instanceof HTTPError) {
       const errorJson = await err.response.json()
       console.error('HTTP Error:', err.response.status, errorJson)
+      if (err.response?.status === 401) {
+        return null;
+      }
     } else if (err instanceof Error) {
       console.error('General Error:', err.message)
     } else {
       console.error('An unknown error occurred', err)
     }
+    // TODOs #12 fix error handling if other error occurs e.g. backend down hence no HTTPError
     throw err
   }
 }
