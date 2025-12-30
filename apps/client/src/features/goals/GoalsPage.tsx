@@ -29,7 +29,14 @@ export const GoalsPage = () => {
 
   const profileMenuItems: Array<DropdownMenuOptionsItemConfig> = [
     // TODOs #30: have navigate of profile name be to logged in user's username
-    { label: "View Profile", onClick: () => navigate({ to: '/profile/$profileName', params: { profileName: "me" } }) },
+    {
+      label: 'View Profile',
+      onClick: () =>
+        navigate({
+          to: '/profile/$profileName',
+          params: { profileName: 'me' },
+        }),
+    },
     { label: 'Settings', onClick: () => navigate({ to: '/settings' }) },
     {
       label: 'Log Out',

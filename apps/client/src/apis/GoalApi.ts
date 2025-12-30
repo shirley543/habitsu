@@ -41,8 +41,10 @@ export function useGoals() {
   })
 }
 
-async function fetchGoalsByUsername(username: string): Promise<Array<GoalResponse>> {
-  return api.get(`goals/user/${username}`).json();
+async function fetchGoalsByUsername(
+  username: string,
+): Promise<Array<GoalResponse>> {
+  return api.get(`goals/user/${username}`).json()
 }
 
 export function useProfileGoals(username: string) {
@@ -50,7 +52,7 @@ export function useProfileGoals(username: string) {
     queryKey: ['goals', username],
     queryFn: () => fetchGoalsByUsername(username),
     retry: REACT_QUERY_RETRY_NUM,
-  });
+  })
 }
 
 async function fetchGoalById(goalId: number): Promise<GoalResponse> {
