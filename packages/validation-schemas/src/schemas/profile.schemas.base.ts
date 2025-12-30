@@ -11,7 +11,7 @@ import { z } from "zod";
 /**
  * Output Schemas
  */
-const ProfileResponseSchema = z.object({
+export const ProfileResponseSchema = z.object({
   username: z.string(),
   joinedAt: z.date(),
   daysTrackedTotal: z.number(),
