@@ -1,6 +1,7 @@
-import type { ProfileResponseDto } from '@habit-tracker/validation-schemas'
 import { useQuery } from '@tanstack/react-query'
-import ky, { HTTPError } from 'ky'
+import ky from 'ky'
+import type { HTTPError } from 'ky';
+import type { ProfileResponseDto } from '@habit-tracker/validation-schemas'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0

@@ -1,15 +1,16 @@
-import { TopBarConfig } from '@/components/custom/TopBar'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { useProfile } from '@/apis/ProfileApi'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
+import { DynamicIcon  } from 'lucide-react/dynamic'
 import { useState } from 'react'
 import { YearDropdown } from '../goals/components/YearDropdown'
-import { useGoals, useProfileGoals } from '@/apis/GoalApi'
 import {
   GoalCardDescriptive,
   SkeletonGoalCard,
 } from '../goals/components/GoalCard'
+import type {IconName} from 'lucide-react/dynamic';
+import { useProfileGoals } from '@/apis/GoalApi'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { useProfile } from '@/apis/ProfileApi'
+import { TopBarConfig } from '@/components/custom/TopBar'
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
@@ -19,6 +20,8 @@ export const ProfilePage = () => {
 
   const { profileName } = route.useParams()
 
+  // Un-used variables to be addressed in #12
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     data: profileData,
     isLoading: profileIsLoading,
@@ -33,6 +36,7 @@ export const ProfilePage = () => {
     isLoading: goalsIsLoading,
     error: goalsError,
   } = useProfileGoals(profileName)
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   // TODOs #30: don't bother calling useGoals if profile is private, pass in to hook as disabled
 
   const formatDateToString = (date: Date | undefined) => {
