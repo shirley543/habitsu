@@ -26,8 +26,8 @@ import { GoalEntryEntity } from './goalEntry.entity';
 import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 import { GoalStatisticsEntity } from './goalStatistics.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
 @Controller()
 @ApiTags('Entries')
 export class GoalEntriesController {
@@ -36,7 +36,7 @@ export class GoalEntriesController {
   /**
    * Statistics-specific
    */
-
+  @UseGuards(JwtAuthGuard)
   @Get('entries/statistics')
   @ApiOkResponse({ type: GoalStatisticsEntity })
   getStatistics(
@@ -48,6 +48,7 @@ export class GoalEntriesController {
     return this.goalEntriesService.getStatistics(goalId, year, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('entries/monthly-averages')
   @ApiOkResponse({ type: GoalStatisticsEntity })
   getMonthlyAverages(
@@ -59,6 +60,7 @@ export class GoalEntriesController {
     return this.goalEntriesService.getMonthlyAverages(goalId, year, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('entries/monthly-counts')
   @ApiOkResponse({ type: GoalStatisticsEntity })
   getMonthlyCounts(
@@ -79,6 +81,7 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto
    * @returns
    */
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyBySearchParams(
@@ -87,6 +90,7 @@ export class GoalEntriesController {
   ) {
     const userId = req.user.id;
 
+    // TODOs #30: Need to ensure findMany respects profile publicity (all other places also need to respect profile publicity)
     // TODOs #32: refactor this to use Zod validation pipe instead of manual call to .safeParse
     const parsed = SearchParamsGoalEntrySchema.safeParse(
       searchParamsGoalEntryDto,
@@ -103,6 +107,7 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto
    * @returns
    */
+  @UseGuards(JwtAuthGuard)
   @Get('entries/:entryId')
   @ApiOkResponse({ type: GoalEntryEntity })
   findOne(@Req() req, @Param('entryId', ParseIntPipe) entryId: number) {
@@ -115,6 +120,7 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto
    * @returns
    */
+  @UseGuards(JwtAuthGuard)
   @Get('goals/:goalId/entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyByGoalId(@Req() req, @Param('goalId', ParseIntPipe) goalId: number) {
@@ -131,6 +137,7 @@ export class GoalEntriesController {
    * @param createGoalEntryDto
    * @returns
    */
+  @UseGuards(JwtAuthGuard)
   @Post('goals/:goalId/entries')
   @ApiCreatedResponse({ type: GoalEntryEntity })
   create(
@@ -149,6 +156,7 @@ export class GoalEntriesController {
    * @param updateGoalEntryDto
    * @returns
    */
+  @UseGuards(JwtAuthGuard)
   @Patch('goals/:goalId/entries/:entryId')
   @ApiCreatedResponse({ type: GoalEntryEntity })
   update(
@@ -167,6 +175,7 @@ export class GoalEntriesController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('goals/:goalId/entries/:entryId')
   @ApiOkResponse({ type: GoalEntryEntity })
   remove(

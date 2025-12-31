@@ -27,7 +27,7 @@ export function assertFound<T>(
 }
 
 /**
- * Asserts that the resource can be viewed by the given user,
+ * Asserts that the resource (goal, goal entry) can be viewed by the given user,
  * given said resource's publicity type
  *
  * @param resource - The resource to check

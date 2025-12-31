@@ -66,7 +66,7 @@ export class GoalsService {
   }
 
   async findManyByUsername(targetUsername: string, requestingUserId: number) {
-    // Fetch user to get their userId (optional optimization if you already have it)
+    // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });

@@ -27,6 +27,7 @@ import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtAuthenticatedRequest } from 'src/auth/jwt-auth.types';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -56,7 +57,7 @@ export class GoalsController {
     return this.goalsService.findAll(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('user/:username')
   @ApiOkResponse({ type: GoalEntity, isArray: true })
   findManyByUsername(@Req() req, @Param('username') username: string) {
@@ -71,7 +72,7 @@ export class GoalsController {
     // TODOs #36: more error catching and mapping prisma errors to other errors.
     // if instance of error is other generic exception, keep error type the same.
     // revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
-    const userId = req.user.id;
+    const userId = req?.user?.id;
     return this.goalsService.findOne(id, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {

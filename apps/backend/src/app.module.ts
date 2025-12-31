@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { GoalsModule } from './goals/goals.module';
 import { GoalEntriesModule } from './goalEntries/goalEntries.module';
 import { UsersModule } from './users/users.module';
+import { ProfilesModule } from './profiles/profiles.module';
 import { AuthModule } from './auth/auth.module';
 import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
@@ -17,6 +18,7 @@ import { EnvModule } from './env/env.module';
     GoalsModule,
     GoalEntriesModule,
     UsersModule,
+    ProfilesModule,
     AuthModule,
     ConfigModule.forRoot({
       validate: (env) => envSchema.parse(env),

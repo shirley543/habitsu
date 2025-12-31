@@ -22,6 +22,7 @@ import { Route as SettingsGoalVisibilityRouteImport } from './routes/settings_/g
 import { Route as SettingsGoalOrderRouteImport } from './routes/settings_/goal-order'
 import { Route as SettingsDeleteAccountRouteImport } from './routes/settings_/delete-account'
 import { Route as SettingsAccountDetailsRouteImport } from './routes/settings_/account-details'
+import { Route as ProfileProfileNameRouteImport } from './routes/profile_/$profileName'
 import { Route as GoalsCreateRouteImport } from './routes/goals_/create'
 import { Route as GoalsGoalIdRouteImport } from './routes/goals_/$goalId'
 import { Route as GoalsGoalIdEditRouteImport } from './routes/goals_/$goalId_.edit'
@@ -93,6 +94,11 @@ const SettingsAccountDetailsRoute = SettingsAccountDetailsRouteImport.update({
   path: '/settings/account-details',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileProfileNameRoute = ProfileProfileNameRouteImport.update({
+  id: '/profile_/$profileName',
+  path: '/profile/$profileName',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GoalsCreateRoute = GoalsCreateRouteImport.update({
   id: '/goals_/create',
   path: '/goals/create',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
+  '/profile/$profileName': typeof ProfileProfileNameRoute
   '/settings/account-details': typeof SettingsAccountDetailsRoute
   '/settings/delete-account': typeof SettingsDeleteAccountRoute
   '/settings/goal-order': typeof SettingsGoalOrderRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/goals/$goalId': typeof GoalsGoalIdRoute
   '/goals/create': typeof GoalsCreateRoute
+  '/profile/$profileName': typeof ProfileProfileNameRoute
   '/settings/account-details': typeof SettingsAccountDetailsRoute
   '/settings/delete-account': typeof SettingsDeleteAccountRoute
   '/settings/goal-order': typeof SettingsGoalOrderRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/goals_/$goalId': typeof GoalsGoalIdRoute
   '/goals_/create': typeof GoalsCreateRoute
+  '/profile_/$profileName': typeof ProfileProfileNameRoute
   '/settings_/account-details': typeof SettingsAccountDetailsRoute
   '/settings_/delete-account': typeof SettingsDeleteAccountRoute
   '/settings_/goal-order': typeof SettingsGoalOrderRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
+    | '/profile/$profileName'
     | '/settings/account-details'
     | '/settings/delete-account'
     | '/settings/goal-order'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals/$goalId'
     | '/goals/create'
+    | '/profile/$profileName'
     | '/settings/account-details'
     | '/settings/delete-account'
     | '/settings/goal-order'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/goals_/$goalId'
     | '/goals_/create'
+    | '/profile_/$profileName'
     | '/settings_/account-details'
     | '/settings_/delete-account'
     | '/settings_/goal-order'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   GoalsGoalIdRoute: typeof GoalsGoalIdRoute
   GoalsCreateRoute: typeof GoalsCreateRoute
+  ProfileProfileNameRoute: typeof ProfileProfileNameRoute
   SettingsAccountDetailsRoute: typeof SettingsAccountDetailsRoute
   SettingsDeleteAccountRoute: typeof SettingsDeleteAccountRoute
   SettingsGoalOrderRoute: typeof SettingsGoalOrderRoute
@@ -350,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsAccountDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile_/$profileName': {
+      id: '/profile_/$profileName'
+      path: '/profile/$profileName'
+      fullPath: '/profile/$profileName'
+      preLoaderRoute: typeof ProfileProfileNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/goals_/create': {
       id: '/goals_/create'
       path: '/goals/create'
@@ -430,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   GoalsGoalIdRoute: GoalsGoalIdRoute,
   GoalsCreateRoute: GoalsCreateRoute,
+  ProfileProfileNameRoute: ProfileProfileNameRoute,
   SettingsAccountDetailsRoute: SettingsAccountDetailsRoute,
   SettingsDeleteAccountRoute: SettingsDeleteAccountRoute,
   SettingsGoalOrderRoute: SettingsGoalOrderRoute,
