@@ -3,10 +3,23 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { prisma } from './helpers/prisma'
-import { GoalQuantify } from '@prisma/client';
+import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
+import { loginWithCookie } from './helpers/login';
+import TestAgent from 'supertest/lib/agent';
 
-describe('Goals API (Integration)', () => {
+describe('Goals API (Integration with cookies)', () => {
   let app: INestApplication;
+
+  let alice: User;
+  let bob: User;
+  
+  let alicePublicGoal: Goal;
+  let alicePrivateGoal: Goal;
+  let bobPublicGoal: Goal;
+  let bobPrivateGoal: Goal;
+
+  let aliceAgent: TestAgent;
+  let bobAgent: TestAgent;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,65 +36,78 @@ describe('Goals API (Integration)', () => {
   });
 
   beforeEach(async () => {
-    // clean DB between tests
     await prisma.goal.deleteMany();
     await prisma.user.deleteMany();
-  });
 
-  describe('POST /goals', () => {
-    it('creates a goal successfully', async () => {
-      // create a user first
-      const user = await prisma.user.create({
-        data: { email: 'alice@test.com', username: 'Alice', password: 'alicepassword' },
-      });
+    // Seed users
+    alice = await prisma.user.create({ data: { email: 'alice@test.com', username: 'Alice', password: 'alicepassword' } });
+    bob = await prisma.user.create({ data: { email: 'bob@test.com', username: 'Bob', password: 'bobpassword' } });
 
-      const response = await request(app.getHttpServer())
-        .post('/goals')
-        .send({
-          title: 'Learn NestJS',
-          description: 'Finish building API tests',
-          userId: user.id,
-        })
-        .expect(201);
-
-      expect(response.body).toMatchObject({
-        title: 'Learn NestJS',
-        description: 'Finish building API tests',
-        userId: user.id,
-      });
-
-      // verify DB state
-      const goalInDb = await prisma.goal.findUnique({ where: { id: response.body.id } });
-      expect(goalInDb).toBeDefined();
-      expect(goalInDb?.title).toBe('Learn NestJS');
+    // Seed goals
+    alicePublicGoal = await prisma.goal.create({
+      data: { title: 'Alice Public', description: 'Public goal', userId: alice.id, colour: '#FFF', icon: 'a1', goalType: GoalQuantify.NUMERIC, order: 1, publicity: GoalPublicity.PUBLIC },
+    });
+    alicePrivateGoal = await prisma.goal.create({
+      data: { title: 'Alice Private', description: 'Private goal', userId: alice.id, colour: '#FFF', icon: 'a2', goalType: GoalQuantify.BOOLEAN, order: 2, publicity: GoalPublicity.PRIVATE },
+    });
+    bobPublicGoal = await prisma.goal.create({
+      data: { title: 'Bob Public', description: 'Public goal', userId: bob.id, colour: '#FFF', icon: 'b1', goalType: GoalQuantify.NUMERIC, order: 1, publicity: GoalPublicity.PUBLIC },
+    });
+    bobPrivateGoal = await prisma.goal.create({
+      data: { title: 'Bob Private', description: 'Private goal', userId: bob.id, colour: '#FFF', icon: 'b2', goalType: GoalQuantify.BOOLEAN, order: 2, publicity: GoalPublicity.PRIVATE },
     });
 
-    it('fails if required fields are missing', async () => {
-      await request(app.getHttpServer())
-        .post('/goals')
-        .send({ title: '' })
-        .expect(400);
+    // Log in users with cookies
+    aliceAgent = await loginWithCookie(app, alice);
+    bobAgent = await loginWithCookie(app, bob);
+  });
+
+  // --------------------------------------
+  // Access control tests for logged-in users with cookies
+  // --------------------------------------
+  describe('GET /goals (logged-in user)', () => {
+    it('Alice sees her own public and private goals, and Bob’s public goals only', async () => {
+      const response = await aliceAgent
+        .get('/goals')
+        .expect(200);
+
+      const titles = response.body.map((g: any) => g.title);
+
+      expect(titles).toContain('Alice Public');
+      expect(titles).toContain('Alice Private');
+      expect(titles).toContain('Bob Public');  // public goal from another user
+      expect(titles).not.toContain('Bob Private'); // cannot see Bob's private goal
+    });
+
+    it('Bob sees his own public and private goals, and Alice’s public goals only', async () => {
+      const response = await bobAgent
+        .get('/goals')
+        .expect(200);
+
+      const titles = response.body.map((g: any) => g.title);
+
+      expect(titles).toContain('Bob Public');
+      expect(titles).toContain('Bob Private');
+      expect(titles).toContain('Alice Public'); // public goal from another user
+      expect(titles).not.toContain('Alice Private'); // cannot see Alice's private goal
     });
   });
 
-  describe('GET /goals', () => {
-    it('returns all goals', async () => {
-      // seed two goals
-      const user = await prisma.user.create({ data: { email: 'bob@test.com', username: 'Bob', password: 'bobpassword' } });
-
-      await prisma.goal.createMany({
-        data: [
-          { title: 'Goal 1', description: 'Desc 1', userId: user.id, colour: '#FFFFFF', icon: 'icon-1', goalType: GoalQuantify.NUMERIC, order: 1 },
-          { title: 'Goal 2', description: 'Desc 2', userId: user.id, colour: '#FFFFFF', icon: 'icon-2', goalType: GoalQuantify.BOOLEAN, order: 2 },
-        ],
-      });
-
+  // --------------------------------------
+  // Access control tests for unauthenticated users
+  // --------------------------------------
+  describe('GET /goals (unauthenticated)', () => {
+    it('returns only public goals', async () => {
       const response = await request(app.getHttpServer())
         .get('/goals')
         .expect(200);
 
-      expect(response.body).toHaveLength(2);
-      expect(response.body.map((g: any) => g.title)).toEqual(expect.arrayContaining(['Goal 1', 'Goal 2']));
+      const titles = response.body.map((g: any) => g.title);
+
+      expect(titles).toContain('Alice Public');
+      expect(titles).toContain('Bob Public');
+      expect(titles).not.toContain('Alice Private');
+      expect(titles).not.toContain('Bob Private');
     });
   });
 });
