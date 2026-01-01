@@ -8,5 +8,9 @@
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
   },
-  "tailwindCSS.classFunctions": ["cva", "cx"]
+  "tailwindCSS.classFunctions": [
+    "cva",
+    "cx"
+  ],
+  "prisma.pinToPrisma6": true
 }
