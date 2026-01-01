@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { GoalPublicity, ProfilePublicity } from '@prisma/client';
-import { assertFound } from 'src/common/assert/assertions';
+import { assertFound } from '../common/assert/assertions';
 import { ProfileEntity } from './profiles.entity';
 
 enum TrackedDaysType {

@@ -23,10 +23,10 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntryEntity } from './goalEntry.entity';
-import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { GoalStatisticsEntity } from './goalStatistics.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 
 @Controller()
 @ApiTags('Entries')

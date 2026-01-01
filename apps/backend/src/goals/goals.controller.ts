@@ -23,11 +23,11 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
-import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { JwtAuthenticatedRequest } from 'src/auth/jwt-auth.types';
-import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 
 @Controller('goals')
 @ApiTags('goals')

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalEntryDto,
   UpdateGoalEntryDto,
@@ -13,12 +13,12 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { GoalsService } from 'src/goals/goals.service';
+import { GoalsService } from '../goals/goals.service';
 import {
   assertCanModify,
   assertCanView,
   assertFound,
-} from 'src/common/assert/assertions';
+} from '../common/assert/assertions';
 
 @Injectable()
 export class GoalEntriesService {

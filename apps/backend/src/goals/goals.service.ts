@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
 import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
-import { assertCanModify, assertFound } from 'src/common/assert/assertions';
+import { UsersService } from '../users/users.service';
+import { assertCanModify, assertFound } from '../common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 
 @Injectable()

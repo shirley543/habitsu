@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateUserDto,
   UpdateUserDto,
   UserResponseDto,
 } from '@habit-tracker/validation-schemas';
-import { EnvService } from 'src/env/env.service';
+import { EnvService } from '../env/env.service';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
