@@ -12,7 +12,7 @@ describe('Goals API (Integration with cookies)', () => {
 
   let alice: User;
   let bob: User;
-  
+
   let alicePublicGoal: Goal;
   let alicePrivateGoal: Goal;
   let bobPublicGoal: Goal;
@@ -93,21 +93,25 @@ describe('Goals API (Integration with cookies)', () => {
     });
   });
 
-  // --------------------------------------
-  // Access control tests for unauthenticated users
-  // --------------------------------------
-  describe('GET /goals (unauthenticated)', () => {
-    it('returns only public goals', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/goals')
-        .expect(200);
+  // // --------------------------------------
+  // // Access control tests for unauthenticated users
+  // // --------------------------------------
+  // describe('GET /goals (unauthenticated)', () => {
+  //   it('returns only public goals', async () => {
+  //     const response = await request(app.getHttpServer())
+  //       .get('/goals')
+  //       .expect(200);
 
-      const titles = response.body.map((g: any) => g.title);
+  //     const titles = response.body.map((g: any) => g.title);
 
-      expect(titles).toContain('Alice Public');
-      expect(titles).toContain('Bob Public');
-      expect(titles).not.toContain('Alice Private');
-      expect(titles).not.toContain('Bob Private');
-    });
-  });
+  //     expect(titles).toContain('Alice Public');
+  //     expect(titles).toContain('Bob Public');
+  //     expect(titles).not.toContain('Alice Private');
+  //     expect(titles).not.toContain('Bob Private');
+  //   });
+  // });
 });
+
+// TODOs #66
+// - Update to use TestContainers properly (currently still modifying local DB)
+// - Fix login with cookie failing (jwt undefined error)

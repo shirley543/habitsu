@@ -25,7 +25,7 @@ import TestAgent from 'supertest/lib/agent';
 export async function loginWithToken(app: INestApplication, user: User): Promise<string> {
   const res = await request(app.getHttpServer())
     .post('/auth/login')
-    .send({ email: user.email, password: 'pass' });
+    .send({ email: user.email, password: user.password });
   return res.body.accessToken;
 }
 
@@ -48,7 +48,7 @@ export async function loginWithCookie(app: INestApplication, user: User): Promis
   const agent = request.agent(app.getHttpServer());
   await agent
     .post('/auth/login')
-    .send({ email: user.email, password: 'pass' });
+    .send({ email: user.email, password: user.password });
 
   // Return agent with stored cookie
   return agent;
