@@ -37,10 +37,12 @@ describe('AuthController (e2e)', () => {
         username: testUser.username,
       },
     });
+  });
 
+  beforeEach(async () => {
     // SuperTest agent to persist cookies
     agent = request.agent(app.getHttpServer());
-  });
+  })
 
   afterAll(async () => {
     await prisma.user.deleteMany({ where: { email: testUser.email } });
@@ -60,6 +62,9 @@ describe('AuthController (e2e)', () => {
   });
 
   it('should access protected route after login', async () => {
+    await agent
+      .post('/auth/login')
+      .send({ email: testUser.email, password: testUser.password })
     await agent.get('/goals').expect(200);
   });
 
@@ -81,5 +86,29 @@ describe('AuthController (e2e)', () => {
       .expect(401);
 
     expect(res.body.message).toBe('Unauthorized');
+  });
+
+  it('should logout and clear JWT cookie', async () => {
+    await agent
+      .post('/auth/login')
+      .send({ email: testUser.email, password: testUser.password })
+    const res = await agent.post('/auth/logout').expect(200);
+
+    expect(res.body.message).toBe('Logged out');
+    expect(res.headers['set-cookie']).toBeDefined();
+    const jwtCookie = res.headers['set-cookie'][0];
+    expect(jwtCookie).toContain('jwt=');
+    expect(jwtCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+
+    await agent.get('/goals').expect(401);
+  });
+
+  it('should disallow access to protected route after logout', async () => {
+    await agent
+      .post('/auth/login')
+      .send({ email: testUser.email, password: testUser.password })
+    await agent.post('/auth/logout');
+
+    await agent.get('/goals').expect(401);
   });
 });
