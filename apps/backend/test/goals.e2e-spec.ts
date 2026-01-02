@@ -59,13 +59,65 @@ describe('Goals API (E2E)', () => {
       await request(app.getHttpServer()).post('/goals').send({ title: 'Test', goalType: GoalQuantify.NUMERIC }).expect(401);
     });
 
-    it('rejects invalid payloads (400)', async () => {
-      await aliceAgent.post('/goals').send({}).expect(400);
-      await aliceAgent.post('/goals').send({ title: 'Goal', goalType: 'INVALID' }).expect(400);
+    it('rejects invalid payloads [all fields missing] (400)', async () => {
+      // Entire object missing
+      const res = await aliceAgent.post('/goals').send({}).expect(400);
+      expect(res.body.message).toBe('Validation failed');
+      expect(res.body.fields).toEqual(
+        {
+          "_errors": [],
+          "colour": {
+            "_errors": [
+              "Required"
+            ]
+          },
+          "description": {
+            "_errors": [
+              "Required"
+            ]
+          },
+          "goalType": {
+            "_errors": [
+              "Invalid discriminator value. Expected 'NUMERIC' | 'BOOLEAN'"
+            ]
+          },
+          "icon": {
+            "_errors": [
+              "Required"
+            ]
+          },
+          "publicity": {
+            "_errors": [
+              "Required"
+            ]
+          },
+          "title": {
+            "_errors": [
+              "Required"
+            ]
+          }
+        }
+      );
     });
 
-    it('creates a goal successfully', async () => {
-      const payload: CreateGoalDto = { title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Numeric, publicity: GoalPublicityType.Public, colour: '#FFF', icon: 'a1', visibility: true, numericTarget: 10, numericUnit: "km" };
+    it('rejects invalid payloads [one field incorrect type] (400)', async () => {
+      // All fields correct except for numeric target type being string
+      const res2 = await aliceAgent.post('/goals').send({ title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Numeric, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true, numericTarget: "10", numericUnit: "km" }).expect(400);
+      expect(res2.body.message).toBe('Validation failed');
+      expect(res2.body.fields).toEqual(
+        {
+          "_errors": [],
+          "numericTarget": {
+            "_errors": [
+              "Expected number, received string",
+            ],
+          },
+        }
+      );
+    })
+
+    it('creates a goal successfully [numeric goal] (201)', async () => {
+      const payload: CreateGoalDto = { title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Numeric, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true, numericTarget: 10, numericUnit: "km" };
       
       const res = await aliceAgent.post('/goals').send(payload).expect(201);
 
@@ -80,7 +132,21 @@ describe('Goals API (E2E)', () => {
       expect(goalInDb?.updatedAt).toBeDefined();
     });
 
-    // TODOs #66 create boolean goal successfully
+    it('creates a goal successfully [boolean goal] (201)', async () => {
+      const payload: CreateGoalDto = { title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Boolean, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true };
+      
+      const res = await aliceAgent.post('/goals').send(payload).expect(201);
+
+      expect(res.body.title).toBe(payload.title);
+      expect(res.body.userId).toBe(alice.id);
+
+      const goalInDb = await prisma.goal.findUnique({ where: { id: res.body.id } });
+      expect(goalInDb).not.toBeNull();
+      expect(goalInDb?.userId).toBe(alice.id);
+      expect(goalInDb?.order).toBe(1);
+      expect(goalInDb?.createdAt).toBeDefined();
+      expect(goalInDb?.updatedAt).toBeDefined();
+    });
   });
 
   // /**
