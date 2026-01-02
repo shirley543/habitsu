@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
 import { GoalPublicity, GoalQuantify, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
-import { CreateGoalDto, GoalPublicityType, GoalQuantifyType } from '@habit-tracker/validation-schemas';
+import { CreateGoalDto, GoalPublicityType, GoalQuantifyType, GoalResponse } from '@habit-tracker/validation-schemas';
 
 describe('Goals API (E2E)', () => {
   let app: INestApplication;
@@ -149,36 +149,40 @@ describe('Goals API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * GET /goals
-  //  */
-  // describe('GET /goals', () => {
-  //   it('rejects unauthenticated requests', async () => {
-  //     await request(app.getHttpServer()).get('/goals').expect(401);
-  //   });
+  /**
+   * GET /goals
+   */
+  describe('GET /goals', () => {
+    it('rejects unauthenticated requests', async () => {
+      await request(app.getHttpServer()).get('/goals').expect(401);
+    });
 
-  //   it('returns user goals correctly', async () => {
-  //     await prisma.goal.createMany({
-  //       data: [
-  //         { title: 'Alice Public', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
-  //         { title: 'Alice Private', userId: alice.id, goalType: GoalQuantify.BOOLEAN, publicity: GoalPublicity.PRIVATE, order: 2, colour: '#FFF', icon: 'a2' },
-  //         { title: 'Bob Public', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'b1' },
-  //       ],
-  //     });
+    it('returns user goals correctly', async () => {
+      await prisma.goal.createMany({
+        data: [
+          { title: 'Alice Public', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+          { title: 'Alice Private', userId: alice.id, goalType: GoalQuantify.BOOLEAN, publicity: GoalPublicity.PRIVATE, order: 2, colour: 'FFFFFF', icon: 'a2' },
+          { title: 'Bob Public', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+          { title: 'Bob Private', userId: bob.id, goalType: GoalQuantify.BOOLEAN, publicity: GoalPublicity.PRIVATE, order: 2, colour: 'FFFFFF', icon: 'b2' },
+        ],
+      });
 
-  //     const res = await aliceAgent.get('/goals').expect(200);
-  //     const titles = res.body.map((g: any) => g.title);
-  //     expect(titles).toContain('Alice Public');
-  //     expect(titles).toContain('Alice Private');
-  //     expect(titles).toContain('Bob Public');
-  //     expect(titles).not.toContain('Bob Private');
-  //   });
+      const aliceRes = await aliceAgent.get('/goals').expect(200);
+      const aliceTitles = aliceRes.body.map((g: GoalResponse) => g.title);
+      const aliceExpected = ['Alice Public', 'Alice Private'];
+      expect(aliceTitles).toEqual(expect.arrayContaining(aliceExpected));
 
-  //   it('returns empty array if no goals', async () => {
-  //     const res = await aliceAgent.get('/goals').expect(200);
-  //     expect(res.body).toEqual([]);
-  //   });
-  // });
+      const bobRes = await bobAgent.get('/goals').expect(200);
+      const bobTitles = bobRes.body.map((g: GoalResponse) => g.title);
+      const bobExpected = ['Bob Public', 'Bob Private'];
+      expect(bobTitles).toEqual(expect.arrayContaining(bobExpected));
+    });
+
+    it('returns empty array if no goals', async () => {
+      const res = await aliceAgent.get('/goals').expect(200);
+      expect(res.body).toEqual([]);
+    });
+  });
 
   // /**
   //  * GET /goals/:id
