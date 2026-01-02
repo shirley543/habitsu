@@ -12,12 +12,23 @@ export class ZodValidationPipe implements PipeTransform {
   // + code 400 undocumented
   transform(value: any) {
     const result = this.schema.safeParse(value);
+    
     if (!result.success) {
-      throw new BadRequestException(result.error.format());
+      const errors = result.error.errors.map((err) => ({
+        path: err.path.join('.'),
+        message: err.message,
+      }))
+      throw new BadRequestException({
+        message: 'Validation failed',
+        errors,
+      });
     }
+
     // ZodValidationPipe returns data whose runtime shape is guaranteed by the Zod schema,
     // but TypeScript cannot infer the validated type from ZodSchema<any>.
     /* eslint-disable @typescript-eslint/no-unsafe-return */
     return result.data;
   }
 }
+
+
