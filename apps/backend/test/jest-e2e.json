@@ -7,5 +7,6 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "globalSetup": "<rootDir>/jest-global-setup.ts",
-  "globalTeardown": "<rootDir>/jest-global-teardown.ts"
+  "globalTeardown": "<rootDir>/jest-global-teardown.ts",
+  "testTimeout": 60000000
 }

@@ -8,6 +8,8 @@ import { loginWithCookie } from './helpers/login';
 import TestAgent from 'supertest/lib/agent';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
+import * as cookieParser from 'cookie-parser';
 
 describe('Goals API (Integration with cookies)', () => {
   let app: INestApplication;
@@ -40,6 +42,7 @@ describe('Goals API (Integration with cookies)', () => {
     .compile();
 
     app = moduleFixture.createNestApplication();
+    app.use(cookieParser()); // Apply global middleware same as main.ts
     await app.init();
   });
 
@@ -53,8 +56,12 @@ describe('Goals API (Integration with cookies)', () => {
     await prisma.user.deleteMany();
 
     // Seed users
-    alice = await prisma.user.create({ data: { email: 'alice@test.com', username: 'Alice', password: 'alicepassword' } });
-    bob = await prisma.user.create({ data: { email: 'bob@test.com', username: 'Bob', password: 'bobpassword' } });
+    const alicePassword = 'alicespassword';
+    const bobPassword = 'bobpassword';
+    const aliceHashedPassword = await bcrypt.hash(alicePassword, parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'));
+    const bobHashedPassword = await bcrypt.hash(bobPassword, parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'));
+    alice = await prisma.user.create({ data: { email: 'alice@test.com', username: 'Alice', password: aliceHashedPassword } });
+    bob = await prisma.user.create({ data: { email: 'bob@test.com', username: 'Bob', password: bobHashedPassword } });
 
     // Seed goals
     alicePublicGoal = await prisma.goal.create({
@@ -71,8 +78,8 @@ describe('Goals API (Integration with cookies)', () => {
     });
 
     // Log in users with cookies
-    aliceAgent = await loginWithCookie(app, alice);
-    bobAgent = await loginWithCookie(app, bob);
+    aliceAgent = await loginWithCookie(app, { email: alice.email, password: alicePassword });
+    bobAgent = await loginWithCookie(app, { email: bob.email, password: bobPassword });
   });
 
   // --------------------------------------

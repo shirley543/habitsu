@@ -1,6 +1,7 @@
 /**
  * Login helper functions for E2E tests.
  */
+import { LoginUserDto } from '@habit-tracker/validation-schemas';
 import { INestApplication } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as request from 'supertest';
@@ -22,7 +23,7 @@ import TestAgent from 'supertest/lib/agent';
  * @param user - A Prisma User object
  * @returns A promise resolving to the access token string
  */
-export async function loginWithToken(app: INestApplication, user: User): Promise<string> {
+export async function loginWithToken(app: INestApplication, user: LoginUserDto): Promise<string> {
   const res = await request(app.getHttpServer())
     .post('/auth/login')
     .send({ email: user.email, password: user.password });
@@ -44,7 +45,7 @@ export async function loginWithToken(app: INestApplication, user: User): Promise
  * @param user - A Prisma User object
  * @returns A promise resolving to a Supertest agent with cookies set
  */
-export async function loginWithCookie(app: INestApplication, user: User): Promise<TestAgent> {
+export async function loginWithCookie(app: INestApplication, user: LoginUserDto): Promise<TestAgent> {
   const agent = request.agent(app.getHttpServer());
   await agent
     .post('/auth/login')

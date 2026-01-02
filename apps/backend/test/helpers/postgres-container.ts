@@ -22,7 +22,7 @@ export async function startPostgres() {
   process.env.JWT_SECRET="jwtsecret"
   process.env.JWT_EXPIRY="3600s"
   process.env.PORT='3000'
-  process.env.SALT_ROUNDS='10'
+  process.env.SALT_ROUNDS='1'
 }
 
 export async function stopPostgres() {
