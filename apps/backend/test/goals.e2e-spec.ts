@@ -29,16 +29,6 @@ describe('Goals API (Integration with cookies)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-    // .overrideProvider(ConfigService)
-    // .useValue({
-    //   get: (key: string) => {
-    //     if (key === 'DATABASE_URL') {
-    //       console.log(`process.env.DATABASE_URL ${process.env.DATABASE_URL}`)
-    //       return process.env.DATABASE_URL; // Testcontainers URL
-    //     }
-    //     return undefined;
-    //   },
-    // })
     .compile();
 
     app = moduleFixture.createNestApplication();
@@ -133,5 +123,86 @@ describe('Goals API (Integration with cookies)', () => {
 });
 
 // TODOs #66
-// - Update to use TestContainers properly (currently still modifying local DB)
-// - Fix login with cookie failing (jwt undefined error)
+
+// Goals E2E
+// ---------
+//
+// Auth notes:
+// - All /goals routes require authentication via JWT cookie
+// - Unauthenticated requests should return 401 Unauthorized
+// - Users must never be able to access or mutate other users' goals
+//
+// POST /goals (create a goal)
+// - Rejected if no authentication (401)
+// - Validation error (400) if request body does not match CreateGoal DTO (zod)
+//   - missing required field
+//   - invalid enum (visibility, status, etc.)
+//   - invalid type (string instead of number, etc.)
+// - Goal created successfully if DTO is valid
+//   - returns 201 Created
+//   - response body matches GoalResponse DTO
+//   - DB contains correct entry
+//   - goal is associated with logged-in user
+//   - default fields are set correctly (visibility, order, timestamps)
+// - Creating a goal does NOT affect other users’ goals
+//
+// GET /goals (get all goals for logged-in user)
+// - Rejected if no authentication (401)
+// - Returns 200 with array of goals for authenticated user
+//   - includes both public + private goals
+//   - response matches GoalsResponse DTO
+// - Returns empty array if user has no goals
+// - Does NOT return goals belonging to other users
+//
+// GET /goals/:id (get single goal)
+// - Rejected if no authentication (401)
+// - Validation error (400) if id param is invalid (not an integer)
+// - Returns 404 if goal does not exist
+// - Returns 404 if goal exists but belongs to another user
+// - Returns 200 if goal exists and belongs to logged-in user
+//   - response matches GoalResponse DTO
+//   - correct goal data returned
+//
+// PATCH /goals/:id (update goal)
+// - Rejected if no authentication (401)
+// - Validation error (400) if id param is invalid
+// - Validation error (400) if request body does not match UpdateGoal DTO
+// - Returns 404 if goal does not exist
+// - Returns 404 if goal exists but belongs to another user
+// - Updates goal successfully if authorized and DTO is valid
+//   - returns 200 OK
+//   - response matches GoalResponse DTO
+//   - DB reflects updated values
+//   - unchanged fields remain unchanged
+//
+// DELETE /goals/:id (delete goal)
+// - Rejected if no authentication (401)
+// - Validation error (400) if id param is invalid
+// - Returns 404 if goal does not exist
+// - Returns 404 if goal exists but belongs to another user
+// - Deletes goal successfully if authorized
+//   - returns 204 No Content (or 200 if you return body)
+//   - goal is removed from DB
+//   - does not affect other goals
+//
+// POST /goals/reorder
+// - Rejected if no authentication (401)
+// - Validation error (400) if body does not match ReorderGoals DTO
+//   - missing ids
+//   - duplicate ids
+//   - non-integer ids
+// - Returns 404 if any goal id does not exist
+// - Returns 404 if any goal id belongs to another user
+// - Reorders goals successfully if valid
+//   - returns 200 OK
+//   - DB order values updated correctly
+//   - order is stable and matches request
+//   - no goals are added or removed
+
+// Profiles E2E
+// ------------
+// - GET /user/:username
+//   - Rejected if no authentication (JWT cookie); returns logged in user's goals
+//   - Goals array returned correctly if authenticated (check success code + DB contains correct entry + correctly returns Goals Response)
+//     - Data differs depending on 
+//   - 404 not found if username doesn't exist
