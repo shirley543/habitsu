@@ -57,14 +57,6 @@ export class GoalsController {
     return this.goalsService.findAll(userId);
   }
 
-  @UseGuards(OptionalJwtAuthGuard)
-  @Get('user/:username')
-  @ApiOkResponse({ type: GoalEntity, isArray: true })
-  findManyByUsername(@Req() req, @Param('username') username: string) {
-    const userId = req.user.id;
-    return this.goalsService.findManyByUsername(username, userId);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
