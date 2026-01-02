@@ -6,6 +6,8 @@ import { prisma } from './helpers/prisma'
 import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
 import { loginWithCookie } from './helpers/login';
 import TestAgent from 'supertest/lib/agent';
+import { PrismaService } from '../src/prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('Goals API (Integration with cookies)', () => {
   let app: INestApplication;
@@ -24,7 +26,18 @@ describe('Goals API (Integration with cookies)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+    // .overrideProvider(ConfigService)
+    // .useValue({
+    //   get: (key: string) => {
+    //     if (key === 'DATABASE_URL') {
+    //       console.log(`process.env.DATABASE_URL ${process.env.DATABASE_URL}`)
+    //       return process.env.DATABASE_URL; // Testcontainers URL
+    //     }
+    //     return undefined;
+    //   },
+    // })
+    .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
