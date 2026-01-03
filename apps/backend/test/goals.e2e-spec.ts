@@ -184,43 +184,53 @@ describe('Goals API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * GET /goals/:id
-  //  */
-  // describe('GET /goals/:id', () => {
-  //   let goal: any;
+  /**
+   * GET /goals/:id
+   */
+  describe('GET /goals/:id', () => {
+    let goal: any;
 
-  //   beforeEach(async () => {
-  //     goal = await prisma.goal.create({
-  //       data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
-  //     });
-  //   });
+    beforeEach(async () => {
+      goal = await prisma.goal.create({
+        data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
+      });
+    });
 
-  //   it('rejects unauthenticated', async () => {
-  //     await request(app.getHttpServer()).get(`/goals/${goal.id}`).expect(401);
-  //   });
+    it('rejects unauthenticated', async () => {
+      const res = await request(app.getHttpServer()).get(`/goals/${goal.id}`).expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns 400 for invalid id', async () => {
-  //     await aliceAgent.get('/goals/invalid').expect(400);
-  //   });
+    it('returns 400 for invalid id', async () => {
+      const res = await aliceAgent.get('/goals/invalid').expect(400);
+      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+    });
 
-  //   it('returns 404 for non-existent goal', async () => {
-  //     await aliceAgent.get('/goals/999999').expect(404);
-  //   });
+    it('returns 404 for non-existent goal', async () => {
+      const res = await aliceAgent.get('/goals/999999').expect(404);
+      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
+      expect(res.body.message).toBe('Not found');
+    });
 
-  //   it('returns 404 if goal belongs to another user', async () => {
-  //     const other = await prisma.goal.create({
-  //       data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'b1' },
-  //     });
-  //     await aliceAgent.get(`/goals/${other.id}`).expect(404);
-  //   });
+    it('returns 404 if goal belongs to another user', async () => {
+      const other = await prisma.goal.create({
+        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+      });
+      const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
+      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
+      expect(res.body.message).toBe('Not found');
+    });
 
-  //   it('returns goal if authorized', async () => {
-  //     const res = await aliceAgent.get(`/goals/${goal.id}`).expect(200);
-  //     expect(res.body.id).toBe(goal.id);
-  //     expect(res.body.userId).toBe(alice.id);
-  //   });
-  // });
+    it('returns goal if authorized', async () => {
+      const goal = await prisma.goal.create({
+        data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+      });
+
+      const res = await aliceAgent.get(`/goals/${goal.id}`).expect(200);
+      expect(res.body.id).toBe(goal.id);
+      expect(res.body.userId).toBe(alice.id);
+    });
+  });
 
   // /**
   //  * PATCH /goals/:id
