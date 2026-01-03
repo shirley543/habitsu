@@ -228,52 +228,64 @@ describe('Goals API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * PATCH /goals/:id
-  //  */
-  // describe('PATCH /goals/:id', () => {
-  //   let goal: any;
+  /**
+   * PATCH /goals/:id
+   */
+  describe('PATCH /goals/:id', () => {
+    let goal: any;
 
-  //   beforeEach(async () => {
-  //     goal = await prisma.goal.create({
-  //       data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
-  //     });
-  //   });
+    beforeEach(async () => {
+      goal = await prisma.goal.create({
+        data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+      });
+    });
 
-  //   it('rejects unauthenticated', async () => {
-  //     await request(app.getHttpServer()).patch(`/goals/${goal.id}`).send({ title: 'Updated' }).expect(401);
-  //   });
+    it('rejects unauthenticated', async () => {
+      const res = await request(app.getHttpServer()).patch(`/goals/${goal.id}`).send({ title: 'Updated' }).expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns 400 for invalid id', async () => {
-  //     await aliceAgent.patch('/goals/invalid').send({ title: 'Updated' }).expect(400);
-  //   });
+    it('returns 400 for invalid id', async () => {
+      const res = await aliceAgent.patch('/goals/invalid').send({ title: 'Updated' }).expect(400);
+      // TODOs #66: investigate difference in message behaviour between PATCH /goals/:id vs. GET /goals/:id
+      expect(res.body.message).toBe('Validation failed');
+    });
 
-  //   it('returns 400 for empty payload', async () => {
-  //     await aliceAgent.patch(`/goals/${goal.id}`).send({}).expect(400);
-  //   });
+    it('returns 400 for empty payload', async () => {
+      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({}).expect(400);
+      expect(res.body.message).toBe('Validation failed');
+    });
 
-  //   it('returns 400 for invalid enum transition', async () => {
-  //     await aliceAgent.patch(`/goals/${goal.id}`).send({ goalType: GoalQuantify.BOOLEAN }).expect(400);
-  //   });
+    it('returns 400 for invalid enum transition', async () => {
+      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ goalType: GoalQuantify.BOOLEAN }).expect(400);
+      expect(res.body.message).toBe('Validation failed');
+    });
 
-  //   it('returns 404 if goal belongs to another user', async () => {
-  //     const other = await prisma.goal.create({
-  //       data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'b1' },
-  //     });
-  //     await aliceAgent.patch(`/goals/${other.id}`).send({ title: 'Updated' }).expect(404);
-  //   });
+    it('returns 404 for non-existent goal', async () => {
+      const res = await aliceAgent.patch(`/goals/999999`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
+      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
+      expect(res.body.message).toBe('Not found');
+    });
 
-  //   it('updates successfully with updatedAt modified', async () => {
-  //     const oldUpdatedAt = goal.updatedAt;
-  //     await new Promise((r) => setTimeout(r, 10));
-  //     const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ title: 'Updated Title' }).expect(200);
+    it('returns 404 if goal belongs to another user', async () => {
+      const other = await prisma.goal.create({
+        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+      });
+      const res = await aliceAgent.patch(`/goals/${other.id}`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
+      expect(res.body.message).toBe('Not found');
+    });
+    
+    it('updates successfully with updatedAt modified', async () => {
+      const oldUpdatedAt = goal.updatedAt;
+      await new Promise((r) => setTimeout(r, 10));
+      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ title: 'Updated Title', goalType: GoalQuantify.BOOLEAN }).expect(200);
 
-  //     expect(res.body.title).toBe('Updated Title');
-  //     const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
-  //     expect(updated?.title).toBe('Updated Title');
-  //     expect(new Date(updated!.updatedAt).getTime()).toBeGreaterThan(new Date(oldUpdatedAt).getTime());
-  //   });
-  // });
+      expect(res.body.title).toBe('Updated Title');
+      const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
+      expect(updated?.title).toBe('Updated Title');
+      expect(new Date(updated!.updatedAt).getTime()).toBeGreaterThan(new Date(oldUpdatedAt).getTime());
+    });
+  });
 
   // /**
   //  * DELETE /goals/:id
@@ -284,9 +296,9 @@ describe('Goals API (E2E)', () => {
   //   beforeEach(async () => {
   //     goals = await prisma.goal.createMany({
   //       data: [
-  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
-  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: '#FFF', icon: 'a2' },
-  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: '#FFF', icon: 'a3' },
+  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
+  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
   //       ],
   //     });
   //   });
@@ -297,7 +309,7 @@ describe('Goals API (E2E)', () => {
 
   //   it('returns 404 if goal belongs to another user', async () => {
   //     const other = await prisma.goal.create({
-  //       data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'b1' },
+  //       data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
   //     });
   //     await aliceAgent.delete(`/goals/${other.id}`).expect(404);
   //   });
@@ -323,9 +335,9 @@ describe('Goals API (E2E)', () => {
   //   beforeEach(async () => {
   //     goals = await prisma.goal.createMany({
   //       data: [
-  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: '#FFF', icon: 'a1' },
-  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: '#FFF', icon: 'a2' },
-  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: '#FFF', icon: 'a3' },
+  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
+  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
   //       ],
   //     });
   //   });
