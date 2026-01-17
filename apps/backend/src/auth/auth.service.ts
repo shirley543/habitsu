@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserResponseDto } from '@habit-tracker/validation-schemas';
 import { JwtPayload } from './jwt-auth.types';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<UserResponseDto | null> {
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findOneByEmailFull(email);
     const passwordValid = user
       ? await bcrypt.compare(password, user.password)
@@ -25,7 +26,8 @@ export class AuthService {
       // Password deliberately destructured and un-used, to remove it from the returned result
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { password: _password, ...result } = user;
-      return result;
+      const output: Omit<User, 'password'> = result;
+      return output;
     }
     return null;
   }
