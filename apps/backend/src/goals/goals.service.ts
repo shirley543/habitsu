@@ -14,6 +14,9 @@ import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { assertCanModify, assertFound } from '../common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
+import { PrismaClientError } from '../common/prisma/prismaError';
+import { UserNotFoundError } from '../users/errors/userNotFound.error';
+import { GoalNotFoundError } from './errors/goalNotFound.error';
 
 @Injectable()
 export class GoalsService {
@@ -63,7 +66,17 @@ export class GoalsService {
       }
     })();
 
-    return this.prisma.goal.create({ data: prismaInput });
+    try {
+      return this.prisma.goal.create({ data: prismaInput });
+    }
+    catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaClientError.MissingDependentRecords
+      ) {
+        throw new UserNotFoundError(userId);
+      }
+      throw error;
+    }
   }
 
   async findAll(userId: number) {
@@ -75,7 +88,7 @@ export class GoalsService {
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
-    assertFound(user, 'User not found');
+    assertFound(user, `User ${targetUsername} not found`);
 
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
@@ -90,7 +103,8 @@ export class GoalsService {
   }
 
   async findOne(id: number, userId: number) {
-    return this.prisma.goal.findUniqueOrThrow({ where: { id, userId } });
+    const goal = this.prisma.goal.findUnique({ where: { id, userId } });
+    assertFound(goal);
   }
 
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
