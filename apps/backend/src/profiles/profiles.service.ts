@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoalPublicity, ProfilePublicity } from '@prisma/client';
-import { assertFound } from '../common/assert/assertions';
 import { ProfileEntity } from './profiles.entity';
+import { assertUserFound } from 'src/users/errors/userAssertions';
 
 enum TrackedDaysType {
   AllGoals = 'all-goals',
@@ -41,7 +41,7 @@ export class ProfilesService {
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
-    assertFound(user, 'User not found');
+    assertUserFound(user, targetUsername);
 
     const isOwner = requestingUserId === user.id;
     const isProfilePublic = user.profilePublicity === ProfilePublicity.PUBLIC;

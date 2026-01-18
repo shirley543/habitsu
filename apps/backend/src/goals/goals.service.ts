@@ -11,12 +11,14 @@ import {
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
 import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
-import { UsersService } from '../users/users.service';
-import { assertCanModify, assertFound } from '../common/assert/assertions';
+import { UsersService } from 'src/users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 import { PrismaClientError } from '../common/prisma/prismaError';
 import { UserNotFoundError } from '../users/errors/userNotFound.error';
 import { GoalNotFoundError } from './errors/goalNotFound.error';
+import { assertGoalCanModify, assertGoalFound } from './errors/goalAssertions';
+import { assertUserFound } from 'src/users/errors/userAssertions';
+import { GoalEntity } from './goal.entity';
 
 @Injectable()
 export class GoalsService {
@@ -25,7 +27,7 @@ export class GoalsService {
     private usersService: UsersService,
   ) {}
 
-  async create(createGoalDto: CreateGoalDto, userId: number) {
+  async create(createGoalDto: CreateGoalDto, userId: number): Promise<Goal> {
     // Ordering: get current maximum order number for the user's goals,
     // and use to determine their new goal's order number
     const maxOrderNum = await this.prisma.goal.aggregate({
@@ -79,16 +81,16 @@ export class GoalsService {
     }
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number): Promise<Goal[]> {
     return this.prisma.goal.findMany({ where: { userId } });
   }
 
-  async findManyByUsername(targetUsername: string, requestingUserId: number) {
+  async findManyByUsername(targetUsername: string, requestingUserId: number): Promise<Goal[]> {
     // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
-    assertFound(user, `User ${targetUsername} not found`);
+    assertUserFound(user, targetUsername);
 
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
@@ -102,18 +104,19 @@ export class GoalsService {
     return goals;
   }
 
-  async findOne(id: number, userId: number) {
-    const goal = this.prisma.goal.findUnique({ where: { id, userId } });
-    assertFound(goal);
+  async findOne(id: number, userId: number): Promise<Goal> {
+    const goal = await this.prisma.goal.findUnique({ where: { id, userId } });
+    assertGoalFound(goal, id);
+    return goal;
   }
 
-  async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
+  async update(id: number, updateGoalDto: UpdateGoalDto, userId: number): Promise<Goal> {
     // Find goal to update and validate ownership
     const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToUpdate, 'Goal not found');
-    assertCanModify(goalToUpdate, userId, 'Goal not found');
+    assertGoalFound(goalToUpdate, id);
+    assertGoalCanModify(goalToUpdate, userId);
 
     if (
       (goalToUpdate.goalType as GoalQuantifyType) !== updateGoalDto.goalType
@@ -158,8 +161,8 @@ export class GoalsService {
     const goalToDelete = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToDelete, 'Goal not found');
-    assertCanModify(goalToDelete, userId, 'Goal not found');
+    assertGoalFound(goalToDelete, id);
+    assertGoalCanModify(goalToDelete, userId);
 
     // Start transaction, so that if any fail entire batch is rolled back,
     // to prevent e.g. delete failing but previous order updates
@@ -193,7 +196,7 @@ export class GoalsService {
     });
   }
 
-  async reorder(reorderGoalDto: ReorderGoalDto, userId: number) {
+  async reorder(reorderGoalDto: ReorderGoalDto, userId: number): Promise<void> {
     // Expect all goals to be present (lengths same)
     // Expect all IDs present
     // Expect orders to be sequential (i.e. no gaps)

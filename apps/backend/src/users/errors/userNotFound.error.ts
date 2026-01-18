@@ -1,5 +1,5 @@
 export class UserNotFoundError extends Error {
-  constructor(userId: number) {
-    super(`User with id ${userId} not found`);
+  constructor(identifier: number | string) {
+    super(`User ${identifier} not found`);
   }
 }

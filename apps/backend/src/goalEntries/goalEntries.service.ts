@@ -14,11 +14,8 @@ import {
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from '../goals/goals.service';
-import {
-  assertCanModify,
-  assertCanView,
-  assertFound,
-} from '../common/assert/assertions';
+import { assertGoalCanModify, assertGoalCanView, assertGoalFound } from '../goals/errors/goalAssertions';
+import { assertGoalEntryFound } from './errors/goalEntryAssertions';
 
 @Injectable()
 export class GoalEntriesService {
@@ -33,8 +30,8 @@ export class GoalEntriesService {
     userId: number,
   ) {
     const goal = await this.goalsService.findOne(goalId, userId);
-    assertFound(goal, 'Associated goal not found');
-    assertCanModify(goal, userId); // Only goal owner can create a goal entry for the given goal
+    assertGoalFound(goal, goalId);
+    assertGoalCanModify(goal, userId); // Only goal owner can create a goal entry for the given goal
 
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryCreateInput = {
@@ -81,13 +78,16 @@ export class GoalEntriesService {
 
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
-      select: { userId: true, publicity: true },
+      select: { 
+        id: true,
+        userId: true,
+        publicity: true
+      },
     });
-    assertFound(goal, 'Goal not found');
-    assertCanView(
+    assertGoalFound(goal, goalId);
+    assertGoalCanView(
       goal,
       currentUserId,
-      'Goal, and thus goal entries, not viewable (unauthorized)',
     );
 
     const entries = await this.prisma.goalEntry.findMany({
@@ -109,15 +109,19 @@ export class GoalEntriesService {
       include: {
         goal: {
           select: {
+            id: true,
             userId: true,
             publicity: true,
           },
         },
       },
     });
-    assertFound(entry, 'Goal entry not found');
-    assertFound(entry.goal, 'Associated goal not found');
-    assertCanView(entry.goal, userId, 'Associated Goal not found');
+    assertGoalEntryFound(entry, id);
+    assertGoalFound(entry.goal, entry.goal.id);
+    assertGoalCanView(
+      entry.goal,
+      userId,
+    );
 
     return entry;
   }
@@ -136,6 +140,7 @@ export class GoalEntriesService {
       include: {
         goal: {
           select: {
+            id: true,
             userId: true,
             publicity: true,
             goalType: true,
@@ -143,9 +148,9 @@ export class GoalEntriesService {
         },
       },
     });
-    assertFound(entry, 'Goal entry not found');
-    assertFound(entry.goal, 'Associated goal not found');
-    assertCanModify(entry.goal, userId); // Only owner can modify (edit)
+    assertGoalEntryFound(entry, entryId);
+    assertGoalFound(entry.goal, entry.goal.id);
+    assertGoalCanModify(entry.goal, userId); // Only owner can modify (edit)
 
     const prismaInput = (() => {
       const baseGoalEntry: Prisma.GoalEntryUpdateInput = {
@@ -184,6 +189,7 @@ export class GoalEntriesService {
       include: {
         goal: {
           select: {
+            id: true,
             userId: true,
             goalType: true,
           },
@@ -191,9 +197,9 @@ export class GoalEntriesService {
       },
     });
 
-    assertFound(entry, 'Goal entry not found');
-    assertFound(entry.goal, 'Associated goal not found');
-    assertCanModify(entry.goal, userId); // Only owner can modify (delete)
+    assertGoalEntryFound(entry, entryId);
+    assertGoalFound(entry.goal, entry.goal.id);
+    assertGoalCanModify(entry.goal, userId); // Only owner can modify (delete)
 
     return this.prisma.goalEntry.delete({
       where: {
@@ -220,8 +226,8 @@ export class GoalEntriesService {
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
     });
-    assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not found');
+    assertGoalFound(goal, goalId);
+    assertGoalCanView(goal, userId);
 
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
@@ -249,8 +255,8 @@ export class GoalEntriesService {
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
     });
-    assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not found');
+    assertGoalFound(goal, goalId);
+    assertGoalCanView(goal, userId);
 
     if (goal.goalType !== GoalQuantify.NUMERIC) {
       throw new BadRequestException('Goal type must be NUMERIC');
@@ -282,8 +288,8 @@ export class GoalEntriesService {
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
     });
-    assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not found');
+    assertGoalFound(goal, goalId);
+    assertGoalCanView(goal, userId);
 
     // TODOs #33: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<
