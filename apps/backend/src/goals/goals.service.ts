@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGoalDto,
   ReorderGoalDto,
@@ -13,12 +8,9 @@ import {
 import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
-import { PrismaClientError } from '../common/prisma/prismaError';
-import { UserNotFoundError } from '../users/errors/userNotFound.error';
-import { GoalNotFoundError } from './errors/goalNotFound.error';
 import { assertGoalCanModify, assertGoalFound } from './errors/goalAssertions';
 import { assertUserFound } from 'src/users/errors/userAssertions';
-import { GoalEntity } from './goal.entity';
+import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
 
 @Injectable()
 export class GoalsService {
@@ -28,6 +20,10 @@ export class GoalsService {
   ) {}
 
   async create(createGoalDto: CreateGoalDto, userId: number): Promise<Goal> {
+    // Validate user exists
+    const user = await this.usersService.findOne(userId);
+    assertUserFound(user, userId);
+
     // Ordering: get current maximum order number for the user's goals,
     // and use to determine their new goal's order number
     const maxOrderNum = await this.prisma.goal.aggregate({
@@ -68,17 +64,7 @@ export class GoalsService {
       }
     })();
 
-    try {
-      return this.prisma.goal.create({ data: prismaInput });
-    }
-    catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === PrismaClientError.MissingDependentRecords
-      ) {
-        throw new UserNotFoundError(userId);
-      }
-      throw error;
-    }
+    return this.prisma.goal.create({ data: prismaInput });
   }
 
   async findAll(userId: number): Promise<Goal[]> {
@@ -208,7 +194,7 @@ export class GoalsService {
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new UnprocessableEntityException(
+      throw new GoalReorderInputInvalidError(
         'Reorder request length does not match number of goals',
       );
     }
@@ -231,7 +217,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new NotFoundException('Reorder request contains invalid goal IDs');
+      throw new GoalReorderInputInvalidError('Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential
@@ -251,9 +237,7 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new UnprocessableEntityException(
-        'Reorder request contains invalid goal orders',
-      );
+      throw new GoalReorderInputInvalidError('Reorder request contains invalid goal orders');
     }
 
     // Use transaction to update order of all given entries
