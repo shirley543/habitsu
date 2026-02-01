@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
   UseGuards,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import {
@@ -23,11 +24,10 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
-import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { JwtAuthenticatedRequest } from 'src/auth/jwt-auth.types';
-import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
 
 @Controller('goals')
 @ApiTags('goals')
@@ -57,14 +57,6 @@ export class GoalsController {
     return this.goalsService.findAll(userId);
   }
 
-  @UseGuards(OptionalJwtAuthGuard)
-  @Get('user/:username')
-  @ApiOkResponse({ type: GoalEntity, isArray: true })
-  findManyByUsername(@Req() req, @Param('username') username: string) {
-    const userId = req.user.id;
-    return this.goalsService.findManyByUsername(username, userId);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
@@ -83,6 +75,7 @@ export class GoalsController {
             throw new InternalServerErrorException(error);
         }
       }
+      throw error;
     });
   }
 
@@ -95,7 +88,20 @@ export class GoalsController {
     @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.update(id, updateGoalDto, userId);
+    return this.goalsService
+      .update(id, updateGoalDto, userId)
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          switch (error.code) {
+            case 'P2025':
+              console.error(error);
+              throw new NotFoundException('Goal not found');
+            default:
+              throw new InternalServerErrorException(error);
+          }
+        }
+        throw error;
+      });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -103,11 +109,23 @@ export class GoalsController {
   @ApiOkResponse({ type: GoalEntity })
   remove(@Req() req, @Param('id', ParseIntPipe) id: number) {
     const userId = req.user.id;
-    return this.goalsService.remove(id, userId);
+    return this.goalsService.remove(id, userId).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':
+            console.error(error);
+            throw new NotFoundException('Goal not found');
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+      throw error;
+    });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/reorder')
+  @HttpCode(200)
   @ApiOkResponse()
   reorder(
     @Req() req,
@@ -115,6 +133,17 @@ export class GoalsController {
     reorderGoalDto: ReorderGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.reorder(reorderGoalDto, userId);
+    return this.goalsService.reorder(reorderGoalDto, userId).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':
+            console.error(error);
+            throw new NotFoundException('Goal not found');
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+      throw error;
+    });
   }
 }

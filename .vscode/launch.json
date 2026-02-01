@@ -3,9 +3,9 @@
   "configurations": [
     // Backend Launch
     {
+      "name": "Backend Launch",
       "type": "node",
       "request": "launch",
-      "name": "Launch Backend (NestJS)",
       "cwd": "${workspaceFolder}/apps/backend",
       "runtimeExecutable": "node",
       "runtimeArgs": [
@@ -20,9 +20,9 @@
     },
     // Backend Attach
     {
+      "name": "Backend Attach",
       "type": "node",
       "request": "attach",
-      "name": "Attach Backend (NestJS)",
       "cwd": "${workspaceFolder}/apps/backend",
       "port": 9229,
       "preLaunchTask": "Start NestJS Backend (Debug)",
@@ -31,10 +31,28 @@
         "NODE_ENV": "development"
       }
     },
+    // Backend Tests Launch
     {
+      "name": "Backend Tests Launch",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/apps/backend",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceFolder}/node_modules/jest/bin/jest.js",
+        "--runInBand",
+        "--config",
+        "./test/jest-e2e.json"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    },
+    // Frontend Launch
+    {
+      "name": "Frontend Launch",
       "type": "pwa-chrome",
       "request": "launch",
-      "name": "Launch Client (Vite)",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/apps/client/src",
       "preLaunchTask": "Start Vite Dev Server"
@@ -42,10 +60,10 @@
   ],
   "compounds": [
     {
-      "name": "Launch Client + Backend",
+      "name": "Launch Frontend + Backend",
       "configurations": [
-        "Launch Backend (NestJS)",
-        "Launch Client (Vite)"
+        "Backend Launch",
+        "Frontend Launch"
       ]
     }
   ]

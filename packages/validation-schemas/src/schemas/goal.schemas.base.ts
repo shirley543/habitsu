@@ -20,17 +20,20 @@ export enum GoalQuantifyType {
 
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
+const NumericGoalSchema = z.object({
+  goalType: z.literal(GoalQuantifyType.Numeric),
+  numericTarget: z.number({ required_error: "Target is required" }),
+  numericUnit: z.string().min(1, "Units are required"),
+});
+
+const BooleanGoalSchema = z.object({
+  goalType: z.literal(GoalQuantifyType.Boolean),
+});
+
+// Discriminated union
 export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
-  // Numeric goal schema
-  z.object({
-    goalType: z.literal(GoalQuantifyType.Numeric),
-    numericTarget: z.number({ required_error: "Target is required" }),
-    numericUnit: z.string().min(1, "Units are required"),
-  }),
-  // Boolean goal schema
-  z.object({
-    goalType: z.literal(GoalQuantifyType.Boolean),
-  }),
+  NumericGoalSchema,
+  BooleanGoalSchema,
 ]);
 
 export const BaseGoalSchema = z.object({
@@ -73,20 +76,38 @@ export const ReorderGoalSchema = z
     }
   });
 
-// --------------------
+/**
+ * Schemas: Create / Response DTOs
+ */
 
 export const CreateGoalSchema = BaseGoalSchema.and(GoalTypeDiscriminatorSchema);
-export const UpdateGoalSchema = BaseGoalSchema.partial().and(
-  GoalTypeDiscriminatorSchema,
-);
 export const GoalResponseSchema = BaseGoalSchema.extend({
   id: z.number(),
   order: z.number(),
 }).and(GoalTypeDiscriminatorSchema);
 
 /**
- * Interfaces: Goals
+ * Schemas: Update DTOs (PATCH)
  */
+
+const UpdateNumericGoalSchema = NumericGoalSchema.partial().required({
+  goalType: true,
+});
+
+const UpdateBooleanGoalSchema = BooleanGoalSchema.partial().required({
+  goalType: true,
+});
+
+const UpdateBaseGoalSchema = BaseGoalSchema.partial();
+
+export const UpdateGoalSchema = UpdateBaseGoalSchema.and(
+  z.union([UpdateNumericGoalSchema, UpdateBooleanGoalSchema]),
+);
+
+/**
+ * Interfaces
+ */
+
 export type CreateGoalDto = z.infer<typeof CreateGoalSchema>;
 export type UpdateGoalDto = z.infer<typeof UpdateGoalSchema>;
 export type GoalResponse = z.infer<typeof GoalResponseSchema>;
@@ -104,7 +125,7 @@ export const BaseGoalEntrySchema = z.object({
   entryDate: z
     .string()
     .transform((val) => new Date(val))
-    .refine((date) => !isNaN(date.getTime())),
+    .refine((date) => !isNaN(date.getTime()), { message: "Invalid date" }),
   note: z.string().nullable(),
 });
 
@@ -119,13 +140,15 @@ export const SearchParamsGoalEntrySchema = z.object({
     .optional(),
 });
 
-const PartialBaseGoalEntrySchema = BaseGoalEntrySchema.partial();
-
 export const CreateGoalEntrySchema = GoalEntrySchema;
+const PartialBaseGoalEntrySchema = BaseGoalEntrySchema.partial();
+const PartialGoalEntryTypeSchema = GoalEntryTypePartialSchema.partial();
+
 export const UpdateGoalEntrySchema = z.intersection(
   PartialBaseGoalEntrySchema,
-  GoalEntryTypePartialSchema,
+  PartialGoalEntryTypeSchema,
 );
+
 export const GoalEntryResponseSchema = BaseGoalEntrySchema.extend({
   id: z.number(),
   goalId: z.number(),
@@ -141,6 +164,9 @@ export type SearchParamsGoalEntryDto = z.infer<
 >;
 export type GoalEntryResponse = z.infer<typeof GoalEntryResponseSchema>;
 
+/**
+ * Schemas / Interfaces: Goal statistics
+ */
 export const GoalStatisticsSchema = z.object({
   yearAvg: z.number().nullable(),
   yearCount: z.number().nullable(),
@@ -149,6 +175,9 @@ export const GoalStatisticsSchema = z.object({
 });
 export type GoalStatisticsReponse = z.infer<typeof GoalStatisticsSchema>;
 
+/**
+ * Schemas / Interfaces: Goal monthly averages/counts
+ */
 export const GoalMonthlyAverageSchema = z.object({
   year: z.number(),
   month: z.number(),

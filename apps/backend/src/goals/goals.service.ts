@@ -1,13 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
-import { assertCanModify, assertFound } from 'src/common/assert/assertions';
+import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
+import { UsersService } from '../users/users.service';
+import { assertCanModify, assertFound } from '../common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 
 @Injectable()
@@ -90,11 +95,19 @@ export class GoalsService {
 
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
     // Find goal to update and validate ownership
-    const goalToUpdate = await this.prisma.goal.findUniqueOrThrow({
+    const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToUpdate);
-    assertCanModify(goalToUpdate, userId);
+    assertFound(goalToUpdate, 'Goal not found');
+    assertCanModify(goalToUpdate, userId, 'Goal not found');
+
+    if (
+      (goalToUpdate.goalType as GoalQuantifyType) !== updateGoalDto.goalType
+    ) {
+      throw new BadRequestException(
+        `Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`,
+      );
+    }
 
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalUpdateInput = {
@@ -106,6 +119,7 @@ export class GoalsService {
         goalType: updateGoalDto.goalType as GoalQuantify,
         visibility: updateGoalDto.visibility,
       };
+
       switch (updateGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
         default:
@@ -125,13 +139,13 @@ export class GoalsService {
     });
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, userId: number): Promise<Goal> {
     // Find goal to delete and validate ownership
-    const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
+    const goalToDelete = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToDelete);
-    assertCanModify(goalToDelete, userId);
+    assertFound(goalToDelete, 'Goal not found');
+    assertCanModify(goalToDelete, userId, 'Goal not found');
 
     // Start transaction, so that if any fail entire batch is rolled back,
     // to prevent e.g. delete failing but previous order updates
@@ -177,8 +191,8 @@ export class GoalsService {
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new BadRequestException(
-        'Bad Request: Reorder goals length does not match goals length',
+      throw new UnprocessableEntityException(
+        'Reorder request length does not match number of goals',
       );
     }
 
@@ -200,7 +214,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new BadRequestException('Bad Request: Invalid Goal IDs');
+      throw new NotFoundException('Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential
@@ -220,7 +234,9 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new BadRequestException('Bad Request: Invalid Goal Orders');
+      throw new UnprocessableEntityException(
+        'Reorder request contains invalid goal orders',
+      );
     }
 
     // Use transaction to update order of all given entries

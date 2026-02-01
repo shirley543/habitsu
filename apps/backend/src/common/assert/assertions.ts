@@ -1,4 +1,4 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { GoalPublicity } from '@prisma/client';
 
 /**
@@ -33,20 +33,16 @@ export function assertFound<T>(
  * @param resource - The resource to check
  * @param userId - The user ID who is requesting to view
  * @param message - Optional custom not viewable (unauthorized) message
- * @throws UnauthorizedException if resource cannot be viewed by the inputted user ID
+ * @throws NotFoundException if resource cannot be viewed by the inputted user ID
  */
 export function assertCanView<
   T extends { userId: number; publicity: GoalPublicity },
->(
-  resource: T,
-  userId: number,
-  message = 'Resource cannot be viewed: Unauthorized',
-) {
+>(resource: T, userId: number, message = 'Resource not found') {
   const isOwner = resource.userId === userId;
   const isPublic = resource.publicity === GoalPublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
-    throw new UnauthorizedException(message);
+    throw new NotFoundException(message);
   }
 }
 
@@ -57,16 +53,16 @@ export function assertCanView<
  * @param resource - The resource to check
  * @param userId - The user ID who is requesting to modify
  * @param message - Optional custom not modifiable (unauthorized) message
- * @throws UnauthorizedException if resource cannot be modified by the inputted user ID
+ * @throws NotFoundException if resource cannot be modified by the inputted user ID
  */
 export function assertCanModify<T extends { userId: number }>(
   resource: T,
   userId: number,
-  message = 'Resource cannot be modified: Unauthorized',
+  message = 'Resource not found',
 ) {
   const isOwner = resource.userId === userId;
   if (!isOwner) {
-    throw new UnauthorizedException(message);
+    throw new NotFoundException(message);
   }
 }
 
@@ -77,15 +73,15 @@ export function assertCanModify<T extends { userId: number }>(
  * @param resource - The resource to check
  * @param userId - The user ID who is requesting to create
  * @param message - Optional custom not modifiable (unauthorized) message
- * @throws UnauthorizedException if resource cannot be created by the inputted user ID
+ * @throws ForbiddenException if resource cannot be created by the inputted user ID
  */
 export function assertCanCreate<T extends { userId: number }>(
   resource: T,
   userId: number,
-  message = 'Resource cannot be created: Unauthorized',
+  message = 'Resource cannot be created',
 ) {
   const isOwner = resource.userId === userId;
   if (!isOwner) {
-    throw new UnauthorizedException(message);
+    throw new ForbiddenException(message);
   }
 }

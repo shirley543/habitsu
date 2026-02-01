@@ -24,8 +24,8 @@ import {
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-import { ZodValidationPipe } from 'src/common/zod/zod-validation.pipe';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 /**
  * Private types
