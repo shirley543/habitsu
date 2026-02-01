@@ -8,7 +8,11 @@ import {
 import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
-import { assertGoalCanModify, assertGoalFound } from './errors/goalAssertions';
+import {
+  assertGoalCanModify,
+  assertGoalCanView,
+  assertGoalFound,
+} from './errors/goalAssertions';
 import { assertUserFound } from 'src/users/errors/userAssertions';
 import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
 
@@ -64,11 +68,24 @@ export class GoalsService {
       }
     })();
 
-    return this.prisma.goal.create({ data: prismaInput });
+    return await this.prisma.goal.create({ data: prismaInput });
+
+    // try {
+    //   return await this.prisma.goal.create({ data: prismaInput });
+    // } catch (err) {
+    //   // Prisma will throw if user does not exist (foreign key violation)
+    //   if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+    //     throw new Error(`User ${userId} not found`); // domain-level error, replace with UserNotFoundError if defined
+    //   }
+    //   throw err;
+    // }
   }
 
   async findAll(userId: number): Promise<Goal[]> {
-    return this.prisma.goal.findMany({ where: { userId } });
+    return this.prisma.goal.findMany({
+      where: { userId },
+      orderBy: { order: 'asc' },
+    });
   }
 
   async findManyByUsername(targetUsername: string, requestingUserId: number): Promise<Goal[]> {
@@ -85,14 +102,17 @@ export class GoalsService {
         // If owner, no publicity filter; otherwise only public goals
         ...(isOwner ? {} : { publicity: GoalPublicity.PUBLIC }),
       },
+      orderBy: { order: 'asc' },
     });
 
     return goals;
   }
 
   async findOne(id: number, userId: number): Promise<Goal> {
-    const goal = await this.prisma.goal.findUnique({ where: { id, userId } });
+    const goal = await this.prisma.goal.findUnique({ where: { id } });
     assertGoalFound(goal, id);
+    assertGoalCanView(goal, userId);
+
     return goal;
   }
 
@@ -143,22 +163,12 @@ export class GoalsService {
   }
 
   async remove(id: number, userId: number): Promise<Goal> {
-    // Find goal to delete and validate ownership
-    const goalToDelete = await this.prisma.goal.findUnique({
-      where: { id },
-    });
-    assertGoalFound(goalToDelete, id);
-    assertGoalCanModify(goalToDelete, userId);
-
-    // Start transaction, so that if any fail entire batch is rolled back,
-    // to prevent e.g. delete failing but previous order updates
-    // were already completed
     return await this.prisma.$transaction(async (tx) => {
-      // Ordering: determine goals to update based on
-      // current goal being removed (e.g. goal with order 4 being removed,
-      // hence goal with order 5 becomes 4, 6 becomes 5, etc)
+      const goalToDelete = await tx.goal.findUnique({ where: { id } });
+      assertGoalFound(goalToDelete, id);
+      assertGoalCanModify(goalToDelete, userId);
 
-      // Get goals with order greater than goal to delete's order
+      // Get goals with order greater than goal being deleted
       const goalsToUpdate = await tx.goal.findMany({
         where: {
           userId,
