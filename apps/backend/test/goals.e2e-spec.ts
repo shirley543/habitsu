@@ -368,27 +368,45 @@ describe('Goals API (E2E)', () => {
         { id: goals[2].id + 1, order: 3 },
       ]
       const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(404);
-      expect(res.body.message).toBe('Reorder request contains invalid Goal IDs');
+      expect(res.body.message).toBe('Reorder request contains invalid goal IDs');
     });
 
-    // TODOs #66 returns 422 reorder request is longer than number of goals
-    // TODOs #66 returns 404 if goal orders are not sequential
-    // TODOs #66 fix below testcase
+    it('returns 422 if reorder request is longer than number of goals', async () => {
+      const reorderDto: ReorderGoalDto = [
+        { id: goals[0].id, order: 1 },
+        { id: goals[1].id, order: 2 },
+        { id: goals[2].id, order: 3 },
+        { id: 9999, order: 4 }, // Extra goal that doesn't exist
+      ]
+      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(422);
+      expect(res.body.message).toBe('Reorder request length does not match number of goals');
+    });
+
+    it('returns 422 if goal orders are not sequential', async () => {
+      const reorderDto: ReorderGoalDto = [
+        { id: goals[0].id, order: 1 },
+        { id: goals[1].id, order: 4 }, // Non-sequential as orders are 1, 2 4
+        { id: goals[2].id, order: 2 },
+      ]
+      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(422);
+      expect(res.body.message).toBe('Reorder request contains invalid goal orders');
+    });
 
     it('reorders successfully', async () => {
       const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
       const reorderDto: ReorderGoalDto = allGoals.map((goal, index, arr) => {
         return {
           id: goal.id,
-          order: arr.length - index // reverse order
+          order: arr.length - index // Reverse order
         };
       });
       await aliceAgent.post('/goals/reorder').send(reorderDto).expect(200);
 
+      const expected = reorderDto.sort((a, b) => a.order - b.order)
       const updated = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-      expect(updated[0].id).toBe(reorderDto[0].order);
-      expect(updated[1].id).toBe(reorderDto[1].order);
-      expect(updated[2].id).toBe(reorderDto[2].order);
+      expect(updated[0].id).toBe(expected[0].id);
+      expect(updated[1].id).toBe(expected[1].id);
+      expect(updated[2].id).toBe(expected[2].id);
     });
   });
 });

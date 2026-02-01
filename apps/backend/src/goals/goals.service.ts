@@ -183,7 +183,7 @@ export class GoalsService {
 
     if (usersGoals.length !== reorderGoalDto.length) {
       throw new UnprocessableEntityException(
-        'Reorder goals length does not match goals length',
+        'Reorder request length does not match number of goals',
       );
     }
 
@@ -205,7 +205,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new NotFoundException('Reorder request contains invalid Goal IDs');
+      throw new NotFoundException('Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential
@@ -225,7 +225,7 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new UnprocessableEntityException('Reorder request contains invalid Goal Orders');
+      throw new UnprocessableEntityException('Reorder request contains invalid goal orders');
     }
 
     // Use transaction to update order of all given entries

@@ -132,6 +132,17 @@ export class GoalsController {
     reorderGoalDto: ReorderGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.reorder(reorderGoalDto, userId);
+    return this.goalsService.reorder(reorderGoalDto, userId).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':  
+            console.error(error);
+            throw new NotFoundException("Goal not found");
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+      throw error;
+    });
   }
 }
