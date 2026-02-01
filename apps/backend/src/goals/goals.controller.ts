@@ -28,7 +28,6 @@ import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
-import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 
 @Controller('goals')
 @ApiTags('goals')

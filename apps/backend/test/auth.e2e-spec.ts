@@ -39,7 +39,7 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     // SuperTest agent to persist cookies
     agent = request.agent(app.getHttpServer());
   })

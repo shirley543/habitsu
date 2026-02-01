@@ -168,12 +168,14 @@ describe('Goals API (E2E)', () => {
       });
 
       const aliceRes = await aliceAgent.get('/goals').expect(200);
-      const aliceTitles = aliceRes.body.map((g: GoalResponse) => g.title);
+      const aliceGoals: GoalResponse[] = aliceRes.body;
+      const aliceTitles = aliceGoals.map((g: GoalResponse) => g.title);
       const aliceExpected = ['Alice Public', 'Alice Private'];
       expect(aliceTitles).toEqual(expect.arrayContaining(aliceExpected));
 
       const bobRes = await bobAgent.get('/goals').expect(200);
-      const bobTitles = bobRes.body.map((g: GoalResponse) => g.title);
+      const bobGoals: GoalResponse[] = bobRes.body;
+      const bobTitles = bobGoals.map((g: GoalResponse) => g.title);
       const bobExpected = ['Bob Public', 'Bob Private'];
       expect(bobTitles).toEqual(expect.arrayContaining(bobExpected));
     });
@@ -188,7 +190,7 @@ describe('Goals API (E2E)', () => {
    * GET /goals/:id
    */
   describe('GET /goals/:id', () => {
-    let goal: any;
+    let goal: Goal;
 
     beforeEach(async () => {
       goal = await prisma.goal.create({
@@ -208,6 +210,7 @@ describe('Goals API (E2E)', () => {
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get('/goals/999999').expect(404);
+      console.log(res)
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       // expect(res.body.message).toBe('Not found');
     });
@@ -217,6 +220,7 @@ describe('Goals API (E2E)', () => {
         data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
+      console.log(res)
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       // expect(res.body.message).toBe('Not found');
     });
@@ -232,7 +236,7 @@ describe('Goals API (E2E)', () => {
    * PATCH /goals/:id
    */
   describe('PATCH /goals/:id', () => {
-    let goal: any;
+    let goal: Goal;
 
     beforeEach(async () => {
       goal = await prisma.goal.create({

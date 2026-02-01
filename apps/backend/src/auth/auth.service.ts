@@ -23,7 +23,7 @@ export class AuthService {
       : false;
     if (user && passwordValid) {
       // Password deliberately destructured and un-used, to remove it from the returned result
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+       
       const { password: _password, ...result } = user;
       return result;
     }

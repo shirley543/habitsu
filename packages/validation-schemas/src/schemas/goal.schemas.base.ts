@@ -24,11 +24,11 @@ const NumericGoalSchema = z.object({
   goalType: z.literal(GoalQuantifyType.Numeric),
   numericTarget: z.number({ required_error: "Target is required" }),
   numericUnit: z.string().min(1, "Units are required"),
-})
+});
 
 const BooleanGoalSchema = z.object({
   goalType: z.literal(GoalQuantifyType.Boolean),
-})
+});
 
 // Discriminated union
 export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
@@ -90,20 +90,18 @@ export const GoalResponseSchema = BaseGoalSchema.extend({
  * Schemas: Update DTOs (PATCH)
  */
 
-const UpdateNumericGoalSchema =
-  NumericGoalSchema
-    .partial()
-    .required({ goalType: true });
+const UpdateNumericGoalSchema = NumericGoalSchema.partial().required({
+  goalType: true,
+});
 
-const UpdateBooleanGoalSchema =
-  BooleanGoalSchema
-    .partial()
-    .required({ goalType: true });
+const UpdateBooleanGoalSchema = BooleanGoalSchema.partial().required({
+  goalType: true,
+});
 
 const UpdateBaseGoalSchema = BaseGoalSchema.partial();
 
 export const UpdateGoalSchema = UpdateBaseGoalSchema.and(
-  z.union([UpdateNumericGoalSchema, UpdateBooleanGoalSchema])
+  z.union([UpdateNumericGoalSchema, UpdateBooleanGoalSchema]),
 );
 
 /**
@@ -148,7 +146,7 @@ const PartialGoalEntryTypeSchema = GoalEntryTypePartialSchema.partial();
 
 export const UpdateGoalEntrySchema = z.intersection(
   PartialBaseGoalEntrySchema,
-  PartialGoalEntryTypeSchema
+  PartialGoalEntryTypeSchema,
 );
 
 export const GoalEntryResponseSchema = BaseGoalEntrySchema.extend({

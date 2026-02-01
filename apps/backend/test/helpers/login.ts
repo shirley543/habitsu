@@ -3,7 +3,6 @@
  */
 import { LoginUserDto } from '@habit-tracker/validation-schemas';
 import { INestApplication } from '@nestjs/common';
-import { User } from '@prisma/client';
 import * as request from 'supertest';
 import TestAgent from 'supertest/lib/agent';
 
@@ -27,6 +26,8 @@ export async function loginWithToken(app: INestApplication, user: LoginUserDto):
   const res = await request(app.getHttpServer())
     .post('/auth/login')
     .send({ email: user.email, password: user.password });
+  // This assumes that access token is sent via body
+  /* eslint-disable @typescript-eslint/no-unsafe-return */
   return res.body.accessToken;
 }
 

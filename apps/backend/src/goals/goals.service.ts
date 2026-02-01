@@ -96,7 +96,7 @@ export class GoalsService {
     assertFound(goalToUpdate, 'Goal not found');
     assertCanModify(goalToUpdate, userId, 'Goal not found');
 
-    if (goalToUpdate.goalType !== updateGoalDto.goalType) {
+    if (goalToUpdate.goalType as GoalQuantifyType !== updateGoalDto.goalType) {
       throw new BadRequestException(`Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`);
     }
 
