@@ -258,13 +258,13 @@ describe('Goals API (E2E)', () => {
 
     it('returns 400 for invalid enum transition', async () => {
       const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ goalType: GoalQuantify.BOOLEAN }).expect(400);
-      expect(res.body.message).toBe('Validation failed');
+      expect(res.body.message).toBe('Validation error: Cannot change goalType. Existing goal type is NUMERIC, but payload contains BOOLEAN');
     });
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.patch(`/goals/999999`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
-      expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
@@ -272,7 +272,7 @@ describe('Goals API (E2E)', () => {
         data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
       });
       const res = await aliceAgent.patch(`/goals/${other.id}`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
-      expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe('Goal not found');
     });
     
     it('updates successfully with updatedAt modified', async () => {

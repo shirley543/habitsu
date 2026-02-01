@@ -20,18 +20,20 @@ export enum GoalQuantifyType {
 
 const GoalPublicityTypeSchema = z.nativeEnum(GoalPublicityType);
 
+const NumericGoalSchema = z.object({
+  goalType: z.literal(GoalQuantifyType.Numeric),
+  numericTarget: z.number({ required_error: "Target is required" }),
+  numericUnit: z.string().min(1, "Units are required"),
+})
+
+const BooleanGoalSchema = z.object({
+  goalType: z.literal(GoalQuantifyType.Boolean),
+})
+
 // Discriminated union
 export const GoalTypeDiscriminatorSchema = z.discriminatedUnion("goalType", [
-  // Numeric goal schema
-  z.object({
-    goalType: z.literal(GoalQuantifyType.Numeric),
-    numericTarget: z.number({ required_error: "Target is required" }),
-    numericUnit: z.string().min(1, "Units are required"),
-  }),
-  // Boolean goal schema
-  z.object({
-    goalType: z.literal(GoalQuantifyType.Boolean),
-  }),
+  NumericGoalSchema,
+  BooleanGoalSchema,
 ]);
 
 export const BaseGoalSchema = z.object({
@@ -88,28 +90,21 @@ export const GoalResponseSchema = BaseGoalSchema.extend({
  * Schemas: Update DTOs (PATCH)
  */
 
-// Partial union per variant
-const NumericGoalPartialSchema = z.object({
-  goalType: z.literal(GoalQuantifyType.Numeric), // cannot change
-  numericTarget: z.number().optional(),
-  numericUnit: z.string().optional(),
-});
+const UpdateNumericGoalSchema =
+  NumericGoalSchema
+    .partial()
+    .required({ goalType: true });
 
-const BooleanGoalPartialSchema = z.object({
-  goalType: z.literal(GoalQuantifyType.Boolean), // cannot change
-});
+const UpdateBooleanGoalSchema =
+  BooleanGoalSchema
+    .partial()
+    .required({ goalType: true });
 
-// Partial union
-const GoalTypePartialSchema = z.discriminatedUnion("goalType", [
-  NumericGoalPartialSchema,
-  BooleanGoalPartialSchema,
-]);
+const UpdateBaseGoalSchema = BaseGoalSchema.partial();
 
-// Partial base fields
-const PartialBaseGoalSchema = BaseGoalSchema.partial();
-
-// Merge for update
-export const UpdateGoalSchema = PartialBaseGoalSchema.and(GoalTypePartialSchema);
+export const UpdateGoalSchema = UpdateBaseGoalSchema.and(
+  z.union([UpdateNumericGoalSchema, UpdateBooleanGoalSchema])
+);
 
 /**
  * Interfaces

@@ -90,11 +90,15 @@ export class GoalsService {
 
   async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
     // Find goal to update and validate ownership
-    const goalToUpdate = await this.prisma.goal.findUniqueOrThrow({
+    const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToUpdate);
+    assertFound(goalToUpdate, 'Goal not found');
     assertCanModify(goalToUpdate, userId);
+
+    if (goalToUpdate.goalType !== updateGoalDto.goalType) {
+      throw new BadRequestException(`Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`);
+    }
 
     const prismaInput = (() => {
       const baseGoal: Prisma.GoalUpdateInput = {
@@ -106,6 +110,7 @@ export class GoalsService {
         goalType: updateGoalDto.goalType as GoalQuantify,
         visibility: updateGoalDto.visibility,
       };
+
       switch (updateGoalDto.goalType) {
         case GoalQuantifyType.Boolean:
         default:

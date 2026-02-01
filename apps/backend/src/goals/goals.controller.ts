@@ -75,6 +75,7 @@ export class GoalsController {
             throw new InternalServerErrorException(error);
         }
       }
+      throw error;
     });
   }
 
@@ -87,7 +88,18 @@ export class GoalsController {
     @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.update(id, updateGoalDto, userId);
+    return this.goalsService.update(id, updateGoalDto, userId).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':
+            console.error(error);
+            throw new NotFoundException("Goal not found");
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+      throw error;
+    });
   }
 
   @UseGuards(JwtAuthGuard)
