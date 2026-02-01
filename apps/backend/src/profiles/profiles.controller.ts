@@ -11,7 +11,7 @@ import { GoalsService } from '../goals/goals.service';
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
-    private readonly goalsService: GoalsService
+    private readonly goalsService: GoalsService,
   ) {}
 
   @UseGuards(OptionalJwtAuthGuard)

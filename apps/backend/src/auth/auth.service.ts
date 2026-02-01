@@ -23,7 +23,7 @@ export class AuthService {
       : false;
     if (user && passwordValid) {
       // Password deliberately destructured and un-used, to remove it from the returned result
-       
+
       const { password: _password, ...result } = user;
       return result;
     }

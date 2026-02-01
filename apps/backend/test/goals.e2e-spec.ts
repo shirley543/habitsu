@@ -8,7 +8,13 @@ import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
 import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
-import { CreateGoalDto, GoalPublicityType, GoalQuantifyType, GoalResponse, ReorderGoalDto } from '@habit-tracker/validation-schemas';
+import {
+  CreateGoalDto,
+  GoalPublicityType,
+  GoalQuantifyType,
+  GoalResponse,
+  ReorderGoalDto,
+} from '@habit-tracker/validation-schemas';
 
 describe('Goals API (E2E)', () => {
   let app: INestApplication;
@@ -41,14 +47,30 @@ describe('Goals API (E2E)', () => {
     // Seed users
     const alicePassword = 'alicespassword';
     const bobPassword = 'bobpassword';
-    const aliceHash = await bcrypt.hash(alicePassword, parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'));
-    const bobHash = await bcrypt.hash(bobPassword, parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'));
-    alice = await prisma.user.create({ data: { email: 'alice@test.com', username: 'Alice', password: aliceHash } });
-    bob = await prisma.user.create({ data: { email: 'bob@test.com', username: 'Bob', password: bobHash } });
+    const aliceHash = await bcrypt.hash(
+      alicePassword,
+      parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
+    );
+    const bobHash = await bcrypt.hash(
+      bobPassword,
+      parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
+    );
+    alice = await prisma.user.create({
+      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash },
+    });
+    bob = await prisma.user.create({
+      data: { email: 'bob@test.com', username: 'Bob', password: bobHash },
+    });
 
     // Login users and get agents
-    aliceAgent = await loginWithCookie(app, { email: alice.email, password: alicePassword });
-    bobAgent = await loginWithCookie(app, { email: bob.email, password: bobPassword });
+    aliceAgent = await loginWithCookie(app, {
+      email: alice.email,
+      password: alicePassword,
+    });
+    bobAgent = await loginWithCookie(app, {
+      email: bob.email,
+      password: bobPassword,
+    });
   });
 
   /**
@@ -56,75 +78,87 @@ describe('Goals API (E2E)', () => {
    */
   describe('POST /goals', () => {
     it('rejects unauthenticated requests (401)', async () => {
-      await request(app.getHttpServer()).post('/goals').send({ title: 'Test', goalType: GoalQuantify.NUMERIC }).expect(401);
+      await request(app.getHttpServer())
+        .post('/goals')
+        .send({ title: 'Test', goalType: GoalQuantify.NUMERIC })
+        .expect(401);
     });
 
     it('rejects invalid payloads [all fields missing] (400)', async () => {
       // Entire object missing
       const res = await aliceAgent.post('/goals').send({}).expect(400);
       expect(res.body.message).toBe('Validation failed');
-      expect(res.body.fields).toEqual(
-        {
-          "_errors": [],
-          "colour": {
-            "_errors": [
-              "Required"
-            ]
-          },
-          "description": {
-            "_errors": [
-              "Required"
-            ]
-          },
-          "goalType": {
-            "_errors": [
-              "Invalid discriminator value. Expected 'NUMERIC' | 'BOOLEAN'"
-            ]
-          },
-          "icon": {
-            "_errors": [
-              "Required"
-            ]
-          },
-          "publicity": {
-            "_errors": [
-              "Required"
-            ]
-          },
-          "title": {
-            "_errors": [
-              "Required"
-            ]
-          }
-        }
-      );
+      expect(res.body.fields).toEqual({
+        _errors: [],
+        colour: {
+          _errors: ['Required'],
+        },
+        description: {
+          _errors: ['Required'],
+        },
+        goalType: {
+          _errors: [
+            "Invalid discriminator value. Expected 'NUMERIC' | 'BOOLEAN'",
+          ],
+        },
+        icon: {
+          _errors: ['Required'],
+        },
+        publicity: {
+          _errors: ['Required'],
+        },
+        title: {
+          _errors: ['Required'],
+        },
+      });
     });
 
     it('rejects invalid payloads [one field incorrect type] (400)', async () => {
       // All fields correct except for numeric target type being string
-      const res2 = await aliceAgent.post('/goals').send({ title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Numeric, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true, numericTarget: "10", numericUnit: "km" }).expect(400);
+      const res2 = await aliceAgent
+        .post('/goals')
+        .send({
+          title: 'Run daily',
+          description: 'Desc',
+          goalType: GoalQuantifyType.Numeric,
+          publicity: GoalPublicityType.Public,
+          colour: 'FFFFFF',
+          icon: 'a1',
+          visibility: true,
+          numericTarget: '10',
+          numericUnit: 'km',
+        })
+        .expect(400);
       expect(res2.body.message).toBe('Validation failed');
-      expect(res2.body.fields).toEqual(
-        {
-          "_errors": [],
-          "numericTarget": {
-            "_errors": [
-              "Expected number, received string",
-            ],
-          },
-        }
-      );
-    })
+      expect(res2.body.fields).toEqual({
+        _errors: [],
+        numericTarget: {
+          _errors: ['Expected number, received string'],
+        },
+      });
+    });
 
     it('creates a goal successfully [numeric goal] (201)', async () => {
-      const payload: CreateGoalDto = { title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Numeric, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true, numericTarget: 10, numericUnit: "km" };
-      
+      const payload: CreateGoalDto = {
+        title: 'Run daily',
+        description: 'Desc',
+        goalType: GoalQuantifyType.Numeric,
+        publicity: GoalPublicityType.Public,
+        colour: 'FFFFFF',
+        icon: 'a1',
+        visibility: true,
+        numericTarget: 10,
+        numericUnit: 'km',
+      };
+
       const res = await aliceAgent.post('/goals').send(payload).expect(201);
 
       expect(res.body.title).toBe(payload.title);
       expect(res.body.userId).toBe(alice.id);
 
-      const goalInDb = await prisma.goal.findUnique({ where: { id: res.body.id } });
+      const goalInDb = await prisma.goal.findUnique({
+        where: { id: res.body.id },
+      });
       expect(goalInDb).not.toBeNull();
       expect(goalInDb?.userId).toBe(alice.id);
       expect(goalInDb?.order).toBe(1);
@@ -133,14 +167,24 @@ describe('Goals API (E2E)', () => {
     });
 
     it('creates a goal successfully [boolean goal] (201)', async () => {
-      const payload: CreateGoalDto = { title: 'Run daily', description: 'Desc', goalType: GoalQuantifyType.Boolean, publicity: GoalPublicityType.Public, colour: 'FFFFFF', icon: 'a1', visibility: true };
-      
+      const payload: CreateGoalDto = {
+        title: 'Run daily',
+        description: 'Desc',
+        goalType: GoalQuantifyType.Boolean,
+        publicity: GoalPublicityType.Public,
+        colour: 'FFFFFF',
+        icon: 'a1',
+        visibility: true,
+      };
+
       const res = await aliceAgent.post('/goals').send(payload).expect(201);
 
       expect(res.body.title).toBe(payload.title);
       expect(res.body.userId).toBe(alice.id);
 
-      const goalInDb = await prisma.goal.findUnique({ where: { id: res.body.id } });
+      const goalInDb = await prisma.goal.findUnique({
+        where: { id: res.body.id },
+      });
       expect(goalInDb).not.toBeNull();
       expect(goalInDb?.userId).toBe(alice.id);
       expect(goalInDb?.order).toBe(1);
@@ -160,10 +204,42 @@ describe('Goals API (E2E)', () => {
     it('returns user goals correctly', async () => {
       await prisma.goal.createMany({
         data: [
-          { title: 'Alice Public', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
-          { title: 'Alice Private', userId: alice.id, goalType: GoalQuantify.BOOLEAN, publicity: GoalPublicity.PRIVATE, order: 2, colour: 'FFFFFF', icon: 'a2' },
-          { title: 'Bob Public', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
-          { title: 'Bob Private', userId: bob.id, goalType: GoalQuantify.BOOLEAN, publicity: GoalPublicity.PRIVATE, order: 2, colour: 'FFFFFF', icon: 'b2' },
+          {
+            title: 'Alice Public',
+            userId: alice.id,
+            goalType: GoalQuantify.NUMERIC,
+            publicity: GoalPublicity.PUBLIC,
+            order: 1,
+            colour: 'FFFFFF',
+            icon: 'a1',
+          },
+          {
+            title: 'Alice Private',
+            userId: alice.id,
+            goalType: GoalQuantify.BOOLEAN,
+            publicity: GoalPublicity.PRIVATE,
+            order: 2,
+            colour: 'FFFFFF',
+            icon: 'a2',
+          },
+          {
+            title: 'Bob Public',
+            userId: bob.id,
+            goalType: GoalQuantify.NUMERIC,
+            publicity: GoalPublicity.PUBLIC,
+            order: 1,
+            colour: 'FFFFFF',
+            icon: 'b1',
+          },
+          {
+            title: 'Bob Private',
+            userId: bob.id,
+            goalType: GoalQuantify.BOOLEAN,
+            publicity: GoalPublicity.PRIVATE,
+            order: 2,
+            colour: 'FFFFFF',
+            icon: 'b2',
+          },
         ],
       });
 
@@ -194,33 +270,53 @@ describe('Goals API (E2E)', () => {
 
     beforeEach(async () => {
       goal = await prisma.goal.create({
-        data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+        data: {
+          title: 'Alice Goal',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'a1',
+        },
       });
     });
 
     it('rejects unauthenticated', async () => {
-      const res = await request(app.getHttpServer()).get(`/goals/${goal.id}`).expect(401);
+      const res = await request(app.getHttpServer())
+        .get(`/goals/${goal.id}`)
+        .expect(401);
       expect(res.body.message).toBe('Unauthorized');
     });
 
     it('returns 400 for invalid id', async () => {
       const res = await aliceAgent.get('/goals/invalid').expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get('/goals/999999').expect(404);
-      console.log(res)
+      console.log(res);
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       // expect(res.body.message).toBe('Not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
       const other = await prisma.goal.create({
-        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
-      console.log(res)
+      console.log(res);
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       // expect(res.body.message).toBe('Not found');
     });
@@ -240,47 +336,86 @@ describe('Goals API (E2E)', () => {
 
     beforeEach(async () => {
       goal = await prisma.goal.create({
-        data: { title: 'Alice Goal', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+        data: {
+          title: 'Alice Goal',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'a1',
+        },
       });
     });
 
     it('rejects unauthenticated', async () => {
-      const res = await request(app.getHttpServer()).patch(`/goals/${goal.id}`).send({ title: 'Updated' }).expect(401);
+      const res = await request(app.getHttpServer())
+        .patch(`/goals/${goal.id}`)
+        .send({ title: 'Updated' })
+        .expect(401);
       expect(res.body.message).toBe('Unauthorized');
     });
 
     it('returns 400 for invalid id', async () => {
-      const res = await aliceAgent.patch('/goals/invalid').send({ title: 'Updated' }).expect(400);
+      const res = await aliceAgent
+        .patch('/goals/invalid')
+        .send({ title: 'Updated' })
+        .expect(400);
       // TODOs #66: investigate difference in message behaviour between PATCH /goals/:id vs. GET /goals/:id
       expect(res.body.message).toBe('Validation failed');
     });
 
     it('returns 400 for empty payload', async () => {
-      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({}).expect(400);
+      const res = await aliceAgent
+        .patch(`/goals/${goal.id}`)
+        .send({})
+        .expect(400);
       expect(res.body.message).toBe('Validation failed');
     });
 
     it('returns 400 for invalid enum transition', async () => {
-      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ goalType: GoalQuantify.BOOLEAN }).expect(400);
-      expect(res.body.message).toBe('Validation error: Cannot change goalType. Existing goal type is NUMERIC, but payload contains BOOLEAN');
+      const res = await aliceAgent
+        .patch(`/goals/${goal.id}`)
+        .send({ goalType: GoalQuantify.BOOLEAN })
+        .expect(400);
+      expect(res.body.message).toBe(
+        'Validation error: Cannot change goalType. Existing goal type is NUMERIC, but payload contains BOOLEAN',
+      );
     });
 
     it('returns 404 for non-existent goal', async () => {
-      const res = await aliceAgent.patch(`/goals/999999`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
+      const res = await aliceAgent
+        .patch(`/goals/999999`)
+        .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
+        .expect(404);
       // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
       const other = await prisma.goal.create({
-        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
       });
-      const res = await aliceAgent.patch(`/goals/${other.id}`).send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN }).expect(404);
+      const res = await aliceAgent
+        .patch(`/goals/${other.id}`)
+        .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
+        .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
-    
+
     it('updates successfully', async () => {
-      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ title: 'Updated Title', goalType: GoalQuantify.NUMERIC }).expect(200);
+      const res = await aliceAgent
+        .patch(`/goals/${goal.id}`)
+        .send({ title: 'Updated Title', goalType: GoalQuantify.NUMERIC })
+        .expect(200);
       expect(res.body.title).toBe('Updated Title');
 
       const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
@@ -296,16 +431,43 @@ describe('Goals API (E2E)', () => {
 
     beforeEach(async () => {
       const goalsToCreate = [
-        { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
-        { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
-        { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
-      ]
+        {
+          title: 'Goal1',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'a1',
+        },
+        {
+          title: 'Goal2',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 2,
+          colour: 'FFFFFF',
+          icon: 'a2',
+        },
+        {
+          title: 'Goal3',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 3,
+          colour: 'FFFFFF',
+          icon: 'a3',
+        },
+      ];
 
       await prisma.goal.createMany({
         data: goalsToCreate,
       });
 
-      goals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      goals = await prisma.goal.findMany({
+        where: { userId: alice.id },
+        orderBy: { order: 'asc' },
+      });
     });
 
     it('rejects unauthenticated', async () => {
@@ -314,20 +476,33 @@ describe('Goals API (E2E)', () => {
 
     it('returns 404 if goal belongs to another user', async () => {
       const other = await prisma.goal.create({
-        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
       });
       await aliceAgent.delete(`/goals/${other.id}`).expect(404);
     });
 
     it('deletes goal successfully and reorders remaining', async () => {
       const deleteId = goals[1].id; // Goal2
-      const deleteResponse = await aliceAgent.delete(`/goals/${deleteId}`).expect(200);
+      const deleteResponse = await aliceAgent
+        .delete(`/goals/${deleteId}`)
+        .expect(200);
 
-      const receivedGoal = deleteResponse.body
+      const receivedGoal = deleteResponse.body;
       const { createdAt, updatedAt, ...expectedGoal } = goals[1];
-      expect(receivedGoal).toMatchObject(expectedGoal)
+      expect(receivedGoal).toMatchObject(expectedGoal);
 
-      const remaining = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      const remaining = await prisma.goal.findMany({
+        where: { userId: alice.id },
+        orderBy: { order: 'asc' },
+      });
       expect(remaining.length).toBe(2);
       expect(remaining[0].order).toBe(1);
       expect(remaining[1].order).toBe(2);
@@ -342,26 +517,62 @@ describe('Goals API (E2E)', () => {
 
     beforeEach(async () => {
       const goalsToCreate = [
-        { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
-        { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
-        { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
-      ]
+        {
+          title: 'Goal1',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'a1',
+        },
+        {
+          title: 'Goal2',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 2,
+          colour: 'FFFFFF',
+          icon: 'a2',
+        },
+        {
+          title: 'Goal3',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 3,
+          colour: 'FFFFFF',
+          icon: 'a3',
+        },
+      ];
 
       await prisma.goal.createMany({
         data: goalsToCreate,
       });
 
-      goals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      goals = await prisma.goal.findMany({
+        where: { userId: alice.id },
+        orderBy: { order: 'asc' },
+      });
     });
 
     it('rejects unauthenticated', async () => {
-      await request(app.getHttpServer()).post('/goals/reorder').send({ ids: [1,2,3] }).expect(401);
+      await request(app.getHttpServer())
+        .post('/goals/reorder')
+        .send({ ids: [1, 2, 3] })
+        .expect(401);
     });
 
     it('rejects invalid payloads', async () => {
       await aliceAgent.post('/goals/reorder').send({ ids: [] }).expect(400);
-      await aliceAgent.post('/goals/reorder').send({ ids: ['a','b'] }).expect(400);
-      await aliceAgent.post('/goals/reorder').send({ ids: [999] }).expect(400);
+      await aliceAgent
+        .post('/goals/reorder')
+        .send({ ids: ['a', 'b'] })
+        .expect(400);
+      await aliceAgent
+        .post('/goals/reorder')
+        .send({ ids: [999] })
+        .expect(400);
       await aliceAgent.post('/goals/reorder').send({}).expect(400);
     });
 
@@ -370,9 +581,14 @@ describe('Goals API (E2E)', () => {
         { id: goals[0].id, order: 1 },
         { id: goals[1].id, order: 2 },
         { id: goals[2].id + 1, order: 3 },
-      ]
-      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(404);
-      expect(res.body.message).toBe('Reorder request contains invalid goal IDs');
+      ];
+      const res = await aliceAgent
+        .post('/goals/reorder')
+        .send(reorderDto)
+        .expect(404);
+      expect(res.body.message).toBe(
+        'Reorder request contains invalid goal IDs',
+      );
     });
 
     it('returns 422 if reorder request is longer than number of goals', async () => {
@@ -381,9 +597,14 @@ describe('Goals API (E2E)', () => {
         { id: goals[1].id, order: 2 },
         { id: goals[2].id, order: 3 },
         { id: 9999, order: 4 }, // Extra goal that doesn't exist
-      ]
-      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(422);
-      expect(res.body.message).toBe('Reorder request length does not match number of goals');
+      ];
+      const res = await aliceAgent
+        .post('/goals/reorder')
+        .send(reorderDto)
+        .expect(422);
+      expect(res.body.message).toBe(
+        'Reorder request length does not match number of goals',
+      );
     });
 
     it('returns 422 if goal orders are not sequential', async () => {
@@ -391,23 +612,34 @@ describe('Goals API (E2E)', () => {
         { id: goals[0].id, order: 1 },
         { id: goals[1].id, order: 4 }, // Non-sequential as orders are 1, 2 4
         { id: goals[2].id, order: 2 },
-      ]
-      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(422);
-      expect(res.body.message).toBe('Reorder request contains invalid goal orders');
+      ];
+      const res = await aliceAgent
+        .post('/goals/reorder')
+        .send(reorderDto)
+        .expect(422);
+      expect(res.body.message).toBe(
+        'Reorder request contains invalid goal orders',
+      );
     });
 
     it('reorders successfully', async () => {
-      const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      const allGoals = await prisma.goal.findMany({
+        where: { userId: alice.id },
+        orderBy: { order: 'asc' },
+      });
       const reorderDto: ReorderGoalDto = allGoals.map((goal, index, arr) => {
         return {
           id: goal.id,
-          order: arr.length - index // Reverse order
+          order: arr.length - index, // Reverse order
         };
       });
       await aliceAgent.post('/goals/reorder').send(reorderDto).expect(200);
 
-      const expected = reorderDto.sort((a, b) => a.order - b.order)
-      const updated = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      const expected = reorderDto.sort((a, b) => a.order - b.order);
+      const updated = await prisma.goal.findMany({
+        where: { userId: alice.id },
+        orderBy: { order: 'asc' },
+      });
       expect(updated[0].id).toBe(expected[0].id);
       expect(updated[1].id).toBe(expected[1].id);
       expect(updated[2].id).toBe(expected[2].id);

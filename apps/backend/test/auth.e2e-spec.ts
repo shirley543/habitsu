@@ -15,7 +15,7 @@ describe('AuthController (e2e)', () => {
   const testUser = {
     email: 'test@example.com',
     password: 'password123',
-    username: 'test-username'
+    username: 'test-username',
   };
 
   beforeAll(async () => {
@@ -42,7 +42,7 @@ describe('AuthController (e2e)', () => {
   beforeEach(() => {
     // SuperTest agent to persist cookies
     agent = request.agent(app.getHttpServer());
-  })
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany({ where: { email: testUser.email } });
@@ -64,7 +64,7 @@ describe('AuthController (e2e)', () => {
   it('should access protected route after login', async () => {
     await agent
       .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
+      .send({ email: testUser.email, password: testUser.password });
     await agent.get('/goals').expect(200);
   });
 
@@ -91,7 +91,7 @@ describe('AuthController (e2e)', () => {
   it('should logout and clear JWT cookie', async () => {
     await agent
       .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
+      .send({ email: testUser.email, password: testUser.password });
     const res = await agent.post('/auth/logout').expect(200);
 
     expect(res.body.message).toBe('Logged out');
@@ -106,7 +106,7 @@ describe('AuthController (e2e)', () => {
   it('should disallow access to protected route after logout', async () => {
     await agent
       .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
+      .send({ email: testUser.email, password: testUser.password });
     await agent.post('/auth/logout');
 
     await agent.get('/goals').expect(401);

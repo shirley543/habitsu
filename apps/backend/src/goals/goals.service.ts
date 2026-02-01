@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
@@ -96,8 +101,12 @@ export class GoalsService {
     assertFound(goalToUpdate, 'Goal not found');
     assertCanModify(goalToUpdate, userId, 'Goal not found');
 
-    if (goalToUpdate.goalType as GoalQuantifyType !== updateGoalDto.goalType) {
-      throw new BadRequestException(`Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`);
+    if (
+      (goalToUpdate.goalType as GoalQuantifyType) !== updateGoalDto.goalType
+    ) {
+      throw new BadRequestException(
+        `Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`,
+      );
     }
 
     const prismaInput = (() => {
@@ -225,7 +234,9 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new UnprocessableEntityException('Reorder request contains invalid goal orders');
+      throw new UnprocessableEntityException(
+        'Reorder request contains invalid goal orders',
+      );
     }
 
     // Use transaction to update order of all given entries

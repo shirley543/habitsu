@@ -12,7 +12,7 @@ export class ZodValidationPipe implements PipeTransform {
   // + code 400 undocumented
   transform(value: any) {
     const result = this.schema.safeParse(value);
-    
+
     if (!result.success) {
       throw new BadRequestException({
         message: 'Validation failed',
@@ -26,5 +26,3 @@ export class ZodValidationPipe implements PipeTransform {
     return result.data;
   }
 }
-
-

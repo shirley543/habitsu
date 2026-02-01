@@ -17,12 +17,15 @@ import TestAgent from 'supertest/lib/agent';
  *   await request(app.getHttpServer())
  *     .get('/goals')
  *     .set('Authorization', `Bearer ${token}`);
- * 
+ *
  * @param app - The NestJS application instance
  * @param user - A Prisma User object
  * @returns A promise resolving to the access token string
  */
-export async function loginWithToken(app: INestApplication, user: LoginUserDto): Promise<string> {
+export async function loginWithToken(
+  app: INestApplication,
+  user: LoginUserDto,
+): Promise<string> {
   const res = await request(app.getHttpServer())
     .post('/auth/login')
     .send({ email: user.email, password: user.password });
@@ -41,12 +44,15 @@ export async function loginWithToken(app: INestApplication, user: LoginUserDto):
  * Example usage:
  *   const agent = await loginWithCookie(app, user);
  *   await agent.post('/goals').send({ title: 'Goal' }); // cookie sent automatically
- * 
+ *
  * @param app - The NestJS application instance
  * @param user - A Prisma User object
  * @returns A promise resolving to a Supertest agent with cookies set
  */
-export async function loginWithCookie(app: INestApplication, user: LoginUserDto): Promise<TestAgent> {
+export async function loginWithCookie(
+  app: INestApplication,
+  user: LoginUserDto,
+): Promise<TestAgent> {
   const agent = request.agent(app.getHttpServer());
   await agent
     .post('/auth/login')

@@ -117,11 +117,7 @@ export class GoalEntriesService {
     });
     assertFound(entry, 'Goal entry not found');
     assertFound(entry.goal, 'Associated goal not found');
-    assertCanView(
-      entry.goal,
-      userId,
-      'Associated Goal not found',
-    );
+    assertCanView(entry.goal, userId, 'Associated Goal not found');
 
     return entry;
   }

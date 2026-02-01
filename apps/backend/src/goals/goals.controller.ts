@@ -88,18 +88,20 @@ export class GoalsController {
     @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.update(id, updateGoalDto, userId).catch((error) => {
-      if (error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2025':
-            console.error(error);
-            throw new NotFoundException("Goal not found");
-          default:
-            throw new InternalServerErrorException(error);
+    return this.goalsService
+      .update(id, updateGoalDto, userId)
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          switch (error.code) {
+            case 'P2025':
+              console.error(error);
+              throw new NotFoundException('Goal not found');
+            default:
+              throw new InternalServerErrorException(error);
+          }
         }
-      }
-      throw error;
-    });
+        throw error;
+      });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -110,9 +112,9 @@ export class GoalsController {
     return this.goalsService.remove(id, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {
-          case 'P2025':  
+          case 'P2025':
             console.error(error);
-            throw new NotFoundException("Goal not found");
+            throw new NotFoundException('Goal not found');
           default:
             throw new InternalServerErrorException(error);
         }
@@ -134,9 +136,9 @@ export class GoalsController {
     return this.goalsService.reorder(reorderGoalDto, userId).catch((error) => {
       if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {
-          case 'P2025':  
+          case 'P2025':
             console.error(error);
-            throw new NotFoundException("Goal not found");
+            throw new NotFoundException('Goal not found');
           default:
             throw new InternalServerErrorException(error);
         }

@@ -37,11 +37,7 @@ export function assertFound<T>(
  */
 export function assertCanView<
   T extends { userId: number; publicity: GoalPublicity },
->(
-  resource: T,
-  userId: number,
-  message = 'Resource not found',
-) {
+>(resource: T, userId: number, message = 'Resource not found') {
   const isOwner = resource.userId === userId;
   const isPublic = resource.publicity === GoalPublicity.PUBLIC;
 
