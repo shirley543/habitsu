@@ -94,7 +94,7 @@ export class GoalsService {
       where: { id },
     });
     assertFound(goalToUpdate, 'Goal not found');
-    assertCanModify(goalToUpdate, userId);
+    assertCanModify(goalToUpdate, userId, 'Goal not found');
 
     if (goalToUpdate.goalType !== updateGoalDto.goalType) {
       throw new BadRequestException(`Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`);
@@ -135,8 +135,8 @@ export class GoalsService {
     const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
       where: { id },
     });
-    assertFound(goalToDelete);
-    assertCanModify(goalToDelete, userId);
+    assertFound(goalToDelete, 'Goal not found');
+    assertCanModify(goalToDelete, userId, 'Goal not found');
 
     // Start transaction, so that if any fail entire batch is rolled back,
     // to prevent e.g. delete failing but previous order updates

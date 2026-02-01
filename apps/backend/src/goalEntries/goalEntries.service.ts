@@ -120,7 +120,7 @@ export class GoalEntriesService {
     assertCanView(
       entry.goal,
       userId,
-      'Associated goal not viewable (unauthorized)',
+      'Associated Goal not found',
     );
 
     return entry;
@@ -225,7 +225,7 @@ export class GoalEntriesService {
       where: { id: goalId },
     });
     assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
+    assertCanView(goal, userId, 'Goal not found');
 
     // Note: casting to INT as default without is BIGINT
     // To determine if worth updating types of SQL function params to BIGINT instead of INT
@@ -254,7 +254,7 @@ export class GoalEntriesService {
       where: { id: goalId },
     });
     assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
+    assertCanView(goal, userId, 'Goal not found');
 
     if (goal.goalType !== GoalQuantify.NUMERIC) {
       throw new BadRequestException('Goal type must be NUMERIC');
@@ -287,7 +287,7 @@ export class GoalEntriesService {
       where: { id: goalId },
     });
     assertFound(goal, 'Goal not found');
-    assertCanView(goal, userId, 'Goal not viewable (unauthorized)');
+    assertCanView(goal, userId, 'Goal not found');
 
     // TODOs #33: as above for changing $queryRaw call
     const rawResults = await this.prisma.$queryRaw<

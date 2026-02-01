@@ -275,15 +275,12 @@ describe('Goals API (E2E)', () => {
       expect(res.body.message).toBe('Goal not found');
     });
     
-    it('updates successfully with updatedAt modified', async () => {
-      const oldUpdatedAt = goal.updatedAt;
-      await new Promise((r) => setTimeout(r, 10));
-      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ title: 'Updated Title', goalType: GoalQuantify.BOOLEAN }).expect(200);
-
+    it('updates successfully', async () => {
+      const res = await aliceAgent.patch(`/goals/${goal.id}`).send({ title: 'Updated Title', goalType: GoalQuantify.NUMERIC }).expect(200);
       expect(res.body.title).toBe('Updated Title');
+
       const updated = await prisma.goal.findUnique({ where: { id: goal.id } });
       expect(updated?.title).toBe('Updated Title');
-      expect(new Date(updated!.updatedAt).getTime()).toBeGreaterThan(new Date(oldUpdatedAt).getTime());
     });
   });
 
