@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
   UseGuards,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import {
@@ -123,6 +124,7 @@ export class GoalsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/reorder')
+  @HttpCode(200)
   @ApiOkResponse()
   reorder(
     @Req() req,

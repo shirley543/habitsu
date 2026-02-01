@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
@@ -182,8 +182,8 @@ export class GoalsService {
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new BadRequestException(
-        'Bad Request: Reorder goals length does not match goals length',
+      throw new UnprocessableEntityException(
+        'Reorder goals length does not match goals length',
       );
     }
 
@@ -205,7 +205,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new BadRequestException('Bad Request: Invalid Goal IDs');
+      throw new NotFoundException('Reorder request contains invalid Goal IDs');
     }
 
     // Check orders are sequential
@@ -225,7 +225,7 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new BadRequestException('Bad Request: Invalid Goal Orders');
+      throw new UnprocessableEntityException('Reorder request contains invalid Goal Orders');
     }
 
     // Use transaction to update order of all given entries

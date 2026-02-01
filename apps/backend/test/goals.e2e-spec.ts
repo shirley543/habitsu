@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
 import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
-import { CreateGoalDto, GoalPublicityType, GoalQuantifyType, GoalResponse } from '@habit-tracker/validation-schemas';
+import { CreateGoalDto, GoalPublicityType, GoalQuantifyType, GoalResponse, ReorderGoalDto } from '@habit-tracker/validation-schemas';
 
 describe('Goals API (E2E)', () => {
   let app: INestApplication;
@@ -330,56 +330,65 @@ describe('Goals API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * POST /goals/reorder
-  //  */
-  // describe('POST /goals/reorder', () => {
-  //   let goals: any[];
+  /**
+   * POST /goals/reorder
+   */
+  describe('POST /goals/reorder', () => {
+    let goals: Goal[];
 
-  //   beforeEach(async () => {
-  //     goals = await prisma.goal.createMany({
-  //       data: [
-  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
-  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
-  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
-  //       ],
-  //     });
-  //   });
+    beforeEach(async () => {
+      const goalsToCreate = [
+        { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+        { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
+        { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
+      ]
 
-  //   it('rejects unauthenticated', async () => {
-  //     await request(app.getHttpServer()).post('/goals/reorder').send({ ids: [1,2,3] }).expect(401);
-  //   });
+      await prisma.goal.createMany({
+        data: goalsToCreate,
+      });
 
-  //   it('rejects invalid payloads', async () => {
-  //     await aliceAgent.post('/goals/reorder').send({ ids: [] }).expect(400);
-  //     await aliceAgent.post('/goals/reorder').send({ ids: ['a','b'] }).expect(400);
-  //     await aliceAgent.post('/goals/reorder').send({}).expect(400);
-  //   });
+      goals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+    });
 
-  //   it('returns 404 if any goal does not exist', async () => {
-  //     await aliceAgent.post('/goals/reorder').send({ ids: [999] }).expect(404);
-  //   });
+    it('rejects unauthenticated', async () => {
+      await request(app.getHttpServer()).post('/goals/reorder').send({ ids: [1,2,3] }).expect(401);
+    });
 
-  //   it('reorders successfully', async () => {
-  //     const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     const ids = allGoals.map(g => g.id).reverse(); // reverse order
-  //     await aliceAgent.post('/goals/reorder').send({ ids }).expect(200);
+    it('rejects invalid payloads', async () => {
+      await aliceAgent.post('/goals/reorder').send({ ids: [] }).expect(400);
+      await aliceAgent.post('/goals/reorder').send({ ids: ['a','b'] }).expect(400);
+      await aliceAgent.post('/goals/reorder').send({ ids: [999] }).expect(400);
+      await aliceAgent.post('/goals/reorder').send({}).expect(400);
+    });
 
-  //     const updated = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     expect(updated[0].id).toBe(ids[0]);
-  //     expect(updated[1].id).toBe(ids[1]);
-  //     expect(updated[2].id).toBe(ids[2]);
-  //   });
+    it('returns 404 if any goal does not exist', async () => {
+      const reorderDto: ReorderGoalDto = [
+        { id: goals[0].id, order: 1 },
+        { id: goals[1].id, order: 2 },
+        { id: goals[2].id + 1, order: 3 },
+      ]
+      const res = await aliceAgent.post('/goals/reorder').send(reorderDto).expect(404);
+      expect(res.body.message).toBe('Reorder request contains invalid Goal IDs');
+    });
 
-  //   it('reorder is atomic (partial failure rolls back)', async () => {
-  //     const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     const ids = allGoals.map(g => g.id).concat(999999); // invalid id
-  //     await aliceAgent.post('/goals/reorder').send({ ids }).expect(404);
+    // TODOs #66 returns 422 reorder request is longer than number of goals
+    // TODOs #66 returns 404 if goal orders are not sequential
+    // TODOs #66 fix below testcase
 
-  //     const after = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     after.forEach((g, idx) => {
-  //       expect(g.order).toBe(idx + 1);
-  //     });
-  //   });
-  // });
+    it('reorders successfully', async () => {
+      const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      const reorderDto: ReorderGoalDto = allGoals.map((goal, index, arr) => {
+        return {
+          id: goal.id,
+          order: arr.length - index // reverse order
+        };
+      });
+      await aliceAgent.post('/goals/reorder').send(reorderDto).expect(200);
+
+      const updated = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      expect(updated[0].id).toBe(reorderDto[0].order);
+      expect(updated[1].id).toBe(reorderDto[1].order);
+      expect(updated[2].id).toBe(reorderDto[2].order);
+    });
+  });
 });
