@@ -6,7 +6,7 @@ import { prisma } from './helpers/prisma';
 import { loginWithCookie } from './helpers/login';
 import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
-import { GoalPublicity, GoalQuantify, User } from '@prisma/client';
+import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import { CreateGoalDto, GoalPublicityType, GoalQuantifyType, GoalResponse } from '@habit-tracker/validation-schemas';
 
@@ -284,44 +284,51 @@ describe('Goals API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * DELETE /goals/:id
-  //  */
-  // describe('DELETE /goals/:id', () => {
-  //   let goals: any[];
+  /**
+   * DELETE /goals/:id
+   */
+  describe('DELETE /goals/:id', () => {
+    let goals: Goal[];
 
-  //   beforeEach(async () => {
-  //     goals = await prisma.goal.createMany({
-  //       data: [
-  //         { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
-  //         { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
-  //         { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
-  //       ],
-  //     });
-  //   });
+    beforeEach(async () => {
+      const goalsToCreate = [
+        { title: 'Goal1', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'a1' },
+        { title: 'Goal2', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 2, colour: 'FFFFFF', icon: 'a2' },
+        { title: 'Goal3', userId: alice.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 3, colour: 'FFFFFF', icon: 'a3' },
+      ]
 
-  //   it('rejects unauthenticated', async () => {
-  //     await request(app.getHttpServer()).delete('/goals/1').expect(401);
-  //   });
+      await prisma.goal.createMany({
+        data: goalsToCreate,
+      });
 
-  //   it('returns 404 if goal belongs to another user', async () => {
-  //     const other = await prisma.goal.create({
-  //       data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
-  //     });
-  //     await aliceAgent.delete(`/goals/${other.id}`).expect(404);
-  //   });
+      goals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+    });
 
-  //   it('deletes goal successfully and reorders remaining', async () => {
-  //     const allGoals = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     const deleteId = allGoals[1].id; // Goal2
-  //     await aliceAgent.delete(`/goals/${deleteId}`).expect(204);
+    it('rejects unauthenticated', async () => {
+      await request(app.getHttpServer()).delete('/goals/1').expect(401);
+    });
 
-  //     const remaining = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
-  //     expect(remaining.length).toBe(2);
-  //     expect(remaining[0].order).toBe(1);
-  //     expect(remaining[1].order).toBe(2);
-  //   });
-  // });
+    it('returns 404 if goal belongs to another user', async () => {
+      const other = await prisma.goal.create({
+        data: { title: 'Bob Goal', userId: bob.id, goalType: GoalQuantify.NUMERIC, publicity: GoalPublicity.PUBLIC, order: 1, colour: 'FFFFFF', icon: 'b1' },
+      });
+      await aliceAgent.delete(`/goals/${other.id}`).expect(404);
+    });
+
+    it('deletes goal successfully and reorders remaining', async () => {
+      const deleteId = goals[1].id; // Goal2
+      const deleteResponse = await aliceAgent.delete(`/goals/${deleteId}`).expect(200);
+
+      const receivedGoal = deleteResponse.body
+      const { createdAt, updatedAt, ...expectedGoal } = goals[1];
+      expect(receivedGoal).toMatchObject(expectedGoal)
+
+      const remaining = await prisma.goal.findMany({ where: { userId: alice.id }, orderBy: { order: 'asc' } });
+      expect(remaining.length).toBe(2);
+      expect(remaining[0].order).toBe(1);
+      expect(remaining[1].order).toBe(2);
+    });
+  });
 
   // /**
   //  * POST /goals/reorder

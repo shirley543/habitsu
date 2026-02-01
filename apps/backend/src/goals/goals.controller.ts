@@ -107,7 +107,18 @@ export class GoalsController {
   @ApiOkResponse({ type: GoalEntity })
   remove(@Req() req, @Param('id', ParseIntPipe) id: number) {
     const userId = req.user.id;
-    return this.goalsService.remove(id, userId);
+    return this.goalsService.remove(id, userId).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':  
+            console.error(error);
+            throw new NotFoundException("Goal not found");
+          default:
+            throw new InternalServerErrorException(error);
+        }
+      }
+      throw error;
+    });
   }
 
   @UseGuards(JwtAuthGuard)

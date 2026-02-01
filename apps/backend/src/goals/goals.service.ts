@@ -5,7 +5,7 @@ import {
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import { GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
+import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { assertCanModify, assertFound } from '../common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
@@ -130,9 +130,9 @@ export class GoalsService {
     });
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, userId: number): Promise<Goal> {
     // Find goal to delete and validate ownership
-    const goalToDelete = await this.prisma.goal.findUniqueOrThrow({
+    const goalToDelete = await this.prisma.goal.findUnique({
       where: { id },
     });
     assertFound(goalToDelete, 'Goal not found');
