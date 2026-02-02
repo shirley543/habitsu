@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  NotFoundException,
-  InternalServerErrorException,
   UseGuards,
   Req,
   HttpCode,
@@ -26,7 +24,6 @@ import {
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GoalEntity } from './goal.entity';
 import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
 import { GoalExceptionFilter } from './filters/goal.exceptionFilter';
