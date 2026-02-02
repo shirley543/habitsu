@@ -15,6 +15,7 @@ import {
 } from './errors/goalAssertions';
 import { assertUserFound } from 'src/users/errors/userAssertions';
 import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
+import { GoalTypeChangeNotAllowedError } from './errors/goalTypeChangeNotAllowed.error';
 
 @Injectable()
 export class GoalsService {
@@ -28,57 +29,52 @@ export class GoalsService {
     const user = await this.usersService.findOne(userId);
     assertUserFound(user, userId);
 
-    // Ordering: get current maximum order number for the user's goals,
-    // and use to determine their new goal's order number
-    const maxOrderNum = await this.prisma.goal.aggregate({
-      _max: {
-        order: true,
-      },
-      where: {
-        userId: userId,
-      },
-    });
-    const nextOrderNum = maxOrderNum._max.order
-      ? maxOrderNum._max.order + 1
-      : 1;
-
-    const prismaInput = (() => {
-      const baseGoal: Prisma.GoalCreateInput = {
-        title: createGoalDto.title,
-        description: createGoalDto.description,
-        colour: createGoalDto.colour,
-        icon: createGoalDto.icon,
-        publicity: createGoalDto.publicity,
-        goalType: createGoalDto.goalType as GoalQuantify,
-        order: nextOrderNum,
-        user: {
-          connect: { id: userId },
+    // Transaction for aggregating + creating,
+    // to avoid race condition where two goals 
+    // created at same time with same order number
+    return await this.prisma.$transaction(async (tx) => {
+      // Ordering: get current maximum order number for the user's goals,
+      // and use to determine their new goal's order number
+      const maxOrderNum = await tx.goal.aggregate({
+        _max: {
+          order: true,
         },
-      };
-      switch (createGoalDto.goalType) {
-        case GoalQuantifyType.Boolean:
-        default:
-          return { ...baseGoal };
-        case GoalQuantifyType.Numeric:
-          return {
-            ...baseGoal,
-            numericTarget: createGoalDto.numericTarget,
-            numericUnit: createGoalDto.numericUnit,
-          };
-      }
-    })();
+        where: {
+          userId: userId,
+        },
+      });
+      const nextOrderNum = maxOrderNum._max.order
+        ? maxOrderNum._max.order + 1
+        : 1;
 
-    return await this.prisma.goal.create({ data: prismaInput });
+      const prismaInput = (() => {
+        const baseGoal: Prisma.GoalCreateInput = {
+          title: createGoalDto.title,
+          description: createGoalDto.description,
+          colour: createGoalDto.colour,
+          icon: createGoalDto.icon,
+          publicity: createGoalDto.publicity,
+          goalType: createGoalDto.goalType as GoalQuantify,
+          order: nextOrderNum,
+          user: {
+            connect: { id: userId },
+          },
+        };
+        switch (createGoalDto.goalType) {
+          case GoalQuantifyType.Boolean:
+          default:
+            return { ...baseGoal };
+          case GoalQuantifyType.Numeric:
+            return {
+              ...baseGoal,
+              numericTarget: createGoalDto.numericTarget,
+              numericUnit: createGoalDto.numericUnit,
+            };
+        }
+      })();
 
-    // try {
-    //   return await this.prisma.goal.create({ data: prismaInput });
-    // } catch (err) {
-    //   // Prisma will throw if user does not exist (foreign key violation)
-    //   if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
-    //     throw new Error(`User ${userId} not found`); // domain-level error, replace with UserNotFoundError if defined
-    //   }
-    //   throw err;
-    // }
+      return tx.goal.create({ data: prismaInput });
+    })
   }
 
   async findAll(userId: number): Promise<Goal[]> {
@@ -127,9 +123,7 @@ export class GoalsService {
     if (
       (goalToUpdate.goalType as GoalQuantifyType) !== updateGoalDto.goalType
     ) {
-      throw new BadRequestException(
-        `Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`,
-      );
+      throw new GoalTypeChangeNotAllowedError();
     }
 
     const prismaInput = (() => {

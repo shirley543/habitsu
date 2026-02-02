@@ -12,6 +12,7 @@ import {
   UseGuards,
   Req,
   HttpCode,
+  UseFilters,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import {
@@ -28,8 +29,10 @@ import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
+import { GoalExceptionFilter } from './filters/goal.exceptionFilter';
 
 @Controller('goals')
+@UseFilters(GoalExceptionFilter)
 @ApiTags('goals')
 export class GoalsController {
   constructor(private readonly goalsService: GoalsService) {}
