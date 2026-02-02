@@ -9,7 +9,7 @@ import {
   UserResponseDto,
 } from '@habit-tracker/validation-schemas';
 import { EnvService } from '../env/env.service';
-import { PrismaClientError } from 'src/common/prisma/prismaError';
+import { PrismaClientError } from '../common/prisma/prismaError';
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
