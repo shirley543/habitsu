@@ -1,7 +1,7 @@
-import { User } from "@prisma/client";
-import { UserNotFoundError } from "./userNotFound.error";
+import { User } from '@prisma/client';
+import { UserNotFoundError } from './userNotFound.error';
 
-type UserWithId = Pick<User, 'id'>
+type UserWithId = Pick<User, 'id'>;
 
 /**
  * Asserts that a user exists.
@@ -10,6 +10,9 @@ type UserWithId = Pick<User, 'id'>
  * @param identifier - The ID or other identifier used in the error if user is not found
  * @throws UserNotFoundError if the user is null
  */
-export function assertUserFound<T extends UserWithId>(user: T | null, identifier: number | string): asserts user is T {
+export function assertUserFound<T extends UserWithId>(
+  user: T | null,
+  identifier: number | string,
+): asserts user is T {
   if (!user) throw new UserNotFoundError(identifier);
 }

@@ -14,7 +14,11 @@ import {
 import { GoalQuantify, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from '../goals/goals.service';
-import { assertGoalCanModify, assertGoalCanView, assertGoalFound } from '../goals/errors/goalAssertions';
+import {
+  assertGoalCanModify,
+  assertGoalCanView,
+  assertGoalFound,
+} from '../goals/errors/goalAssertions';
 import { assertGoalEntryFound } from './errors/goalEntryAssertions';
 
 @Injectable()
@@ -78,17 +82,14 @@ export class GoalEntriesService {
 
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
-      select: { 
+      select: {
         id: true,
         userId: true,
-        publicity: true
+        publicity: true,
       },
     });
     assertGoalFound(goal, goalId);
-    assertGoalCanView(
-      goal,
-      currentUserId,
-    );
+    assertGoalCanView(goal, currentUserId);
 
     const entries = await this.prisma.goalEntry.findMany({
       where: {
@@ -118,10 +119,7 @@ export class GoalEntriesService {
     });
     assertGoalEntryFound(entry, id);
     assertGoalFound(entry.goal, entry.goal.id);
-    assertGoalCanView(
-      entry.goal,
-      userId,
-    );
+    assertGoalCanView(entry.goal, userId);
 
     return entry;
   }

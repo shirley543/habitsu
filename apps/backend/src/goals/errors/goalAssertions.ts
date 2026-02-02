@@ -1,10 +1,10 @@
-import { Goal, GoalPublicity } from "@prisma/client";
-import { GoalNotFoundError } from "./goalNotFound.error";
-import { GoalUnauthorizedError } from "./goalUnauthorized.error";
+import { Goal, GoalPublicity } from '@prisma/client';
+import { GoalNotFoundError } from './goalNotFound.error';
+import { GoalUnauthorizedError } from './goalUnauthorized.error';
 
-type GoalWithId = Pick<Goal, 'id'>
-type GoalWithIds = Pick<Goal, 'id' | 'userId'>
-type GoalWithIdsPublicity = Pick<Goal, 'id' | 'userId' | 'publicity'>
+type GoalWithId = Pick<Goal, 'id'>;
+type GoalWithIds = Pick<Goal, 'id' | 'userId'>;
+type GoalWithIdsPublicity = Pick<Goal, 'id' | 'userId' | 'publicity'>;
 
 /**
  * Asserts that a goal exists.
@@ -27,8 +27,12 @@ export function assertGoalFound<T extends GoalWithId>(
  * @param userId - The ID of the user performing the action
  * @throws GoalUnauthorizedError if the user does not own the goal
  */
-export function assertGoalCanCreate<T extends GoalWithIds>(goal: T, userId: number) {
-  if (goal.userId !== userId) throw new GoalUnauthorizedError(goal.id, 'created');
+export function assertGoalCanCreate<T extends GoalWithIds>(
+  goal: T,
+  userId: number,
+) {
+  if (goal.userId !== userId)
+    throw new GoalUnauthorizedError(goal.id, 'created');
 }
 
 /**
@@ -38,11 +42,14 @@ export function assertGoalCanCreate<T extends GoalWithIds>(goal: T, userId: numb
  * @param userId - The ID of the user performing the action
  * @throws GoalNotFoundError if the user does not own the goal
  */
-export function assertGoalCanModify<T extends GoalWithIds>(goal: T, userId: number) {
+export function assertGoalCanModify<T extends GoalWithIds>(
+  goal: T,
+  userId: number,
+) {
   if (goal.userId !== userId) throw new GoalNotFoundError(goal.id);
 }
 /**
- * 
+ *
  * Asserts that the given user can view this goal.
  *
  * Viewing rules:
@@ -53,7 +60,10 @@ export function assertGoalCanModify<T extends GoalWithIds>(goal: T, userId: numb
  * @param userId - The ID of the user performing the action
  * @throws GoalNotFoundError if the user is not allowed to view the goal
  */
-export function assertGoalCanView<T extends GoalWithIdsPublicity>(goal: T, userId: number) {
+export function assertGoalCanView<T extends GoalWithIdsPublicity>(
+  goal: T,
+  userId: number,
+) {
   const isOwner = goal.userId === userId;
   const isPublic = goal.publicity === GoalPublicity.PUBLIC;
 

@@ -31,7 +31,7 @@ export class GoalsService {
     assertUserFound(user, userId);
 
     // Transaction for aggregating + creating,
-    // to avoid race condition where two goals 
+    // to avoid race condition where two goals
     // created at same time with same order number
     return await this.prisma.$transaction(async (tx) => {
       // Ordering: get current maximum order number for the user's goals,
@@ -75,7 +75,7 @@ export class GoalsService {
       })();
 
       return tx.goal.create({ data: prismaInput });
-    })
+    });
   }
 
   async findAll(userId: number): Promise<Goal[]> {
@@ -85,7 +85,10 @@ export class GoalsService {
     });
   }
 
-  async findManyByUsername(targetUsername: string, requestingUserId: number): Promise<Goal[]> {
+  async findManyByUsername(
+    targetUsername: string,
+    requestingUserId: number,
+  ): Promise<Goal[]> {
     // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
@@ -113,7 +116,11 @@ export class GoalsService {
     return goal;
   }
 
-  async update(id: number, updateGoalDto: UpdateGoalDto, userId: number): Promise<Goal> {
+  async update(
+    id: number,
+    updateGoalDto: UpdateGoalDto,
+    userId: number,
+  ): Promise<Goal> {
     // Find goal to update and validate ownership
     const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
@@ -222,7 +229,10 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new GoalNotFoundError(undefined, 'Reorder request contains invalid goal IDs');
+      throw new GoalNotFoundError(
+        undefined,
+        'Reorder request contains invalid goal IDs',
+      );
     }
 
     // Check orders are sequential
@@ -242,7 +252,9 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new GoalReorderInputInvalidError('Reorder request contains invalid goal orders');
+      throw new GoalReorderInputInvalidError(
+        'Reorder request contains invalid goal orders',
+      );
     }
 
     // Use transaction to update order of all given entries

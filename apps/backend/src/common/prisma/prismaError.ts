@@ -1,6 +1,6 @@
 /**
  * Prisma known error codes.
- * 
+ *
  * Refer to:
  * https://www.prisma.io/docs/orm/reference/error-reference#error-codes
  */
