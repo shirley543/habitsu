@@ -61,9 +61,6 @@ export class GoalsController {
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
   findOne(@Req() req, @Param('id', ParseIntPipe) id: number) {
-    // TODOs #36: more error catching and mapping prisma errors to other errors.
-    // if instance of error is other generic exception, keep error type the same.
-    // revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
     const userId = req?.user?.id;
     return this.goalsService.findOne(id, userId);
   }

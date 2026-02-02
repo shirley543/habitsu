@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -33,10 +33,20 @@ export class UsersService {
       email: createUserDto.email,
       password: hashedPassword,
     };
-    return this.prisma.user.create({
-      data: prismaInput,
-      select: userResponseSelect,
-    });
+    try {
+      return await this.prisma.user.create({
+        data: prismaInput,
+        select: userResponseSelect,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          const field = (error.meta?.target as string[])?.[0] || 'user';
+          throw new ConflictException(`A user with this ${field} already exists`);
+        }
+      }
+      throw error;
+    }
   }
 
   findOne(id: number): Promise<UserResponseDto | null> {
@@ -71,11 +81,21 @@ export class UsersService {
       username: updateUserDto.username,
       email: updateUserDto.email,
     };
-    return this.prisma.user.update({
-      where: { id },
-      data: prismaInput,
-      select: userResponseSelect,
-    });
+    try {
+      return this.prisma.user.update({
+        where: { id },
+        data: prismaInput,
+        select: userResponseSelect,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          const field = (error.meta?.target as string[])?.[0] || 'user';
+          throw new ConflictException(`A user with this ${field} already exists`);
+        }
+      }
+      throw error;
+    }
   }
 
   remove(id: number) {
@@ -83,5 +103,38 @@ export class UsersService {
       where: { id },
       select: userResponseSelect,
     });
+  }
+
+  async changePassword(id: number, oldPassword: string, newPassword: string): Promise<void> {
+    const user = await this.findOneByEmailFull(
+      (await this.prisma.user.findUnique({ where: { id } }))?.email || '',
+    );
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid current password');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(
+      newPassword,
+      this.envService.get('SALT_ROUNDS'),
+    );
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedNewPassword },
+    });
+  }
+
+  async exists(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    return !!user;
   }
 }

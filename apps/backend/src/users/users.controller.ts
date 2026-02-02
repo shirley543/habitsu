@@ -102,5 +102,4 @@ export class UsersController {
   }
 
   // TODOs #34 Check swagger doc generation, and include more descriptive endpoint explanations
-  // TODOs #36 Add conversion of prisma errors to nest js exceptions (with nest js auto-converting said exceptions into correct HTTP status codes) in service
 }
