@@ -298,7 +298,7 @@ describe('Goals API (E2E)', () => {
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get('/goals/999999').expect(404);
-      expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe('Goal with id 999999 not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
@@ -314,7 +314,7 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
-      expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
     });
 
     it('returns goal if authorized', async () => {
@@ -368,13 +368,13 @@ describe('Goals API (E2E)', () => {
       expect(res.body.message).toBe('Validation failed');
     });
 
-    it('returns 400 for invalid enum transition', async () => {
+    it('returns 422 for invalid enum transition', async () => {
       const res = await aliceAgent
         .patch(`/goals/${goal.id}`)
         .send({ goalType: GoalQuantify.BOOLEAN })
-        .expect(400);
+        .expect(422);
       expect(res.body.message).toBe(
-        'Validation error: Cannot change goalType. Existing goal type is NUMERIC, but payload contains BOOLEAN',
+        'Cannot change goalType once a goal is created',
       );
     });
 
@@ -383,7 +383,7 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/999999`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(404);
-      expect(res.body.message).toBe('Goal not found');
+      expect(res.body.message).toBe('Goal with id 999999 not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
@@ -402,7 +402,7 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/${other.id}`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(404);
-      expect(res.body.message).toBe('Goal not found');
+      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
     });
 
     it('updates successfully', async () => {

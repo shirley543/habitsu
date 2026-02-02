@@ -1,4 +1,6 @@
-export class GoalUnauthorizedError extends Error {
+import { GoalDomainError } from "./goal.domainError";
+
+export class GoalUnauthorizedError extends GoalDomainError {
   code = 'GOAL_UNAUTHORIZED'
   constructor(goalId?: number, action: string = 'accessed') {
     super(goalId

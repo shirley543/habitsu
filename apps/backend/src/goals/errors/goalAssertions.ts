@@ -36,10 +36,10 @@ export function assertGoalCanCreate<T extends GoalWithIds>(goal: T, userId: numb
  *
  * @param goal - The goal object (must contain id and userId)
  * @param userId - The ID of the user performing the action
- * @throws GoalUnauthorizedError if the user does not own the goal
+ * @throws GoalNotFoundError if the user does not own the goal
  */
 export function assertGoalCanModify<T extends GoalWithIds>(goal: T, userId: number) {
-  if (goal.userId !== userId) throw new GoalUnauthorizedError(goal.id, 'modified');
+  if (goal.userId !== userId) throw new GoalNotFoundError(goal.id);
 }
 /**
  * 
@@ -51,13 +51,13 @@ export function assertGoalCanModify<T extends GoalWithIds>(goal: T, userId: numb
  *
  * @param goal - The goal object (must contain id, userId, and publicity)
  * @param userId - The ID of the user performing the action
- * @throws GoalUnauthorizedError if the user is not allowed to view the goal
+ * @throws GoalNotFoundError if the user is not allowed to view the goal
  */
 export function assertGoalCanView<T extends GoalWithIdsPublicity>(goal: T, userId: number) {
   const isOwner = goal.userId === userId;
   const isPublic = goal.publicity === GoalPublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
-    throw new GoalUnauthorizedError(goal.id, 'viewed');
+    throw new GoalNotFoundError(goal.id);
   }
 }

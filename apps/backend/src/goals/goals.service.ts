@@ -16,6 +16,7 @@ import {
 import { assertUserFound } from '../users/errors/userAssertions';
 import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
 import { GoalTypeChangeNotAllowedError } from './errors/goalTypeChangeNotAllowed.error';
+import { GoalNotFoundError } from './errors/goalNotFound.error';
 
 @Injectable()
 export class GoalsService {
@@ -221,7 +222,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new GoalReorderInputInvalidError('Reorder request contains invalid goal IDs');
+      throw new GoalNotFoundError(undefined, 'Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential

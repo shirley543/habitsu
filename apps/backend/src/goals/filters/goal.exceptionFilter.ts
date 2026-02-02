@@ -32,7 +32,7 @@ export class GoalExceptionFilter implements ExceptionFilter {
       exception instanceof GoalReorderInputInvalidError ||
       exception instanceof GoalTypeChangeNotAllowedError
     ) {
-      status = HttpStatus.BAD_REQUEST;
+      status = HttpStatus.UNPROCESSABLE_ENTITY;
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
     }
