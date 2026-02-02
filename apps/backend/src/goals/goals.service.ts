@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
@@ -12,8 +7,16 @@ import {
 } from '@habit-tracker/validation-schemas';
 import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
 import { UsersService } from '../users/users.service';
-import { assertCanModify, assertFound } from '../common/assert/assertions';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
+import {
+  assertGoalCanModify,
+  assertGoalCanView,
+  assertGoalFound,
+} from './errors/goalAssertions';
+import { assertUserFound } from '../users/errors/userAssertions';
+import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
+import { GoalTypeChangeNotAllowedError } from './errors/goalTypeChangeNotAllowed.error';
+import { GoalNotFoundError } from './errors/goalNotFound.error';
 
 @Injectable()
 export class GoalsService {
@@ -22,60 +25,75 @@ export class GoalsService {
     private usersService: UsersService,
   ) {}
 
-  async create(createGoalDto: CreateGoalDto, userId: number) {
-    // Ordering: get current maximum order number for the user's goals,
-    // and use to determine their new goal's order number
-    const maxOrderNum = await this.prisma.goal.aggregate({
-      _max: {
-        order: true,
-      },
-      where: {
-        userId: userId,
-      },
-    });
-    const nextOrderNum = maxOrderNum._max.order
-      ? maxOrderNum._max.order + 1
-      : 1;
+  async create(createGoalDto: CreateGoalDto, userId: number): Promise<Goal> {
+    // Validate user exists
+    const user = await this.usersService.findOne(userId);
+    assertUserFound(user, userId);
 
-    const prismaInput = (() => {
-      const baseGoal: Prisma.GoalCreateInput = {
-        title: createGoalDto.title,
-        description: createGoalDto.description,
-        colour: createGoalDto.colour,
-        icon: createGoalDto.icon,
-        publicity: createGoalDto.publicity,
-        goalType: createGoalDto.goalType as GoalQuantify,
-        order: nextOrderNum,
-        user: {
-          connect: { id: userId },
+    // Transaction for aggregating + creating,
+    // to avoid race condition where two goals
+    // created at same time with same order number
+    return await this.prisma.$transaction(async (tx) => {
+      // Ordering: get current maximum order number for the user's goals,
+      // and use to determine their new goal's order number
+      const maxOrderNum = await tx.goal.aggregate({
+        _max: {
+          order: true,
         },
-      };
-      switch (createGoalDto.goalType) {
-        case GoalQuantifyType.Boolean:
-        default:
-          return { ...baseGoal };
-        case GoalQuantifyType.Numeric:
-          return {
-            ...baseGoal,
-            numericTarget: createGoalDto.numericTarget,
-            numericUnit: createGoalDto.numericUnit,
-          };
-      }
-    })();
+        where: {
+          userId: userId,
+        },
+      });
+      const nextOrderNum = maxOrderNum._max.order
+        ? maxOrderNum._max.order + 1
+        : 1;
 
-    return this.prisma.goal.create({ data: prismaInput });
+      const prismaInput = (() => {
+        const baseGoal: Prisma.GoalCreateInput = {
+          title: createGoalDto.title,
+          description: createGoalDto.description,
+          colour: createGoalDto.colour,
+          icon: createGoalDto.icon,
+          publicity: createGoalDto.publicity,
+          goalType: createGoalDto.goalType as GoalQuantify,
+          order: nextOrderNum,
+          user: {
+            connect: { id: userId },
+          },
+        };
+        switch (createGoalDto.goalType) {
+          case GoalQuantifyType.Boolean:
+          default:
+            return { ...baseGoal };
+          case GoalQuantifyType.Numeric:
+            return {
+              ...baseGoal,
+              numericTarget: createGoalDto.numericTarget,
+              numericUnit: createGoalDto.numericUnit,
+            };
+        }
+      })();
+
+      return tx.goal.create({ data: prismaInput });
+    });
   }
 
-  async findAll(userId: number) {
-    return this.prisma.goal.findMany({ where: { userId } });
+  async findAll(userId: number): Promise<Goal[]> {
+    return this.prisma.goal.findMany({
+      where: { userId },
+      orderBy: { order: 'asc' },
+    });
   }
 
-  async findManyByUsername(targetUsername: string, requestingUserId: number) {
+  async findManyByUsername(
+    targetUsername: string,
+    requestingUserId: number,
+  ): Promise<Goal[]> {
     // Fetch user to get their userId
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
-    assertFound(user, 'User not found');
+    assertUserFound(user, targetUsername);
 
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
@@ -84,29 +102,36 @@ export class GoalsService {
         // If owner, no publicity filter; otherwise only public goals
         ...(isOwner ? {} : { publicity: GoalPublicity.PUBLIC }),
       },
+      orderBy: { order: 'asc' },
     });
 
     return goals;
   }
 
-  async findOne(id: number, userId: number) {
-    return this.prisma.goal.findUniqueOrThrow({ where: { id, userId } });
+  async findOne(id: number, userId: number): Promise<Goal> {
+    const goal = await this.prisma.goal.findUnique({ where: { id } });
+    assertGoalFound(goal, id);
+    assertGoalCanView(goal, userId);
+
+    return goal;
   }
 
-  async update(id: number, updateGoalDto: UpdateGoalDto, userId: number) {
+  async update(
+    id: number,
+    updateGoalDto: UpdateGoalDto,
+    userId: number,
+  ): Promise<Goal> {
     // Find goal to update and validate ownership
     const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertFound(goalToUpdate, 'Goal not found');
-    assertCanModify(goalToUpdate, userId, 'Goal not found');
+    assertGoalFound(goalToUpdate, id);
+    assertGoalCanModify(goalToUpdate, userId);
 
     if (
       (goalToUpdate.goalType as GoalQuantifyType) !== updateGoalDto.goalType
     ) {
-      throw new BadRequestException(
-        `Validation error: Cannot change goalType. Existing goal type is ${goalToUpdate.goalType}, but payload contains ${updateGoalDto.goalType}`,
-      );
+      throw new GoalTypeChangeNotAllowedError();
     }
 
     const prismaInput = (() => {
@@ -140,22 +165,12 @@ export class GoalsService {
   }
 
   async remove(id: number, userId: number): Promise<Goal> {
-    // Find goal to delete and validate ownership
-    const goalToDelete = await this.prisma.goal.findUnique({
-      where: { id },
-    });
-    assertFound(goalToDelete, 'Goal not found');
-    assertCanModify(goalToDelete, userId, 'Goal not found');
-
-    // Start transaction, so that if any fail entire batch is rolled back,
-    // to prevent e.g. delete failing but previous order updates
-    // were already completed
     return await this.prisma.$transaction(async (tx) => {
-      // Ordering: determine goals to update based on
-      // current goal being removed (e.g. goal with order 4 being removed,
-      // hence goal with order 5 becomes 4, 6 becomes 5, etc)
+      const goalToDelete = await tx.goal.findUnique({ where: { id } });
+      assertGoalFound(goalToDelete, id);
+      assertGoalCanModify(goalToDelete, userId);
 
-      // Get goals with order greater than goal to delete's order
+      // Get goals with order greater than goal being deleted
       const goalsToUpdate = await tx.goal.findMany({
         where: {
           userId,
@@ -179,7 +194,7 @@ export class GoalsService {
     });
   }
 
-  async reorder(reorderGoalDto: ReorderGoalDto, userId: number) {
+  async reorder(reorderGoalDto: ReorderGoalDto, userId: number): Promise<void> {
     // Expect all goals to be present (lengths same)
     // Expect all IDs present
     // Expect orders to be sequential (i.e. no gaps)
@@ -191,7 +206,7 @@ export class GoalsService {
     });
 
     if (usersGoals.length !== reorderGoalDto.length) {
-      throw new UnprocessableEntityException(
+      throw new GoalReorderInputInvalidError(
         'Reorder request length does not match number of goals',
       );
     }
@@ -214,7 +229,10 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new NotFoundException('Reorder request contains invalid goal IDs');
+      throw new GoalNotFoundError(
+        undefined,
+        'Reorder request contains invalid goal IDs',
+      );
     }
 
     // Check orders are sequential
@@ -234,7 +252,7 @@ export class GoalsService {
     })();
 
     if (!areOrdersSequential) {
-      throw new UnprocessableEntityException(
+      throw new GoalReorderInputInvalidError(
         'Reorder request contains invalid goal orders',
       );
     }
