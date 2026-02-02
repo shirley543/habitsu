@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -9,6 +9,10 @@ import {
   UserResponseDto,
 } from '@habit-tracker/validation-schemas';
 import { EnvService } from '../env/env.service';
+import { PrismaClientError } from 'src/common/prisma/prismaError';
+import { UserNotFoundError } from './errors/userNotFound.error';
+import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
+import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
@@ -40,9 +44,9 @@ export class UsersService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
+        if (error.code === PrismaClientError.UniqueConstraintFailed) {
           const field = (error.meta?.target as string[])?.[0] || 'user';
-          throw new ConflictException(`A user with this ${field} already exists`);
+          throw new UserAlreadyExistsError(`A user with this ${field} already exists`);
         }
       }
       throw error;
@@ -89,9 +93,9 @@ export class UsersService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
+        if (error.code === PrismaClientError.UniqueConstraintFailed) {
           const field = (error.meta?.target as string[])?.[0] || 'user';
-          throw new ConflictException(`A user with this ${field} already exists`);
+          throw new UserAlreadyExistsError(`A user with this ${field} already exists`);
         }
       }
       throw error;
@@ -111,12 +115,12 @@ export class UsersService {
     );
 
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new UserNotFoundError('User not found');
     }
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
-      throw new BadRequestException('Invalid current password');
+      throw new UserPasswordInputInvalidError('Invalid current password');
     }
 
     const hashedNewPassword = await bcrypt.hash(
