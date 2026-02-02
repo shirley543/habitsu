@@ -298,9 +298,7 @@ describe('Goals API (E2E)', () => {
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get('/goals/999999').expect(404);
-      console.log(res);
-      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
-      // expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe('Not found');
     });
 
     it('returns 404 if goal belongs to another user', async () => {
@@ -309,16 +307,14 @@ describe('Goals API (E2E)', () => {
           title: 'Bob Goal',
           userId: bob.id,
           goalType: GoalQuantify.NUMERIC,
-          publicity: GoalPublicity.PUBLIC,
+          publicity: GoalPublicity.PRIVATE,
           order: 1,
           colour: 'FFFFFF',
           icon: 'b1',
         },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
-      console.log(res);
-      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
-      // expect(res.body.message).toBe('Not found');
+      expect(res.body.message).toBe('Not found');
     });
 
     it('returns goal if authorized', async () => {
@@ -361,7 +357,6 @@ describe('Goals API (E2E)', () => {
         .patch('/goals/invalid')
         .send({ title: 'Updated' })
         .expect(400);
-      // TODOs #66: investigate difference in message behaviour between PATCH /goals/:id vs. GET /goals/:id
       expect(res.body.message).toBe('Validation failed');
     });
 
@@ -388,7 +383,6 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/999999`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(404);
-      // TODOs #36: Currently this fails. Fix by implementing a global Prisma exception filter and map out general messages
       expect(res.body.message).toBe('Goal not found');
     });
 

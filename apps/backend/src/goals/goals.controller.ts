@@ -68,18 +68,7 @@ export class GoalsController {
     // if instance of error is other generic exception, keep error type the same.
     // revisit. feels stinky; handling of a mixture of both prisma client errors + own thrown errors.
     const userId = req?.user?.id;
-    return this.goalsService.findOne(id, userId).catch((error) => {
-      if (error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2025':
-            console.error(error);
-            throw new NotFoundException(error);
-          default:
-            throw new InternalServerErrorException(error);
-        }
-      }
-      throw error;
-    });
+    return this.goalsService.findOne(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -91,20 +80,7 @@ export class GoalsController {
     @Body(new ZodValidationPipe(UpdateGoalSchema)) updateGoalDto: UpdateGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService
-      .update(id, updateGoalDto, userId)
-      .catch((error) => {
-        if (error instanceof PrismaClientKnownRequestError) {
-          switch (error.code) {
-            case 'P2025':
-              console.error(error);
-              throw new NotFoundException('Goal not found');
-            default:
-              throw new InternalServerErrorException(error);
-          }
-        }
-        throw error;
-      });
+    return this.goalsService.update(id, updateGoalDto, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -112,18 +88,7 @@ export class GoalsController {
   @ApiOkResponse({ type: GoalEntity })
   remove(@Req() req, @Param('id', ParseIntPipe) id: number) {
     const userId = req.user.id;
-    return this.goalsService.remove(id, userId).catch((error) => {
-      if (error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2025':
-            console.error(error);
-            throw new NotFoundException('Goal not found');
-          default:
-            throw new InternalServerErrorException(error);
-        }
-      }
-      throw error;
-    });
+    return this.goalsService.remove(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -136,17 +101,6 @@ export class GoalsController {
     reorderGoalDto: ReorderGoalDto,
   ) {
     const userId = req.user.id;
-    return this.goalsService.reorder(reorderGoalDto, userId).catch((error) => {
-      if (error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2025':
-            console.error(error);
-            throw new NotFoundException('Goal not found');
-          default:
-            throw new InternalServerErrorException(error);
-        }
-      }
-      throw error;
-    });
+    return this.goalsService.reorder(reorderGoalDto, userId);
   }
 }

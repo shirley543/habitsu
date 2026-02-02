@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
 import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 import {
   assertGoalCanModify,
   assertGoalCanView,
   assertGoalFound,
 } from './errors/goalAssertions';
-import { assertUserFound } from 'src/users/errors/userAssertions';
+import { assertUserFound } from '../users/errors/userAssertions';
 import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
 import { GoalTypeChangeNotAllowedError } from './errors/goalTypeChangeNotAllowed.error';
 

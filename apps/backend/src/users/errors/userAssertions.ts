@@ -10,6 +10,6 @@ type UserWithId = Pick<User, 'id'>
  * @param identifier - The ID or other identifier used in the error if user is not found
  * @throws UserNotFoundError if the user is null
  */
-export function assertUserFound<T extends UserWithId>(user: T | null, identifier: number | string): asserts user is User {
+export function assertUserFound<T extends UserWithId>(user: T | null, identifier: number | string): asserts user is T {
   if (!user) throw new UserNotFoundError(identifier);
 }
