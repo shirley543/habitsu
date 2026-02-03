@@ -803,183 +803,186 @@ describe('Goal Entries API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * GET /entries/statistics
-  //  */
-  // describe('GET /entries/statistics', () => {
-  //   beforeEach(async () => {
-  //     // Create multiple entries for statistics
-  //     await prisma.goalEntry.createMany({
-  //       data: [
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-01'),
-  //           numericValue: 5,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-02'),
-  //           numericValue: 10,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-03'),
-  //           numericValue: 8,
-  //         },
-  //       ],
-  //     });
-  //   });
+  /**
+   * GET /entries/statistics
+   */
+  describe('GET /entries/statistics', () => {
+    beforeEach(async () => {
+      // Create multiple entries for statistics
+      await prisma.goalEntry.createMany({
+        data: [
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-01'),
+            numericValue: 5,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-02'),
+            numericValue: 10,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-03'),
+            numericValue: 8,
+          },
+        ],
+      });
+    });
 
-  //   it('rejects unauthenticated requests', async () => {
-  //     const res = await request(app.getHttpServer())
-  //       .get('/entries/statistics')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(401);
-  //     expect(res.body.message).toBe('Unauthorized');
-  //   });
+    it('rejects unauthenticated requests', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/entries/statistics')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns statistics for numeric goal', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/statistics')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(200);
+    it('returns statistics for numeric goal', async () => {
+      const res = await aliceAgent
+        .get('/entries/statistics')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(200);
 
-  //     expect(res.body.yearAvg).toBeDefined();
-  //     expect(res.body.yearCount).toBeDefined();
-  //     expect(res.body.currentStreakLen).toBeDefined();
-  //     expect(res.body.maxStreakLen).toBeDefined();
-  //   });
+      expect(res.body.yearAvg).toBeDefined();
+      expect(res.body.yearCount).toBeDefined();
+      expect(res.body.currentStreakLen).toBeDefined();
+      expect(res.body.maxStreakLen).toBeDefined();
+    });
 
-  //   it('returns 400 for missing required query params', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/statistics')
-  //       .expect(400);
-  //     expect(res.body.message).toBe('Validation failed (numeric string is expected)');
-  //   });
+    it('returns 400 for missing required query params', async () => {
+      const res = await aliceAgent
+        .get('/entries/statistics')
+        .expect(400);
+      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+    });
 
-  //   it('returns 400 for invalid goalId', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/statistics')
-  //       .query({ goalId: 'invalid', year: 2025 })
-  //       .expect(400);
-  //   });
+    it('returns 400 for invalid goalId', async () => {
+      const res = await aliceAgent
+        .get('/entries/statistics')
+        .query({ goalId: 'invalid', year: 2025 })
+        .expect(400);
+    });
 
-  //   it('returns 404 if goal does not exist', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/statistics')
-  //       .query({ goalId: 999999, year: 2025 })
-  //       .expect(404);
-  //   });
-  // });
+    it('returns 404 if goal does not exist', async () => {
+      const res = await aliceAgent
+        .get('/entries/statistics')
+        .query({ goalId: 999999, year: 2025 })
+        .expect(404);
+    });
+  });
 
-  // /**
-  //  * GET /entries/monthly-averages
-  //  */
-  // describe('GET /entries/monthly-averages', () => {
-  //   beforeEach(async () => {
-  //     await prisma.goalEntry.createMany({
-  //       data: [
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-01'),
-  //           numericValue: 5,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-15'),
-  //           numericValue: 10,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-02-01'),
-  //           numericValue: 8,
-  //         },
-  //       ],
-  //     });
-  //   });
+  /**
+   * GET /entries/monthly-averages
+   */
+  describe('GET /entries/monthly-averages', () => {
+    // TODOs #36: Add checks to confirm that:
+    // - Alice sees full values across all their own (Alice's) public + private goal entries
+    // - Bob sees only values across other people's (Alice's) public goal entries
+    beforeEach(async () => {
+      await prisma.goalEntry.createMany({
+        data: [
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-01'),
+            numericValue: 5,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-15'),
+            numericValue: 10,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-02-01'),
+            numericValue: 8,
+          },
+        ],
+      });
+    });
 
-  //   it('rejects unauthenticated requests', async () => {
-  //     const res = await request(app.getHttpServer())
-  //       .get('/entries/monthly-averages')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(401);
-  //     expect(res.body.message).toBe('Unauthorized');
-  //   });
+    it('rejects unauthenticated requests', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/entries/monthly-averages')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns monthly averages for numeric goal', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/monthly-averages')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(200);
+    it('returns monthly averages for numeric goal', async () => {
+      const res = await aliceAgent
+        .get('/entries/monthly-averages')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(200);
 
-  //     expect(Array.isArray(res.body)).toBe(true);
-  //     expect(res.body.length).toBeGreaterThan(0);
-  //     expect(res.body[0]).toHaveProperty('month');
-  //     expect(res.body[0]).toHaveProperty('year');
-  //     expect(res.body[0]).toHaveProperty('average');
-  //   });
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body[0]).toHaveProperty('month');
+      expect(res.body[0]).toHaveProperty('year');
+      expect(res.body[0]).toHaveProperty('average');
+    });
 
-  //   it('returns 400 for boolean goal', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/monthly-averages')
-  //       .query({ goalId: alicePrivateGoal.id, year: 2025 })
-  //       .expect(400);
-  //     expect(res.body.message).toBe('NUMERIC');
-  //   });
-  // });
+    it('returns 400 for boolean goal', async () => {
+      const res = await aliceAgent
+        .get('/entries/monthly-averages')
+        .query({ goalId: alicePrivateGoal.id, year: 2025 })
+        .expect(400);
+      expect(res.body.message).toBe('Goal type must be NUMERIC');
+    });
+  });
 
-  // /**
-  //  * GET /entries/monthly-counts
-  //  */
-  // describe('GET /entries/monthly-counts', () => {
-  //   beforeEach(async () => {
-  //     await prisma.goalEntry.createMany({
-  //       data: [
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-01'),
-  //           numericValue: 5,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-01-15'),
-  //           numericValue: 10,
-  //         },
-  //         {
-  //           goalId: aliceGoal.id,
-  //           entryDate: new Date('2025-02-01'),
-  //           numericValue: 8,
-  //         },
-  //       ],
-  //     });
-  //   });
+  /**
+   * GET /entries/monthly-counts
+   */
+  describe('GET /entries/monthly-counts', () => {
+    beforeEach(async () => {
+      await prisma.goalEntry.createMany({
+        data: [
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-01'),
+            numericValue: 5,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-01-15'),
+            numericValue: 10,
+          },
+          {
+            goalId: aliceGoal.id,
+            entryDate: new Date('2025-02-01'),
+            numericValue: 8,
+          },
+        ],
+      });
+    });
 
-  //   it('rejects unauthenticated requests', async () => {
-  //     const res = await request(app.getHttpServer())
-  //       .get('/entries/monthly-counts')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(401);
-  //     expect(res.body.message).toBe('Unauthorized');
-  //   });
+    it('rejects unauthenticated requests', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/entries/monthly-counts')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns monthly counts for goal', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/monthly-counts')
-  //       .query({ goalId: aliceGoal.id, year: 2025 })
-  //       .expect(200);
+    it('returns monthly counts for goal', async () => {
+      const res = await aliceAgent
+        .get('/entries/monthly-counts')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(200);
 
-  //     expect(Array.isArray(res.body)).toBe(true);
-  //     expect(res.body.length).toBeGreaterThan(0);
-  //     expect(res.body[0]).toHaveProperty('month');
-  //     expect(res.body[0]).toHaveProperty('year');
-  //     expect(res.body[0]).toHaveProperty('count');
-  //   });
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body[0]).toHaveProperty('month');
+      expect(res.body[0]).toHaveProperty('year');
+      expect(res.body[0]).toHaveProperty('count');
+    });
 
-  //   it('returns 404 if goal does not exist', async () => {
-  //     const res = await aliceAgent
-  //       .get('/entries/monthly-counts')
-  //       .query({ goalId: 999999, year: 2025 })
-  //       .expect(404);
-  //   });
-  // });
+    it('returns 404 if goal does not exist', async () => {
+      const res = await aliceAgent
+        .get('/entries/monthly-counts')
+        .query({ goalId: 999999, year: 2025 })
+        .expect(404);
+    });
+  });
 });
