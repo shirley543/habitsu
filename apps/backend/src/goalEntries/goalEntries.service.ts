@@ -189,6 +189,7 @@ export class GoalEntriesService {
           select: {
             id: true,
             userId: true,
+            publicity: true,
             goalType: true,
           },
         },
