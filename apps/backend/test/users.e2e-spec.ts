@@ -425,7 +425,7 @@ describe('Users API (E2E)', () => {
     it('rejects duplicate username (409)', async () => {
       const payload: UpdateUserDto = {
         username: 'bob', // Already taken
-        currentPassword: 'bobspassword123'
+        currentPassword: 'alicespassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -437,7 +437,7 @@ describe('Users API (E2E)', () => {
     it('rejects duplicate email (409)', async () => {
       const payload: UpdateUserDto = {
         email: 'bob@test.com', // Already taken
-        currentPassword: 'bobspassword123',
+        currentPassword: 'alicespassword123',
       };
       const res = await aliceAgent
         .patch('/users/me')
