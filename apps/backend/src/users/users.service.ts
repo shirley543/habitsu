@@ -80,13 +80,15 @@ export class UsersService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+    // TODOs: #36 ensure passwords can also be changed with this endpoint,
+    // all changes require existing password to be provided
     const prismaInput: Prisma.UserUpdateInput = {
       username: updateUserDto.username,
       email: updateUserDto.email,
     };
     try {
-      return this.prisma.user.update({
+      return await this.prisma.user.update({
         where: { id },
         data: prismaInput,
         select: userResponseSelect,

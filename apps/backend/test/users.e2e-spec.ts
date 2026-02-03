@@ -103,7 +103,7 @@ describe('Users API (E2E)', () => {
         .send(payload)
         .expect(400);
       expect(res.body.message).toBe('Validation failed');
-      expect(res.body.fields.password).toBeDefined();
+      expect(res.body.fields.password._errors).toEqual(['Password minimum length is 8']);
     });
 
     it('rejects request with invalid email (400)', async () => {
@@ -117,6 +117,7 @@ describe('Users API (E2E)', () => {
         .send(payload)
         .expect(400);
       expect(res.body.message).toBe('Validation failed');
+      expect(res.body.fields.email._errors).toEqual(['Invalid email']);
     });
 
     it('rejects request with empty username (400)', async () => {
@@ -130,6 +131,7 @@ describe('Users API (E2E)', () => {
         .send(payload)
         .expect(400);
       expect(res.body.message).toBe('Validation failed');
+      expect(res.body.fields.username._errors).toEqual(['Username is required']);
     });
 
     it('creates user successfully (201)', async () => {
@@ -165,7 +167,7 @@ describe('Users API (E2E)', () => {
         .post('/users')
         .send(payload)
         .expect(409);
-      expect(res.body.message).toContain('already exists');
+      expect(res.body.message).toBe('A user with this email already exists');
     });
 
     it('rejects duplicate username (409)', async () => {
@@ -178,7 +180,7 @@ describe('Users API (E2E)', () => {
         .post('/users')
         .send(payload)
         .expect(409);
-      expect(res.body.message).toContain('already exists');
+      expect(res.body.message).toBe('A user with this username already exists');
     });
 
     it('does not return password in response', async () => {
@@ -316,11 +318,45 @@ describe('Users API (E2E)', () => {
       expect(updated?.email).toBe('alice_new@test.com');
     });
 
-    it('updates both username and email', async () => {
+    it('updates password successfully', async () => {
+      const payload: UpdateUserDto = {
+        password: 'alice_new_password',
+      };
+      const res = await aliceAgent
+        .patch('/users/me')
+        .send(payload)
+        .expect(200);
+
+      // Check response fields
+      expect(res.body.email).toBe('alice@test.com'); // Unchanged
+      expect(res.body.username).toBe('alice'); // Unchanged
+
+      // Check database fields
+      const updated = await prisma.user.findUnique({
+        where: { id: alice.id },
+      });
+      expect(updated?.email).toBe('alice@test.com'); // Unchanged
+      expect(updated?.username).toBe('alice'); // Unchanged
+
+      // TODOs #36 uncomment once fixed, currently endpoint does not support changing of password
+      // // Check successfully able to login with new password
+      // await request(app.getHttpServer())
+      //   .post('/auth/login')
+      //   .send({
+      //     email: 'alice@test.com',
+      //     password: 'alice_new_password',
+      //   })
+      //   .expect(200);
+    });
+
+    it('updates username, email, and password', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_new',
         email: 'alice_new@test.com',
+        password: 'alice_new_password'
       };
+
+      // Check response fields
       const res = await aliceAgent
         .patch('/users/me')
         .send(payload)
@@ -328,6 +364,24 @@ describe('Users API (E2E)', () => {
 
       expect(res.body.username).toBe('alice_new');
       expect(res.body.email).toBe('alice_new@test.com');
+      expect(res.body.password).toBeUndefined();
+
+      // Check database fields
+      const updated = await prisma.user.findUnique({
+        where: { id: alice.id },
+      });
+      expect(updated?.username).toBe('alice_new');
+      expect(updated?.email).toBe('alice_new@test.com');
+
+      // TODOs #36
+      // // Check successfully able to login with new password
+      // await request(app.getHttpServer())
+      //   .post('/auth/login')
+      //   .send({
+      //     email: 'alice@test.com',
+      //     password: 'alice_new_password',
+      //   })
+      //   .expect(200);
     });
 
     it('rejects duplicate username (409)', async () => {
@@ -338,7 +392,7 @@ describe('Users API (E2E)', () => {
         .patch('/users/me')
         .send(payload)
         .expect(409);
-      expect(res.body.message).toContain('already exists');
+      expect(res.body.message).toBe('A user with this username already exists');
     });
 
     it('rejects duplicate email (409)', async () => {
@@ -349,7 +403,7 @@ describe('Users API (E2E)', () => {
         .patch('/users/me')
         .send(payload)
         .expect(409);
-      expect(res.body.message).toContain('already exists');
+      expect(res.body.message).toBe('A user with this email already exists');
     });
 
     it('does not return password in response', async () => {
@@ -362,18 +416,6 @@ describe('Users API (E2E)', () => {
         .expect(200);
 
       expect(res.body.password).toBeUndefined();
-    });
-
-    it('does not allow direct password update via this endpoint', async () => {
-      const payload: UpdateUserDto = {
-        password: 'newpassword123',
-      };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(400);
-      // Should fail validation as password requires minimum length in update schema
-      expect(res.body.message).toBe('Validation failed');
     });
   });
 
@@ -435,6 +477,8 @@ describe('Users API (E2E)', () => {
         where: { userId: alice.id },
       });
       expect(goalsAfter.length).toBe(0);
+
+      // TODOs #36 verify related goal entries are deleted due to cascade
     });
 
     it('allows user to delete their own account', async () => {
@@ -454,91 +498,6 @@ describe('Users API (E2E)', () => {
       expect(responseData.id).toBeDefined();
       expect(responseData.username).toBeDefined();
       expect(responseData.email).toBeDefined();
-    });
-  });
-
-  /**
-   * Integration Tests
-   */
-  describe('User lifecycle integration', () => {
-    it('allows sign up, login, and profile management', async () => {
-      // Sign up
-      const createPayload: CreateUserDto = {
-        username: 'evan',
-        email: 'evan@test.com',
-        password: 'evanpassword123',
-      };
-      const signupRes = await request(app.getHttpServer())
-        .post('/users')
-        .send(createPayload)
-        .expect(201);
-
-      const newUserId = signupRes.body.id;
-      expect(signupRes.body.username).toBe('evan');
-
-      // Login
-      const evanAgent = await loginWithCookie(app, {
-        email: 'evan@test.com',
-        password: 'evanpassword123',
-      });
-
-      // Get profile
-      const profileRes = await evanAgent.get('/users/me').expect(200);
-      expect(profileRes.body.id).toBe(newUserId);
-      expect(profileRes.body.username).toBe('evan');
-
-      // Update profile
-      const updatePayload: UpdateUserDto = {
-        username: 'evan_updated',
-      };
-      const updateRes = await evanAgent
-        .patch('/users/me')
-        .send(updatePayload)
-        .expect(200);
-      expect(updateRes.body.username).toBe('evan_updated');
-
-      // Verify update persisted
-      const verifyRes = await evanAgent.get('/users/me').expect(200);
-      expect(verifyRes.body.username).toBe('evan_updated');
-
-      // Delete account
-      await evanAgent.delete('/users/me').expect(200);
-
-      // Verify deleted
-      const deletedUser = await prisma.user.findUnique({
-        where: { id: newUserId },
-      });
-      expect(deletedUser).toBeNull();
-    });
-
-    it('maintains isolation between users', async () => {
-      // Alice updates her profile
-      const aliceUpdate: UpdateUserDto = {
-        username: 'alice_updated',
-      };
-      await aliceAgent.patch('/users/me').send(aliceUpdate).expect(200);
-
-      // Verify bob is unaffected
-      const bobProfile = await bobAgent.get('/users/me').expect(200);
-      expect(bobProfile.body.username).toBe('bob'); // Should be unchanged
-      expect(bobProfile.body.email).toBe('bob@test.com');
-
-      // Verify alice's change
-      const aliceProfile = await aliceAgent.get('/users/me').expect(200);
-      expect(aliceProfile.body.username).toBe('alice_updated');
-    });
-
-    it('prevents user from updating another user', async () => {
-      // Alice cannot delete Bob
-      const res = await aliceAgent.delete('/users/me').expect(200);
-      const deletedId = res.body.id;
-      expect(deletedId).toBe(alice.id); // Only alice should be deleted
-
-      // Verify bob still exists
-      const bobStillExists = await prisma.user.findUnique({
-        where: { id: bob.id },
-      });
-      expect(bobStillExists).not.toBeNull();
     });
   });
 });

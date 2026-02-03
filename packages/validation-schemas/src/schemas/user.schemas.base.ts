@@ -5,7 +5,7 @@ import { z } from "zod";
  */
 const UserSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  email: z.string().min(1, "Email is required"),
+  email: z.string().email().min(1, "Email is required"),
   password: z.string().min(8, "Password minimum length is 8"),
 });
 
@@ -13,7 +13,7 @@ export const CreateUserSchema = UserSchema;
 export const UpdateUserSchema = CreateUserSchema.partial();
 
 export const LoginUserSchema = z.object({
-  email: z.string().min(1, "Email is required"),
+  email: z.string().email().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -30,7 +30,7 @@ export type LoginUserDto = z.infer<typeof LoginUserSchema>;
 export const UserResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
-  email: z.string(),
+  email: z.string().email(),
 });
 
 /**
