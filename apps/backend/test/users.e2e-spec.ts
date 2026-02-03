@@ -241,9 +241,40 @@ describe('Users API (E2E)', () => {
    * PATCH /users/me
    */
   describe('PATCH /users/me', () => {
+    afterEach(async () => {
+      // Reset users
+      const alicePassword = 'alicespassword123';
+      const bobPassword = 'bobspassword123';
+      const aliceHash = await bcrypt.hash(
+        alicePassword,
+        parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
+      );
+      const bobHash = await bcrypt.hash(
+        bobPassword,
+        parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
+      );
+      alice = await prisma.user.update({
+        where: { id: alice.id },
+        data: {
+          email: 'alice@test.com',
+          username: 'alice',
+          password: aliceHash,
+        },
+      });
+      bob = await prisma.user.update({
+        where: { id: bob.id },
+        data: {
+          email: 'bob@test.com',
+          username: 'bob',
+          password: bobHash,
+        },
+      });
+    })
+
     it('rejects unauthenticated requests (401)', async () => {
       const payload: UpdateUserDto = {
         username: 'updated',
+        currentPassword: 'irrelevantpassword'
       };
       const res = await request(app.getHttpServer())
         .patch('/users/me')
@@ -253,7 +284,10 @@ describe('Users API (E2E)', () => {
     });
 
     it('allows empty payload (200)', async () => {
-      const res = await aliceAgent.patch('/users/me').send({}).expect(200);
+      const payload: UpdateUserDto = {
+        currentPassword: 'alicespassword123'
+      };
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       expect(res.body.id).toBe(alice.id);
       expect(res.body.username).toBe('alice'); // Unchanged
@@ -263,6 +297,7 @@ describe('Users API (E2E)', () => {
     it('rejects invalid email (400)', async () => {
       const payload: UpdateUserDto = {
         email: 'notanemail',
+        currentPassword: 'irrelevantpassword'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -274,6 +309,7 @@ describe('Users API (E2E)', () => {
     it('rejects short password (400)', async () => {
       const payload: UpdateUserDto = {
         password: 'short',
+        currentPassword: 'irrelevantpassword'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -285,6 +321,7 @@ describe('Users API (E2E)', () => {
     it('updates username successfully', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_updated',
+        currentPassword: 'alicespassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -303,6 +340,7 @@ describe('Users API (E2E)', () => {
     it('updates email successfully', async () => {
       const payload: UpdateUserDto = {
         email: 'alice_new@test.com',
+        currentPassword: 'alicespassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -321,6 +359,7 @@ describe('Users API (E2E)', () => {
     it('updates password successfully', async () => {
       const payload: UpdateUserDto = {
         password: 'alice_new_password',
+        currentPassword: 'alicespassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -338,22 +377,22 @@ describe('Users API (E2E)', () => {
       expect(updated?.email).toBe('alice@test.com'); // Unchanged
       expect(updated?.username).toBe('alice'); // Unchanged
 
-      // TODOs #36 uncomment once fixed, currently endpoint does not support changing of password
-      // // Check successfully able to login with new password
-      // await request(app.getHttpServer())
-      //   .post('/auth/login')
-      //   .send({
-      //     email: 'alice@test.com',
-      //     password: 'alice_new_password',
-      //   })
-      //   .expect(200);
+      // Check successfully able to login with new password
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'alice@test.com',
+          password: 'alice_new_password',
+        })
+        .expect(200);
     });
 
     it('updates username, email, and password', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_new',
         email: 'alice_new@test.com',
-        password: 'alice_new_password'
+        password: 'alice_new_password',
+        currentPassword: 'alicespassword123'
       };
 
       // Check response fields
@@ -373,20 +412,20 @@ describe('Users API (E2E)', () => {
       expect(updated?.username).toBe('alice_new');
       expect(updated?.email).toBe('alice_new@test.com');
 
-      // TODOs #36
-      // // Check successfully able to login with new password
-      // await request(app.getHttpServer())
-      //   .post('/auth/login')
-      //   .send({
-      //     email: 'alice@test.com',
-      //     password: 'alice_new_password',
-      //   })
-      //   .expect(200);
+      // Check successfully able to login with new email and password
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'alice_new@test.com',
+          password: 'alice_new_password',
+        })
+        .expect(200);
     });
 
     it('rejects duplicate username (409)', async () => {
       const payload: UpdateUserDto = {
         username: 'bob', // Already taken
+        currentPassword: 'bobspassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -398,6 +437,7 @@ describe('Users API (E2E)', () => {
     it('rejects duplicate email (409)', async () => {
       const payload: UpdateUserDto = {
         email: 'bob@test.com', // Already taken
+        currentPassword: 'bobspassword123',
       };
       const res = await aliceAgent
         .patch('/users/me')
@@ -409,6 +449,7 @@ describe('Users API (E2E)', () => {
     it('does not return password in response', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_v2',
+        currentPassword: 'alicespassword123'
       };
       const res = await aliceAgent
         .patch('/users/me')

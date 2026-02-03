@@ -81,11 +81,30 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
-    // TODOs: #36 ensure passwords can also be changed with this endpoint,
-    // all changes require existing password to be provided
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (user === null) {
+      throw new UserNotFoundError(id);
+    }
+
+    const passwordValid = user
+      ? await bcrypt.compare(updateUserDto.currentPassword, user.password)
+      : false;
+    if (!passwordValid) {
+      throw new UserPasswordInputInvalidError('Invalid current password');
+    }
+
+    const hashedPassword = updateUserDto.password && await bcrypt.hash(
+      updateUserDto.password,
+      this.envService.get('SALT_ROUNDS'),
+    );
+
     const prismaInput: Prisma.UserUpdateInput = {
       username: updateUserDto.username,
       email: updateUserDto.email,
+      password: hashedPassword,
     };
     try {
       return await this.prisma.user.update({
@@ -109,38 +128,5 @@ export class UsersService {
       where: { id },
       select: userResponseSelect,
     });
-  }
-
-  async changePassword(id: number, oldPassword: string, newPassword: string): Promise<void> {
-    const user = await this.findOneByEmailFull(
-      (await this.prisma.user.findUnique({ where: { id } }))?.email || '',
-    );
-
-    if (!user) {
-      throw new UserNotFoundError('User not found');
-    }
-
-    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!passwordMatch) {
-      throw new UserPasswordInputInvalidError('Invalid current password');
-    }
-
-    const hashedNewPassword = await bcrypt.hash(
-      newPassword,
-      this.envService.get('SALT_ROUNDS'),
-    );
-
-    await this.prisma.user.update({
-      where: { id },
-      data: { password: hashedNewPassword },
-    });
-  }
-
-  async exists(email: string): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      select: { id: true },
-    });
-    return !!user;
   }
 }
