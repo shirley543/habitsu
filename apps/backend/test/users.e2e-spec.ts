@@ -519,7 +519,15 @@ describe('Users API (E2E)', () => {
       });
       expect(goalsAfter.length).toBe(0);
 
-      // TODOs #36 verify related goal entries are deleted due to cascade
+      // Verify related goal entries are deleted due to cascade
+      const goalEntriesAfter = await prisma.goalEntry.findMany({
+        where: { 
+          goal: {
+            userId: alice.id
+          }
+        }
+      });
+      expect(goalEntriesAfter.length).toBe(0);
     });
 
     it('allows user to delete their own account', async () => {
