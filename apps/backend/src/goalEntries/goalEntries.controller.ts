@@ -11,6 +11,7 @@ import {
   BadRequestException,
   Req,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { GoalEntriesService } from './goalEntries.service';
 import {
@@ -27,8 +28,12 @@ import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { GoalStatisticsEntity } from './goalStatistics.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
+import { GoalExceptionFilter } from '../goals/filters/goal.exceptionFilter';
+import { GoalEntryExceptionFilter } from './filters/goalEntries.exceptionFilter';
 
 @Controller()
+@UseFilters(GoalExceptionFilter)
+@UseFilters(GoalEntryExceptionFilter)
 @ApiTags('Entries')
 export class GoalEntriesController {
   constructor(private readonly goalEntriesService: GoalEntriesService) {}
