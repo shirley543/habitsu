@@ -700,81 +700,108 @@ describe('Goal Entries API (E2E)', () => {
     });
   });
 
-  // /**
-  //  * DELETE /goals/:goalId/entries/:entryId
-  //  */
-  // describe('DELETE /goals/:goalId/entries/:entryId', () => {
-  //   let entry: GoalEntry;
+  /**
+   * DELETE /goals/:goalId/entries/:entryId
+   */
+  describe('DELETE /goals/:goalId/entries/:entryId', () => {
+    let entry: GoalEntry;
+    let bobGoalEntry: GoalEntry;
+    let bobPrivateGoalEntry: GoalEntry;
 
-  //   beforeEach(async () => {
-  //     entry = await prisma.goalEntry.create({
-  //       data: {
-  //         goalId: aliceGoal.id,
-  //         entryDate: new Date('2025-01-01'),
-  //         numericValue: 5,
-  //         note: 'To delete',
-  //       },
-  //     });
-  //   });
+    beforeEach(async () => {
+      entry = await prisma.goalEntry.create({
+        data: {
+          goalId: aliceGoal.id,
+          entryDate: new Date('2025-01-01'),
+          numericValue: 5,
+          note: 'To delete',
+        },
+      });
 
-  //   it('rejects unauthenticated requests', async () => {
-  //     const res = await request(app.getHttpServer())
-  //       .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
-  //       .expect(401);
-  //     expect(res.body.message).toBe('Unauthorized');
-  //   });
+      bobGoalEntry = await prisma.goalEntry.create({
+        data: {
+          goalId: bobGoal.id,
+          entryDate: new Date('2025-01-01'),
+          numericValue: 5,
+          note: 'To delete',
+        },
+      });
 
-  //   it('returns 400 for invalid goalId', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/invalid/entries/${entry.id}`)
-  //       .expect(400);
-  //     expect(res.body.message).toBe('Validation failed (numeric string is expected)');
-  //   });
+      bobPrivateGoalEntry = await prisma.goalEntry.create({
+        data: {
+          goalId: bobPrivateGoal.id,
+          entryDate: new Date('2025-01-01'),
+          note: 'To delete',
+        },
+      });
+    });
 
-  //   it('returns 400 for invalid entryId', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/${aliceGoal.id}/entries/invalid`)
-  //       .expect(400);
-  //     expect(res.body.message).toBe('Validation failed (numeric string is expected)');
-  //   });
+    it('rejects unauthenticated requests', async () => {
+      const res = await request(app.getHttpServer())
+        .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
+        .expect(401);
+      expect(res.body.message).toBe('Unauthorized');
+    });
 
-  //   it('returns 404 for non-existent entry', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/${aliceGoal.id}/entries/999999`)
-  //       .expect(404);
-  //     expect(res.body.message).toBe('not found');
-  //   });
+    it('returns 400 for invalid goalId', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/invalid/entries/${entry.id}`)
+        .expect(400);
+      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+    });
 
-  //   it('returns 403 if user is not goal owner', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/${bobGoal.id}/entries/999999`)
-  //       .expect(403);
-  //     expect(res.body.message).toBe('not authorized');
-  //   });
+    it('returns 400 for invalid entryId', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${aliceGoal.id}/entries/invalid`)
+        .expect(400);
+      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+    });
 
-  //   it('deletes entry successfully', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
-  //       .expect(200);
+    it('returns 404 for non-existent entry', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${aliceGoal.id}/entries/999999`)
+        .expect(404);
+      expect(res.body.message).toBe('Goal entry with id 999999 not found');
+    });
 
-  //     expect(res.body.id).toBe(entry.id);
+    it('returns 403 if goal public and user is not the goal owner', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${bobGoal.id}/entries/${bobGoalEntry.id}`)
+        .expect(403);
+      expect(res.body.message).toBe(`Goal ${bobGoal.id} cannot be modified by the current user`);
+    });
 
-  //     const deleted = await prisma.goalEntry.findUnique({
-  //       where: { id: entry.id },
-  //     });
-  //     expect(deleted).toBeNull();
-  //   });
+    it('returns 404 if goal private and user is not the goal owner', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${bobPrivateGoal.id}/entries/${bobPrivateGoalEntry.id}`)
+        .expect(404);
+      // TODOs #36 rethink this error message; leaky
+      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+    });
 
-  //   it('returns deleted entry data on successful deletion', async () => {
-  //     const res = await aliceAgent
-  //       .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
-  //       .expect(200);
+    it('deletes entry successfully', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
+        .expect(200);
 
-  //     expect(res.body.goalId).toBe(aliceGoal.id);
-  //     expect(res.body.numericValue).toBe(5);
-  //     expect(res.body.note).toBe('To delete');
-  //   });
-  // });
+      expect(res.body.id).toBe(entry.id);
+
+      const deleted = await prisma.goalEntry.findUnique({
+        where: { id: entry.id },
+      });
+      expect(deleted).toBeNull();
+    });
+
+    it('returns deleted entry data on successful deletion', async () => {
+      const res = await aliceAgent
+        .delete(`/goals/${aliceGoal.id}/entries/${entry.id}`)
+        .expect(200);
+
+      expect(res.body.goalId).toBe(aliceGoal.id);
+      expect(res.body.numericValue).toBe(5);
+      expect(res.body.note).toBe('To delete');
+    });
+  });
 
   // /**
   //  * GET /entries/statistics
