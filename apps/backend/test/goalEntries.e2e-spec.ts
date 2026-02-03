@@ -17,8 +17,7 @@ import {
   SearchParamsGoalEntryDto,
 } from '@habit-tracker/validation-schemas';
 
-// TODOs #36 remove skip once working
-describe.skip('Goal Entries API (E2E)', () => {
+describe('Goal Entries API (E2E)', () => {
   let app: INestApplication;
 
   let alice: User;
@@ -165,10 +164,10 @@ describe.skip('Goal Entries API (E2E)', () => {
         .post(`/goals/999999/entries`)
         .send(payload)
         .expect(404);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toBe('Goal with id 999999 not found');
     });
 
-    it('returns 403 if user is not the goal owner', async () => {
+    it('returns 404 if user is not the goal owner', async () => {
       const payload: CreateGoalEntryDto = {
         entryDate: new Date('2025-01-01'),
         note: 'Test note',
@@ -177,8 +176,8 @@ describe.skip('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .post(`/goals/${bobGoal.id}/entries`)
         .send(payload)
-        .expect(403);
-      expect(res.body.message).toContain('not authorized');
+        .expect(404);
+      expect(res.body.message).toBe(`Goal with id ${bobGoal.id} not found`);
     });
 
     it('creates numeric goal entry successfully (201)', async () => {
@@ -343,29 +342,31 @@ describe.skip('Goal Entries API (E2E)', () => {
       expect(entries.length).toBe(2);
     });
 
-    it('denies unauthenticated access to private goal entries', async () => {
+    it('rejects unauthenticated access to private goal entries (404)', async () => {
       const searchParams: SearchParamsGoalEntryDto = {
         goalId: alicePrivateGoal.id,
       };
       const res = await request(app.getHttpServer())
         .get('/entries')
         .query(searchParams)
-        .expect(403);
+        .expect(404);
+      expect(res.body.message).toBe(`Goal with id ${alicePrivateGoal.id} not found`);
     });
 
-    it('denies access to other user private goals', async () => {
+    it('rejects access to other user private goals (404)', async () => {
       const searchParams: SearchParamsGoalEntryDto = {
         goalId: alicePrivateGoal.id,
       };
-      const res = await bobAgent.get('/entries').query(searchParams).expect(403);
+      const res = await bobAgent.get('/entries').query(searchParams).expect(404);
+      expect(res.body.message).toBe(`Goal with id ${alicePrivateGoal.id} not found`);
     });
 
-    it('returns 400 for missing required query params', async () => {
+    it('rejects missing required query params (400)', async () => { 
       const res = await aliceAgent.get('/entries').expect(400);
       expect(res.body.message).toBe('Validation failed');
     });
 
-    it('returns 400 for invalid goalId', async () => {
+    it('rejects invalid goalId (400)', async () => {
       const res = await aliceAgent
         .get('/entries')
         .query({ goalId: 'invalid' })
@@ -400,12 +401,12 @@ describe.skip('Goal Entries API (E2E)', () => {
 
     it('returns 400 for invalid entryId', async () => {
       const res = await aliceAgent.get('/entries/invalid').expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 404 for non-existent entry', async () => {
       const res = await aliceAgent.get('/entries/999999').expect(404);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toBe('not found');
     });
 
     it('returns 404 if entry belongs to inaccessible goal', async () => {
@@ -420,7 +421,7 @@ describe.skip('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get(`/entries/${bobEntry.id}`)
         .expect(403);
-      expect(res.body.message).toContain('not authorized');
+      expect(res.body.message).toBe('not authorized');
     });
 
     it('returns entry if authorized', async () => {
@@ -496,14 +497,14 @@ describe.skip('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get(`/goals/999999/entries`)
         .expect(404);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toBe('not found');
     });
 
     it('returns 403 if user is not goal owner', async () => {
       const res = await aliceAgent
         .get(`/goals/${bobGoal.id}/entries`)
         .expect(403);
-      expect(res.body.message).toContain('not authorized');
+      expect(res.body.message).toBe('not authorized');
     });
   });
 
@@ -537,7 +538,7 @@ describe.skip('Goal Entries API (E2E)', () => {
         .patch(`/goals/invalid/entries/${entry.id}`)
         .send({ note: 'Updated' })
         .expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 400 for invalid entryId', async () => {
@@ -545,7 +546,7 @@ describe.skip('Goal Entries API (E2E)', () => {
         .patch(`/goals/${aliceGoal.id}/entries/invalid`)
         .send({ note: 'Updated' })
         .expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 404 for non-existent entry', async () => {
@@ -553,7 +554,7 @@ describe.skip('Goal Entries API (E2E)', () => {
         .patch(`/goals/${aliceGoal.id}/entries/999999`)
         .send({ note: 'Updated' })
         .expect(404);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toBe('not found');
     });
 
     it('returns 403 if user is not goal owner', async () => {
@@ -561,7 +562,7 @@ describe.skip('Goal Entries API (E2E)', () => {
         .patch(`/goals/${bobGoal.id}/entries/999999`)
         .send({ note: 'Updated' })
         .expect(403);
-      expect(res.body.message).toContain('not authorized');
+      expect(res.body.message).toBe('not authorized');
     });
 
     it('updates entry note successfully', async () => {
@@ -672,28 +673,28 @@ describe.skip('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .delete(`/goals/invalid/entries/${entry.id}`)
         .expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 400 for invalid entryId', async () => {
       const res = await aliceAgent
         .delete(`/goals/${aliceGoal.id}/entries/invalid`)
         .expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 404 for non-existent entry', async () => {
       const res = await aliceAgent
         .delete(`/goals/${aliceGoal.id}/entries/999999`)
         .expect(404);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toBe('not found');
     });
 
     it('returns 403 if user is not goal owner', async () => {
       const res = await aliceAgent
         .delete(`/goals/${bobGoal.id}/entries/999999`)
         .expect(403);
-      expect(res.body.message).toContain('not authorized');
+      expect(res.body.message).toBe('not authorized');
     });
 
     it('deletes entry successfully', async () => {
@@ -771,7 +772,7 @@ describe.skip('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get('/entries/statistics')
         .expect(400);
-      expect(res.body.message).toContain('numeric string is expected');
+      expect(res.body.message).toBe('numeric string is expected');
     });
 
     it('returns 400 for invalid goalId', async () => {
@@ -841,7 +842,7 @@ describe.skip('Goal Entries API (E2E)', () => {
         .get('/entries/monthly-averages')
         .query({ goalId: alicePrivateGoal.id, year: 2025 })
         .expect(400);
-      expect(res.body.message).toContain('NUMERIC');
+      expect(res.body.message).toBe('NUMERIC');
     });
   });
 

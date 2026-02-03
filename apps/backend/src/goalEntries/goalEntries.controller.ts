@@ -91,7 +91,7 @@ export class GoalEntriesController {
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyBySearchParams(
     @Req() req,
-    @Query() searchParamsGoalEntryDto: SearchParamsGoalEntryDto,
+    @Query(new ZodValidationPipe(SearchParamsGoalEntrySchema)) searchParamsGoalEntryDto: SearchParamsGoalEntryDto,
   ) {
     const userId = req.user.id;
 
