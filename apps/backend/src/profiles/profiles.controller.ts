@@ -1,12 +1,21 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Req,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ProfileEntity } from './profiles.entity';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { GoalEntity } from '../goals/goal.entity';
 import { GoalsService } from '../goals/goals.service';
+import { UserExceptionFilter } from '../users/filters/user.exceptionFilter';
 
 @Controller('profiles')
+@UseFilters(UserExceptionFilter)
 @ApiTags('profiles')
 export class ProfilesController {
   constructor(

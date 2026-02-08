@@ -95,6 +95,9 @@ export class GoalsService {
     });
     assertUserFound(user, targetUsername);
 
+    // TODOs #30 add check here so that if profile publicity is private, no goals are shown.
+    // Confirm e2e test fixed/ working for profiles.e2e
+
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
       where: {
@@ -110,7 +113,7 @@ export class GoalsService {
 
   async findOne(id: number, userId: number): Promise<Goal> {
     const goal = await this.prisma.goal.findUnique({ where: { id } });
-    assertGoalFound(goal, id);
+    assertGoalFound(goal);
     assertGoalCanView(goal, userId);
 
     return goal;
@@ -125,7 +128,7 @@ export class GoalsService {
     const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertGoalFound(goalToUpdate, id);
+    assertGoalFound(goalToUpdate);
     assertGoalCanModify(goalToUpdate, userId);
 
     if (
@@ -167,7 +170,7 @@ export class GoalsService {
   async remove(id: number, userId: number): Promise<Goal> {
     return await this.prisma.$transaction(async (tx) => {
       const goalToDelete = await tx.goal.findUnique({ where: { id } });
-      assertGoalFound(goalToDelete, id);
+      assertGoalFound(goalToDelete);
       assertGoalCanModify(goalToDelete, userId);
 
       // Get goals with order greater than goal being deleted
@@ -229,10 +232,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new GoalNotFoundError(
-        undefined,
-        'Reorder request contains invalid goal IDs',
-      );
+      throw new GoalNotFoundError('Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential

@@ -9,6 +9,13 @@ import {
   UserResponseDto,
 } from '@habit-tracker/validation-schemas';
 import { EnvService } from '../env/env.service';
+import {
+  isPrismaClientError,
+  PrismaClientError,
+} from '../common/prisma/prismaError';
+import { UserNotFoundError } from './errors/userNotFound.error';
+import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
+import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
@@ -33,10 +40,25 @@ export class UsersService {
       email: createUserDto.email,
       password: hashedPassword,
     };
-    return this.prisma.user.create({
-      data: prismaInput,
-      select: userResponseSelect,
-    });
+    try {
+      return await this.prisma.user.create({
+        data: prismaInput,
+        select: userResponseSelect,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (
+          isPrismaClientError(error.code) &&
+          error.code === PrismaClientError.UniqueConstraintFailed
+        ) {
+          const field = (error.meta?.target as string[])?.[0] || 'user';
+          throw new UserAlreadyExistsError(
+            `A user with this ${field} already exists`,
+          );
+        }
+      }
+      throw error;
+    }
   }
 
   findOne(id: number): Promise<UserResponseDto | null> {
@@ -66,16 +88,57 @@ export class UsersService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (user === null) {
+      throw new UserNotFoundError(id);
+    }
+
+    const passwordValid = user
+      ? await bcrypt.compare(updateUserDto.currentPassword, user.password)
+      : false;
+    if (!passwordValid) {
+      throw new UserPasswordInputInvalidError('Invalid current password');
+    }
+
+    const hashedPassword =
+      updateUserDto.password &&
+      (await bcrypt.hash(
+        updateUserDto.password,
+        this.envService.get('SALT_ROUNDS'),
+      ));
+
     const prismaInput: Prisma.UserUpdateInput = {
       username: updateUserDto.username,
       email: updateUserDto.email,
+      password: hashedPassword,
     };
-    return this.prisma.user.update({
-      where: { id },
-      data: prismaInput,
-      select: userResponseSelect,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: prismaInput,
+        select: userResponseSelect,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (
+          isPrismaClientError(error.code) &&
+          error.code === PrismaClientError.UniqueConstraintFailed
+        ) {
+          const field = (error.meta?.target as string[])?.[0] || 'user';
+          throw new UserAlreadyExistsError(
+            `A user with this ${field} already exists`,
+          );
+        }
+      }
+      throw error;
+    }
   }
 
   remove(id: number) {

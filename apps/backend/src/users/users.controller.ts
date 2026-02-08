@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -26,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UserExceptionFilter } from './filters/user.exceptionFilter';
 
 /**
  * Private types
@@ -58,6 +60,7 @@ class CreateUserDtoClass implements CreateUserDto {
  */
 
 @Controller('users')
+@UseFilters(UserExceptionFilter)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -102,5 +105,4 @@ export class UsersController {
   }
 
   // TODOs #34 Check swagger doc generation, and include more descriptive endpoint explanations
-  // TODOs #36 Add conversion of prisma errors to nest js exceptions (with nest js auto-converting said exceptions into correct HTTP status codes) in service
 }

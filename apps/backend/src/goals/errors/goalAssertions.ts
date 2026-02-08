@@ -15,9 +15,8 @@ type GoalWithIdsPublicity = Pick<Goal, 'id' | 'userId' | 'publicity'>;
  */
 export function assertGoalFound<T extends GoalWithId>(
   goal: T | null,
-  goalId: number,
 ): asserts goal is T {
-  if (!goal) throw new GoalNotFoundError(goalId);
+  if (!goal) throw new GoalNotFoundError();
 }
 
 /**
@@ -31,23 +30,34 @@ export function assertGoalCanCreate<T extends GoalWithIds>(
   goal: T,
   userId: number,
 ) {
-  if (goal.userId !== userId)
-    throw new GoalUnauthorizedError(goal.id, 'created');
+  if (goal.userId !== userId) throw new GoalUnauthorizedError('created');
 }
 
 /**
  * Asserts that the given user can modify this goal.
  *
+ * Modifying rules:
+ * - Owner can always modify
+ * - Non-owner cannot modify; forbidden error if public, not found error if private
+ *
  * @param goal - The goal object (must contain id and userId)
  * @param userId - The ID of the user performing the action
  * @throws GoalNotFoundError if the user does not own the goal
  */
-export function assertGoalCanModify<T extends GoalWithIds>(
+export function assertGoalCanModify<T extends GoalWithIdsPublicity>(
   goal: T,
   userId: number,
 ) {
-  if (goal.userId !== userId) throw new GoalNotFoundError(goal.id);
+  const isOwner = goal.userId === userId;
+  const isPublic = goal.publicity === GoalPublicity.PUBLIC;
+
+  if (!isOwner && !isPublic) {
+    throw new GoalNotFoundError();
+  } else if (!isOwner && isPublic) {
+    throw new GoalUnauthorizedError('modified');
+  }
 }
+
 /**
  *
  * Asserts that the given user can view this goal.
@@ -68,6 +78,6 @@ export function assertGoalCanView<T extends GoalWithIdsPublicity>(
   const isPublic = goal.publicity === GoalPublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
-    throw new GoalNotFoundError(goal.id);
+    throw new GoalNotFoundError();
   }
 }
