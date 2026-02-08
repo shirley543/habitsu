@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Req, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Req,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ProfileEntity } from './profiles.entity';

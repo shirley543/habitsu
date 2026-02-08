@@ -232,9 +232,7 @@ export class GoalsService {
     })();
 
     if (!areIdsEqual) {
-      throw new GoalNotFoundError(
-        'Reorder request contains invalid goal IDs',
-      );
+      throw new GoalNotFoundError('Reorder request contains invalid goal IDs');
     }
 
     // Check orders are sequential

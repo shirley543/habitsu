@@ -6,7 +6,13 @@ import { prisma } from './helpers/prisma';
 import { loginWithCookie } from './helpers/login';
 import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
-import { Goal, GoalEntry, GoalPublicity, GoalQuantify, User } from '@prisma/client';
+import {
+  Goal,
+  GoalEntry,
+  GoalPublicity,
+  GoalQuantify,
+  User,
+} from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import {
   CreateGoalEntryDto,
@@ -188,7 +194,9 @@ describe('Goal Entries API (E2E)', () => {
         .post(`/goals/${bobGoal.id}/entries`)
         .send(payload)
         .expect(403);
-      expect(res.body.message).toBe('Goal cannot be modified by the current user');
+      expect(res.body.message).toBe(
+        'Goal cannot be modified by the current user',
+      );
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -378,11 +386,14 @@ describe('Goal Entries API (E2E)', () => {
       const searchParams: SearchParamsGoalEntryDto = {
         goalId: alicePrivateGoal.id,
       };
-      const res = await bobAgent.get('/entries').query(searchParams).expect(404);
+      const res = await bobAgent
+        .get('/entries')
+        .query(searchParams)
+        .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
-    it('rejects missing required query params (400)', async () => { 
+    it('rejects missing required query params (400)', async () => {
       const res = await aliceAgent.get('/entries').expect(400);
       expect(res.body.message).toBe('Validation failed');
     });
@@ -422,7 +433,9 @@ describe('Goal Entries API (E2E)', () => {
 
     it('returns 400 for invalid entryId', async () => {
       const res = await aliceAgent.get('/entries/invalid').expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 404 for non-existent entry', async () => {
@@ -439,9 +452,7 @@ describe('Goal Entries API (E2E)', () => {
           note: 'Bob Entry',
         },
       });
-      const res = await aliceAgent
-        .get(`/entries/${bobEntry.id}`)
-        .expect(404);
+      const res = await aliceAgent.get(`/entries/${bobEntry.id}`).expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
@@ -515,9 +526,7 @@ describe('Goal Entries API (E2E)', () => {
     });
 
     it('returns 404 for non-existent goal', async () => {
-      const res = await aliceAgent
-        .get(`/goals/999999/entries`)
-        .expect(404);
+      const res = await aliceAgent.get(`/goals/999999/entries`).expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
@@ -561,7 +570,9 @@ describe('Goal Entries API (E2E)', () => {
         .patch(`/goals/invalid/entries/${entry.id}`)
         .send({ note: 'Updated' })
         .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 400 for invalid entryId', async () => {
@@ -569,7 +580,9 @@ describe('Goal Entries API (E2E)', () => {
         .patch(`/goals/${aliceGoal.id}/entries/invalid`)
         .send({ note: 'Updated' })
         .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 404 for non-existent entry', async () => {
@@ -595,7 +608,7 @@ describe('Goal Entries API (E2E)', () => {
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
-    
+
     it('returns 403 if goal public and user is not goal owner', async () => {
       const bobGoalEntry = await prisma.goalEntry.create({
         data: {
@@ -610,7 +623,9 @@ describe('Goal Entries API (E2E)', () => {
         .patch(`/goals/${bobGoal.id}/entries/${bobGoalEntry.id}`)
         .send({ note: 'Updated' })
         .expect(403);
-      expect(res.body.message).toBe('Goal cannot be modified by the current user');
+      expect(res.body.message).toBe(
+        'Goal cannot be modified by the current user',
+      );
     });
 
     it('updates entry note successfully', async () => {
@@ -740,14 +755,18 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .delete(`/goals/invalid/entries/${entry.id}`)
         .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 400 for invalid entryId', async () => {
       const res = await aliceAgent
         .delete(`/goals/${aliceGoal.id}/entries/invalid`)
         .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 404 for non-existent entry', async () => {
@@ -761,7 +780,9 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .delete(`/goals/${bobGoal.id}/entries/${bobGoalEntry.id}`)
         .expect(403);
-      expect(res.body.message).toBe('Goal cannot be modified by the current user');
+      expect(res.body.message).toBe(
+        'Goal cannot be modified by the current user',
+      );
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -843,10 +864,10 @@ describe('Goal Entries API (E2E)', () => {
     });
 
     it('returns 400 for missing required query params', async () => {
-      const res = await aliceAgent
-        .get('/entries/statistics')
-        .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      const res = await aliceAgent.get('/entries/statistics').expect(400);
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 400 for invalid goalId', async () => {
@@ -854,7 +875,9 @@ describe('Goal Entries API (E2E)', () => {
         .get('/entries/statistics')
         .query({ goalId: 'invalid', year: 2025 })
         .expect(400);
-      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
+      expect(res.body.message).toBe(
+        'Validation failed (numeric string is expected)',
+      );
     });
 
     it('returns 404 if goal does not exist', async () => {

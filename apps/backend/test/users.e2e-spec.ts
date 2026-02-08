@@ -103,7 +103,9 @@ describe('Users API (E2E)', () => {
         .send(payload)
         .expect(400);
       expect(res.body.message).toBe('Validation failed');
-      expect(res.body.fields.password._errors).toEqual(['Password minimum length is 8']);
+      expect(res.body.fields.password._errors).toEqual([
+        'Password minimum length is 8',
+      ]);
     });
 
     it('rejects request with invalid email (400)', async () => {
@@ -131,7 +133,9 @@ describe('Users API (E2E)', () => {
         .send(payload)
         .expect(400);
       expect(res.body.message).toBe('Validation failed');
-      expect(res.body.fields.username._errors).toEqual(['Username is required']);
+      expect(res.body.fields.username._errors).toEqual([
+        'Username is required',
+      ]);
     });
 
     it('creates user successfully (201)', async () => {
@@ -269,12 +273,12 @@ describe('Users API (E2E)', () => {
           password: bobHash,
         },
       });
-    })
+    });
 
     it('rejects unauthenticated requests (401)', async () => {
       const payload: UpdateUserDto = {
         username: 'updated',
-        currentPassword: 'irrelevantpassword'
+        currentPassword: 'irrelevantpassword',
       };
       const res = await request(app.getHttpServer())
         .patch('/users/me')
@@ -285,7 +289,7 @@ describe('Users API (E2E)', () => {
 
     it('allows empty payload (200)', async () => {
       const payload: UpdateUserDto = {
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
       const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
@@ -297,36 +301,27 @@ describe('Users API (E2E)', () => {
     it('rejects invalid email (400)', async () => {
       const payload: UpdateUserDto = {
         email: 'notanemail',
-        currentPassword: 'irrelevantpassword'
+        currentPassword: 'irrelevantpassword',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(400);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(400);
       expect(res.body.message).toBe('Validation failed');
     });
 
     it('rejects short password (400)', async () => {
       const payload: UpdateUserDto = {
         password: 'short',
-        currentPassword: 'irrelevantpassword'
+        currentPassword: 'irrelevantpassword',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(400);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(400);
       expect(res.body.message).toBe('Validation failed');
     });
 
     it('updates username successfully', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_updated',
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(200);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       expect(res.body.username).toBe('alice_updated');
       expect(res.body.email).toBe('alice@test.com'); // Unchanged
@@ -340,12 +335,9 @@ describe('Users API (E2E)', () => {
     it('updates email successfully', async () => {
       const payload: UpdateUserDto = {
         email: 'alice_new@test.com',
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(200);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       expect(res.body.email).toBe('alice_new@test.com');
       expect(res.body.username).toBe('alice'); // Unchanged
@@ -359,12 +351,9 @@ describe('Users API (E2E)', () => {
     it('updates password successfully', async () => {
       const payload: UpdateUserDto = {
         password: 'alice_new_password',
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(200);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       // Check response fields
       expect(res.body.email).toBe('alice@test.com'); // Unchanged
@@ -392,14 +381,11 @@ describe('Users API (E2E)', () => {
         username: 'alice_new',
         email: 'alice_new@test.com',
         password: 'alice_new_password',
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
 
       // Check response fields
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(200);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       expect(res.body.username).toBe('alice_new');
       expect(res.body.email).toBe('alice_new@test.com');
@@ -425,12 +411,9 @@ describe('Users API (E2E)', () => {
     it('rejects duplicate username (409)', async () => {
       const payload: UpdateUserDto = {
         username: 'bob', // Already taken
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(409);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(409);
       expect(res.body.message).toBe('A user with this username already exists');
     });
 
@@ -439,22 +422,16 @@ describe('Users API (E2E)', () => {
         email: 'bob@test.com', // Already taken
         currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(409);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(409);
       expect(res.body.message).toBe('A user with this email already exists');
     });
 
     it('does not return password in response', async () => {
       const payload: UpdateUserDto = {
         username: 'alice_v2',
-        currentPassword: 'alicespassword123'
+        currentPassword: 'alicespassword123',
       };
-      const res = await aliceAgent
-        .patch('/users/me')
-        .send(payload)
-        .expect(200);
+      const res = await aliceAgent.patch('/users/me').send(payload).expect(200);
 
       expect(res.body.password).toBeUndefined();
     });
@@ -521,11 +498,11 @@ describe('Users API (E2E)', () => {
 
       // Verify related goal entries are deleted due to cascade
       const goalEntriesAfter = await prisma.goalEntry.findMany({
-        where: { 
+        where: {
           goal: {
-            userId: alice.id
-          }
-        }
+            userId: alice.id,
+          },
+        },
       });
       expect(goalEntriesAfter.length).toBe(0);
     });

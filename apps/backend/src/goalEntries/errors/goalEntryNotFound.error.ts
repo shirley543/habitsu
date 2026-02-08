@@ -1,4 +1,4 @@
-import { GoalEntryDomainError } from "./goalEntry.domainError";
+import { GoalEntryDomainError } from './goalEntry.domainError';
 
 export class GoalEntryNotFoundError extends GoalEntryDomainError {
   code = 'GOAL_ENTRY_NOT_FOUND';

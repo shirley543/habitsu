@@ -11,7 +11,10 @@ export default async function globalSetup() {
 
   // Load SQL functions from file
   console.log('Loading SQL functions...');
-  execSync(`psql -d "${connectionUri}" -f src/database/dbStatisticFunctions.sql`, { stdio: 'inherit' });
-  
+  execSync(
+    `psql -d "${connectionUri}" -f src/database/dbStatisticFunctions.sql`,
+    { stdio: 'inherit' },
+  );
+
   console.log('Global setup finished, Postgres ready.');
 }

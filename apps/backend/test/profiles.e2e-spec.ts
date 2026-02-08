@@ -6,7 +6,13 @@ import { prisma } from './helpers/prisma';
 import { loginWithCookie } from './helpers/login';
 import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
-import { Goal, GoalPublicity, GoalQuantify, ProfilePublicity, User } from '@prisma/client';
+import {
+  Goal,
+  GoalPublicity,
+  GoalQuantify,
+  ProfilePublicity,
+  User,
+} from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import { GoalResponse } from '@habit-tracker/validation-schemas';
 
@@ -103,7 +109,9 @@ describe('Profiles API (E2E)', () => {
     });
 
     it('returns full profile data for public profile (owner)', async () => {
-      const res = await aliceAgent.get(`/profiles/${alice.username}`).expect(200);
+      const res = await aliceAgent
+        .get(`/profiles/${alice.username}`)
+        .expect(200);
 
       expect(res.body.username).toBe('alice');
       expect(res.body.joinedAt).toBeDefined();
@@ -202,7 +210,9 @@ describe('Profiles API (E2E)', () => {
         ],
       });
 
-      const res = await aliceAgent.get(`/profiles/${alice.username}`).expect(200);
+      const res = await aliceAgent
+        .get(`/profiles/${alice.username}`)
+        .expect(200);
 
       // Should count all 3 days (2 different dates would give 2, but we have 3 entries across 3 dates)
       expect(res.body.daysTrackedTotal).toBe(3);
@@ -237,7 +247,9 @@ describe('Profiles API (E2E)', () => {
     });
 
     it('returns zero days tracked when no entries exist', async () => {
-      const res = await aliceAgent.get(`/profiles/${alice.username}`).expect(200);
+      const res = await aliceAgent
+        .get(`/profiles/${alice.username}`)
+        .expect(200);
       expect(res.body.daysTrackedTotal).toBe(0);
     });
 
@@ -263,7 +275,9 @@ describe('Profiles API (E2E)', () => {
         ],
       });
 
-      const res = await aliceAgent.get(`/profiles/${alice.username}`).expect(200);
+      const res = await aliceAgent
+        .get(`/profiles/${alice.username}`)
+        .expect(200);
 
       // Should count 2 unique dates
       expect(res.body.daysTrackedTotal).toBe(2);

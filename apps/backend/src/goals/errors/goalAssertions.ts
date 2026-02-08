@@ -30,8 +30,7 @@ export function assertGoalCanCreate<T extends GoalWithIds>(
   goal: T,
   userId: number,
 ) {
-  if (goal.userId !== userId)
-    throw new GoalUnauthorizedError('created');
+  if (goal.userId !== userId) throw new GoalUnauthorizedError('created');
 }
 
 /**
@@ -40,7 +39,7 @@ export function assertGoalCanCreate<T extends GoalWithIds>(
  * Modifying rules:
  * - Owner can always modify
  * - Non-owner cannot modify; forbidden error if public, not found error if private
- * 
+ *
  * @param goal - The goal object (must contain id and userId)
  * @param userId - The ID of the user performing the action
  * @throws GoalNotFoundError if the user does not own the goal

@@ -149,8 +149,12 @@ export enum PrismaMigrateError {
   ShadowDatabaseCreationFailed = 'P3014',
 }
 
-export function isPrismaMigrateError(value: string): value is PrismaMigrateError {
-  return Object.values(PrismaMigrateError).includes(value as PrismaMigrateError);
+export function isPrismaMigrateError(
+  value: string,
+): value is PrismaMigrateError {
+  return Object.values(PrismaMigrateError).includes(
+    value as PrismaMigrateError,
+  );
 }
 
 /**
@@ -165,8 +169,12 @@ export enum PrismaIntrospectionError {
   SchemaInconsistent = 'P4002',
 }
 
-export function isPrismaIntrospectionError(value: string): value is PrismaIntrospectionError {
-  return Object.values(PrismaIntrospectionError).includes(value as PrismaIntrospectionError);
+export function isPrismaIntrospectionError(
+  value: string,
+): value is PrismaIntrospectionError {
+  return Object.values(PrismaIntrospectionError).includes(
+    value as PrismaIntrospectionError,
+  );
 }
 
 /**
@@ -197,6 +205,10 @@ export enum PrismaAccelerateError {
   TooManyRequests = 'P5011',
 }
 
-export function isPrismaAccelerateError(value: string): value is PrismaAccelerateError {
-  return Object.values(PrismaAccelerateError).includes(value as PrismaAccelerateError);
+export function isPrismaAccelerateError(
+  value: string,
+): value is PrismaAccelerateError {
+  return Object.values(PrismaAccelerateError).includes(
+    value as PrismaAccelerateError,
+  );
 }

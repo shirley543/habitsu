@@ -330,7 +330,7 @@ describe('Goals API (E2E)', () => {
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(200);
       expect(res.body.id).toBe(other.id);
-      expect(res.body.userId).toBe(bob.id)
+      expect(res.body.userId).toBe(bob.id);
     });
 
     it('returns goal if goal public and user is unauthenticated', async () => {
@@ -349,7 +349,7 @@ describe('Goals API (E2E)', () => {
         .get(`/goals/${other.id}`)
         .expect(200);
       expect(res.body.id).toBe(other.id);
-      expect(res.body.userId).toBe(bob.id)
+      expect(res.body.userId).toBe(bob.id);
     });
   });
 
@@ -431,7 +431,9 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/${other.id}`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(403);
-      expect(res.body.message).toBe('Goal cannot be modified by the current user');
+      expect(res.body.message).toBe(
+        'Goal cannot be modified by the current user',
+      );
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -529,7 +531,9 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.delete(`/goals/${other.id}`).expect(403);
-      expect(res.body.message).toBe('Goal cannot be modified by the current user');
+      expect(res.body.message).toBe(
+        'Goal cannot be modified by the current user',
+      );
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
