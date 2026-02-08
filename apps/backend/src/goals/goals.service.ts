@@ -95,6 +95,9 @@ export class GoalsService {
     });
     assertUserFound(user, targetUsername);
 
+    // TODOs #30 add check here so that if profile publicity is private, no goals are shown.
+    // Confirm e2e test fixed/ working for profiles.e2e
+
     const isOwner = requestingUserId === user.id;
     const goals = await this.prisma.goal.findMany({
       where: {
