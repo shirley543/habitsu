@@ -15,7 +15,6 @@ type GoalWithIdsPublicity = Pick<Goal, 'id' | 'userId' | 'publicity'>;
  */
 export function assertGoalFound<T extends GoalWithId>(
   goal: T | null,
-  goalId: number,
 ): asserts goal is T {
   if (!goal) throw new GoalNotFoundError();
 }

@@ -8,14 +8,12 @@ import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
 import { Goal, GoalPublicity, GoalQuantify, ProfilePublicity, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
-import { ProfileResponseDto } from '@habit-tracker/validation-schemas';
 
 describe('Profiles API (E2E)', () => {
   let app: INestApplication;
 
   let alice: User;
   let bob: User;
-  let charlie: User;
 
   let aliceAgent: TestAgent;
   let bobAgent: TestAgent;
@@ -43,7 +41,6 @@ describe('Profiles API (E2E)', () => {
     // Seed users
     const alicePassword = 'alicespassword123';
     const bobPassword = 'bobspassword123';
-    const charliePassword = 'charliepassword123';
 
     const aliceHash = await bcrypt.hash(
       alicePassword,
@@ -51,10 +48,6 @@ describe('Profiles API (E2E)', () => {
     );
     const bobHash = await bcrypt.hash(
       bobPassword,
-      parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
-    );
-    const charlieHash = await bcrypt.hash(
-      charliePassword,
       parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
     );
 
@@ -73,15 +66,6 @@ describe('Profiles API (E2E)', () => {
         username: 'bob',
         password: bobHash,
         profilePublicity: ProfilePublicity.PRIVATE,
-      },
-    });
-
-    charlie = await prisma.user.create({
-      data: {
-        email: 'charlie@test.com',
-        username: 'charlie',
-        password: charlieHash,
-        profilePublicity: ProfilePublicity.PUBLIC,
       },
     });
 
@@ -289,12 +273,9 @@ describe('Profiles API (E2E)', () => {
    * GET /profiles/:username/goals
    */
   describe('GET /profiles/:username/goals', () => {
-    let alicePublicGoal: Goal;
-    let alicePrivateGoal: Goal;
-    let bobPublicGoal: Goal;
-
     beforeEach(async () => {
-      alicePublicGoal = await prisma.goal.create({
+      // Alice public goal
+      await prisma.goal.create({
         data: {
           title: 'Alice Public Goal',
           userId: alice.id,
@@ -306,7 +287,8 @@ describe('Profiles API (E2E)', () => {
         },
       });
 
-      alicePrivateGoal = await prisma.goal.create({
+      // Alice private goal
+      await prisma.goal.create({
         data: {
           title: 'Alice Private Goal',
           userId: alice.id,
@@ -318,7 +300,8 @@ describe('Profiles API (E2E)', () => {
         },
       });
 
-      bobPublicGoal = await prisma.goal.create({
+      // Bob public goal
+      await prisma.goal.create({
         data: {
           title: 'Bob Public Goal',
           userId: bob.id,

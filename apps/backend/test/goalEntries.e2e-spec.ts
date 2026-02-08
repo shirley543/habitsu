@@ -11,8 +11,6 @@ import TestAgent from 'supertest/lib/agent';
 import {
   CreateGoalEntryDto,
   UpdateGoalEntryDto,
-  GoalQuantifyType,
-  GoalPublicityType,
   GoalEntryResponse,
   SearchParamsGoalEntryDto,
 } from '@habit-tracker/validation-schemas';
@@ -270,8 +268,6 @@ describe('Goal Entries API (E2E)', () => {
   describe('GET /entries', () => {
     let aliceEntry1: GoalEntry;
     let aliceEntry2: GoalEntry;
-    let alicePrivateEntry: GoalEntry;
-    let bobEntry: GoalEntry;
 
     beforeEach(async () => {
       // Create entries for testing
@@ -293,7 +289,7 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      alicePrivateEntry = await prisma.goalEntry.create({
+      await prisma.goalEntry.create({
         data: {
           goalId: alicePrivateGoal.id,
           entryDate: new Date('2025-01-10'),
@@ -301,7 +297,7 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      bobEntry = await prisma.goalEntry.create({
+      await prisma.goalEntry.create({
         data: {
           goalId: bobGoal.id,
           entryDate: new Date('2025-01-05'),
@@ -597,7 +593,6 @@ describe('Goal Entries API (E2E)', () => {
         .patch(`/goals/${bobPrivateGoal.id}/entries/${bobPrivateGoalEntry.id}`)
         .send({ note: 'Updated' })
         .expect(404);
-      // TODOs #34 rethink this error message. Leaks private goal ID.
       expect(res.body.message).toBe('Goal not found');
     });
     
@@ -859,6 +854,7 @@ describe('Goal Entries API (E2E)', () => {
         .get('/entries/statistics')
         .query({ goalId: 'invalid', year: 2025 })
         .expect(400);
+      expect(res.body.message).toBe('Validation failed (numeric string is expected)');
     });
 
     it('returns 404 if goal does not exist', async () => {
@@ -866,6 +862,7 @@ describe('Goal Entries API (E2E)', () => {
         .get('/entries/statistics')
         .query({ goalId: 999999, year: 2025 })
         .expect(404);
+      expect(res.body.message).toBe('Goal not found');
     });
   });
 
@@ -980,6 +977,7 @@ describe('Goal Entries API (E2E)', () => {
         .get('/entries/monthly-counts')
         .query({ goalId: 999999, year: 2025 })
         .expect(404);
+      expect(res.body.message).toBe('Goal not found');
     });
   });
 });

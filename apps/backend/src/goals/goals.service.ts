@@ -113,7 +113,7 @@ export class GoalsService {
 
   async findOne(id: number, userId: number): Promise<Goal> {
     const goal = await this.prisma.goal.findUnique({ where: { id } });
-    assertGoalFound(goal, id);
+    assertGoalFound(goal);
     assertGoalCanView(goal, userId);
 
     return goal;
@@ -128,7 +128,7 @@ export class GoalsService {
     const goalToUpdate = await this.prisma.goal.findUnique({
       where: { id },
     });
-    assertGoalFound(goalToUpdate, id);
+    assertGoalFound(goalToUpdate);
     assertGoalCanModify(goalToUpdate, userId);
 
     if (
@@ -170,7 +170,7 @@ export class GoalsService {
   async remove(id: number, userId: number): Promise<Goal> {
     return await this.prisma.$transaction(async (tx) => {
       const goalToDelete = await tx.goal.findUnique({ where: { id } });
-      assertGoalFound(goalToDelete, id);
+      assertGoalFound(goalToDelete);
       assertGoalCanModify(goalToDelete, userId);
 
       // Get goals with order greater than goal being deleted
