@@ -282,13 +282,6 @@ describe('Goals API (E2E)', () => {
       });
     });
 
-    it('rejects unauthenticated', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/goals/${goal.id}`)
-        .expect(401);
-      expect(res.body.message).toBe('Unauthorized');
-    });
-
     it('returns 400 for invalid id', async () => {
       const res = await aliceAgent.get('/goals/invalid').expect(400);
       expect(res.body.message).toBe(
@@ -301,7 +294,7 @@ describe('Goals API (E2E)', () => {
       expect(res.body.message).toBe('Goal with id 999999 not found');
     });
 
-    it('returns 404 if goal belongs to another user', async () => {
+    it('returns 404 if goal private and user is not the goal owner', async () => {
       const other = await prisma.goal.create({
         data: {
           title: 'Bob Goal',
@@ -317,10 +310,46 @@ describe('Goals API (E2E)', () => {
       expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
     });
 
-    it('returns goal if authorized', async () => {
+    it('returns goal if user is goal owner', async () => {
       const res = await aliceAgent.get(`/goals/${goal.id}`).expect(200);
       expect(res.body.id).toBe(goal.id);
       expect(res.body.userId).toBe(alice.id);
+    });
+
+    it('returns goal if goal public and user is not the goal owner', async () => {
+      const other = await prisma.goal.create({
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
+      });
+      const res = await aliceAgent.get(`/goals/${other.id}`).expect(200);
+      expect(res.body.id).toBe(other.id);
+      expect(res.body.userId).toBe(bob.id)
+    });
+
+    it('returns goal if goal public and user is unauthenticated', async () => {
+      const other = await prisma.goal.create({
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
+      });
+      const res = await request(app.getHttpServer())
+        .get(`/goals/${other.id}`)
+        .expect(200);
+      expect(res.body.id).toBe(other.id);
+      expect(res.body.userId).toBe(bob.id)
     });
   });
 
@@ -386,13 +415,32 @@ describe('Goals API (E2E)', () => {
       expect(res.body.message).toBe('Goal with id 999999 not found');
     });
 
-    it('returns 404 if goal belongs to another user', async () => {
+    it('returns 403 if goal public and user is not the goal owner', async () => {
       const other = await prisma.goal.create({
         data: {
           title: 'Bob Goal',
           userId: bob.id,
           goalType: GoalQuantify.NUMERIC,
           publicity: GoalPublicity.PUBLIC,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
+      });
+      const res = await aliceAgent
+        .patch(`/goals/${other.id}`)
+        .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
+        .expect(403);
+      expect(res.body.message).toBe(`Goal ${other.id} cannot be modified by the current user`);
+    });
+
+    it('returns 404 if goal private and user is not the goal owner', async () => {
+      const other = await prisma.goal.create({
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PRIVATE,
           order: 1,
           colour: 'FFFFFF',
           icon: 'b1',
@@ -468,7 +516,7 @@ describe('Goals API (E2E)', () => {
       await request(app.getHttpServer()).delete('/goals/1').expect(401);
     });
 
-    it('returns 404 if goal belongs to another user', async () => {
+    it('returns 403 if goal public and user is not the goal owner', async () => {
       const other = await prisma.goal.create({
         data: {
           title: 'Bob Goal',
@@ -480,7 +528,24 @@ describe('Goals API (E2E)', () => {
           icon: 'b1',
         },
       });
-      await aliceAgent.delete(`/goals/${other.id}`).expect(404);
+      const res = await aliceAgent.delete(`/goals/${other.id}`).expect(403);
+      expect(res.body.message).toBe(`Goal ${other.id} cannot be modified by the current user`);
+    });
+
+    it('returns 404 if goal private and user is not the goal owner', async () => {
+      const other = await prisma.goal.create({
+        data: {
+          title: 'Bob Goal',
+          userId: bob.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PRIVATE,
+          order: 1,
+          colour: 'FFFFFF',
+          icon: 'b1',
+        },
+      });
+      const res = await aliceAgent.delete(`/goals/${other.id}`).expect(404);
+      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
     });
 
     it('deletes goal successfully and reorders remaining', async () => {

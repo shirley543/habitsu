@@ -27,6 +27,7 @@ import { ZodValidationPipe } from '../common/zod/zod-validation.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtAuthenticatedRequest } from '../auth/jwt-auth.types';
 import { GoalExceptionFilter } from './filters/goal.exceptionFilter';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 
 @Controller('goals')
 @UseFilters(GoalExceptionFilter)
@@ -57,7 +58,7 @@ export class GoalsController {
     return this.goalsService.findAll(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id')
   @ApiOkResponse({ type: GoalEntity })
   findOne(@Req() req, @Param('id', ParseIntPipe) id: number) {
