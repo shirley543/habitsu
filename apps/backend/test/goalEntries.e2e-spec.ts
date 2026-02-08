@@ -532,7 +532,7 @@ describe('Goal Entries API (E2E)', () => {
       expect(res.body.message).toBe('Goal not found');
     });
 
-    // TODOs #36 add testcases for user accessing public goals
+    // TODOs #30 add testcases for user accessing public goals
   });
 
   /**
