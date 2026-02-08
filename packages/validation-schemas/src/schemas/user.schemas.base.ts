@@ -10,9 +10,11 @@ const UserSchema = z.object({
 });
 
 export const CreateUserSchema = UserSchema;
-export const UpdateUserSchema = CreateUserSchema.partial().and(z.object({
-  currentPassword: z.string()
-}));
+export const UpdateUserSchema = CreateUserSchema.partial().and(
+  z.object({
+    currentPassword: z.string(),
+  }),
+);
 
 export const LoginUserSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
