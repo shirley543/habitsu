@@ -17,7 +17,7 @@ export function assertGoalFound<T extends GoalWithId>(
   goal: T | null,
   goalId: number,
 ): asserts goal is T {
-  if (!goal) throw new GoalNotFoundError(goalId);
+  if (!goal) throw new GoalNotFoundError();
 }
 
 /**
@@ -32,7 +32,7 @@ export function assertGoalCanCreate<T extends GoalWithIds>(
   userId: number,
 ) {
   if (goal.userId !== userId)
-    throw new GoalUnauthorizedError(goal.id, 'created');
+    throw new GoalUnauthorizedError('created');
 }
 
 /**
@@ -54,9 +54,9 @@ export function assertGoalCanModify<T extends GoalWithIdsPublicity>(
   const isPublic = goal.publicity === GoalPublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
-    throw new GoalNotFoundError(goal.id);
+    throw new GoalNotFoundError();
   } else if (!isOwner && isPublic) {
-    throw new GoalUnauthorizedError(goal.id, 'modified');
+    throw new GoalUnauthorizedError('modified');
   }
 }
 
@@ -80,6 +80,6 @@ export function assertGoalCanView<T extends GoalWithIdsPublicity>(
   const isPublic = goal.publicity === GoalPublicity.PUBLIC;
 
   if (!isOwner && !isPublic) {
-    throw new GoalNotFoundError(goal.id);
+    throw new GoalNotFoundError();
   }
 }

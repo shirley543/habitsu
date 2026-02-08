@@ -291,7 +291,7 @@ describe('Goals API (E2E)', () => {
 
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get('/goals/999999').expect(404);
-      expect(res.body.message).toBe('Goal with id 999999 not found');
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -307,7 +307,7 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
-      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns goal if user is goal owner', async () => {
@@ -412,7 +412,7 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/999999`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(404);
-      expect(res.body.message).toBe('Goal with id 999999 not found');
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 403 if goal public and user is not the goal owner', async () => {
@@ -431,7 +431,7 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/${other.id}`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(403);
-      expect(res.body.message).toBe(`Goal ${other.id} cannot be modified by the current user`);
+      expect(res.body.message).toBe('Goal cannot be modified by the current user');
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -450,7 +450,7 @@ describe('Goals API (E2E)', () => {
         .patch(`/goals/${other.id}`)
         .send({ title: 'Updated', goalType: GoalQuantify.BOOLEAN })
         .expect(404);
-      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('updates successfully', async () => {
@@ -529,7 +529,7 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.delete(`/goals/${other.id}`).expect(403);
-      expect(res.body.message).toBe(`Goal ${other.id} cannot be modified by the current user`);
+      expect(res.body.message).toBe('Goal cannot be modified by the current user');
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -545,7 +545,7 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.delete(`/goals/${other.id}`).expect(404);
-      expect(res.body.message).toBe(`Goal with id ${other.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('deletes goal successfully and reorders remaining', async () => {

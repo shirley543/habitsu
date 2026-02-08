@@ -233,7 +233,6 @@ export class GoalsService {
 
     if (!areIdsEqual) {
       throw new GoalNotFoundError(
-        undefined,
         'Reorder request contains invalid goal IDs',
       );
     }

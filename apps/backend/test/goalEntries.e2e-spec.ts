@@ -177,7 +177,7 @@ describe('Goal Entries API (E2E)', () => {
         .post(`/goals/999999/entries`)
         .send(payload)
         .expect(404);
-      expect(res.body.message).toBe('Goal with id 999999 not found');
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 403 if goal public and user is not the goal owner', async () => {
@@ -190,7 +190,7 @@ describe('Goal Entries API (E2E)', () => {
         .post(`/goals/${bobGoal.id}/entries`)
         .send(payload)
         .expect(403);
-      expect(res.body.message).toBe(`Goal ${bobGoal.id} cannot be modified by the current user`);
+      expect(res.body.message).toBe('Goal cannot be modified by the current user');
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
@@ -202,7 +202,7 @@ describe('Goal Entries API (E2E)', () => {
         .post(`/goals/${bobPrivateGoal.id}/entries`)
         .send(payload)
         .expect(404);
-      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('creates numeric goal entry successfully (201)', async () => {
@@ -375,7 +375,7 @@ describe('Goal Entries API (E2E)', () => {
         .get('/entries')
         .query(searchParams)
         .expect(404);
-      expect(res.body.message).toBe(`Goal with id ${alicePrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('rejects access to other user private goals (404)', async () => {
@@ -383,7 +383,7 @@ describe('Goal Entries API (E2E)', () => {
         goalId: alicePrivateGoal.id,
       };
       const res = await bobAgent.get('/entries').query(searchParams).expect(404);
-      expect(res.body.message).toBe(`Goal with id ${alicePrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('rejects missing required query params (400)', async () => { 
@@ -446,8 +446,7 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get(`/entries/${bobEntry.id}`)
         .expect(404);
-      // TODOs #36 rethink this error message; leaks private goal ID when requestor is looking for specific private goal's entry
-      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns entry if authorized', async () => {
@@ -523,14 +522,14 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get(`/goals/999999/entries`)
         .expect(404);
-      expect(res.body.message).toBe('Goal with id 999999 not found');
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns 404 if user is not private goal owner', async () => {
       const res = await aliceAgent
         .get(`/goals/${bobPrivateGoal.id}/entries`)
         .expect(404);
-      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     // TODOs #36 add testcases for user accessing public goals
@@ -599,7 +598,7 @@ describe('Goal Entries API (E2E)', () => {
         .send({ note: 'Updated' })
         .expect(404);
       // TODOs #34 rethink this error message. Leaks private goal ID.
-      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
     
     it('returns 403 if goal public and user is not goal owner', async () => {
@@ -616,8 +615,7 @@ describe('Goal Entries API (E2E)', () => {
         .patch(`/goals/${bobGoal.id}/entries/${bobGoalEntry.id}`)
         .send({ note: 'Updated' })
         .expect(403);
-      // TODOs #36 rethink this error message. Accessing entries/:id hence should be displaying that Goal entry cannot be modified by current user
-      expect(res.body.message).toBe(`Goal ${bobGoal.id} cannot be modified by the current user`);
+      expect(res.body.message).toBe('Goal cannot be modified by the current user');
     });
 
     it('updates entry note successfully', async () => {
@@ -768,15 +766,14 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .delete(`/goals/${bobGoal.id}/entries/${bobGoalEntry.id}`)
         .expect(403);
-      expect(res.body.message).toBe(`Goal ${bobGoal.id} cannot be modified by the current user`);
+      expect(res.body.message).toBe('Goal cannot be modified by the current user');
     });
 
     it('returns 404 if goal private and user is not the goal owner', async () => {
       const res = await aliceAgent
         .delete(`/goals/${bobPrivateGoal.id}/entries/${bobPrivateGoalEntry.id}`)
         .expect(404);
-      // TODOs #36 rethink this error message; leaky
-      expect(res.body.message).toBe(`Goal with id ${bobPrivateGoal.id} not found`);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('deletes entry successfully', async () => {
@@ -876,7 +873,7 @@ describe('Goal Entries API (E2E)', () => {
    * GET /entries/monthly-averages
    */
   describe('GET /entries/monthly-averages', () => {
-    // TODOs #36: Add checks to confirm that:
+    // TODOs #30: Add checks to confirm that:
     // - Alice sees full values across all their own (Alice's) public + private goal entries
     // - Bob sees only values across other people's (Alice's) public goal entries
     beforeEach(async () => {
