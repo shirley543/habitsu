@@ -39,6 +39,10 @@ export enum PrismaInitError {
   ServerClosedConnection = 'P1017',
 }
 
+export function isPrismaInitError(value: string): value is PrismaInitError {
+  return Object.values(PrismaInitError).includes(value as PrismaInitError);
+}
+
 /**
  * Prisma Client (Query Engine / P2xxx)
  */
@@ -119,6 +123,10 @@ export enum PrismaClientError {
   TooManyDatabaseConnections = 'P2037',
 }
 
+export function isPrismaClientError(value: string): value is PrismaClientError {
+  return Object.values(PrismaClientError).includes(value as PrismaClientError);
+}
+
 /**
  * Prisma Migrate (Schema Engine / P3xxx)
  */
@@ -141,6 +149,10 @@ export enum PrismaMigrateError {
   ShadowDatabaseCreationFailed = 'P3014',
 }
 
+export function isPrismaMigrateError(value: string): value is PrismaMigrateError {
+  return Object.values(PrismaMigrateError).includes(value as PrismaMigrateError);
+}
+
 /**
  * Prisma "db pull" / Introspection Errors (P4xxx)
  */
@@ -151,6 +163,10 @@ export enum PrismaIntrospectionError {
   DatabaseEmpty = 'P4001',
   /** P4002: Schema of introspected database was inconsistent. */
   SchemaInconsistent = 'P4002',
+}
+
+export function isPrismaIntrospectionError(value: string): value is PrismaIntrospectionError {
+  return Object.values(PrismaIntrospectionError).includes(value as PrismaIntrospectionError);
 }
 
 /**
@@ -181,9 +197,6 @@ export enum PrismaAccelerateError {
   TooManyRequests = 'P5011',
 }
 
-export type PrismaErrorCode =
-  | PrismaInitError
-  | PrismaClientError
-  | PrismaMigrateError
-  | PrismaIntrospectionError
-  | PrismaAccelerateError;
+export function isPrismaAccelerateError(value: string): value is PrismaAccelerateError {
+  return Object.values(PrismaAccelerateError).includes(value as PrismaAccelerateError);
+}

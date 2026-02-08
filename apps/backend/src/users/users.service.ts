@@ -9,7 +9,7 @@ import {
   UserResponseDto,
 } from '@habit-tracker/validation-schemas';
 import { EnvService } from '../env/env.service';
-import { PrismaClientError } from '../common/prisma/prismaError';
+import { isPrismaClientError, PrismaClientError } from '../common/prisma/prismaError';
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
@@ -44,7 +44,7 @@ export class UsersService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaClientError.UniqueConstraintFailed) {
+        if (isPrismaClientError(error.code) && error.code === PrismaClientError.UniqueConstraintFailed) {
           const field = (error.meta?.target as string[])?.[0] || 'user';
           throw new UserAlreadyExistsError(`A user with this ${field} already exists`);
         }
@@ -114,7 +114,7 @@ export class UsersService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaClientError.UniqueConstraintFailed) {
+        if (isPrismaClientError(error.code) && error.code === PrismaClientError.UniqueConstraintFailed) {
           const field = (error.meta?.target as string[])?.[0] || 'user';
           throw new UserAlreadyExistsError(`A user with this ${field} already exists`);
         }

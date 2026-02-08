@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
 import { Goal, GoalPublicity, GoalQuantify, ProfilePublicity, User } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
+import { GoalResponse } from '@habit-tracker/validation-schemas';
 
 describe('Profiles API (E2E)', () => {
   let app: INestApplication;
@@ -327,7 +328,7 @@ describe('Profiles API (E2E)', () => {
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
-      const goalTitles = res.body.map((g) => g.title);
+      const goalTitles = (res.body as GoalResponse[]).map((g) => g.title);
       expect(goalTitles).toContain('Alice Public Goal');
       expect(goalTitles).toContain('Alice Private Goal');
       expect(res.body.length).toBe(2);
@@ -339,7 +340,7 @@ describe('Profiles API (E2E)', () => {
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
-      const goalTitles = res.body.map((g) => g.title);
+      const goalTitles = (res.body as GoalResponse[]).map((g) => g.title);
       expect(goalTitles).toContain('Alice Public Goal');
       expect(goalTitles).not.toContain('Alice Private Goal');
       expect(res.body.length).toBe(1);
@@ -360,7 +361,7 @@ describe('Profiles API (E2E)', () => {
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
-      const goalTitles = res.body.map((g) => g.title);
+      const goalTitles = (res.body as GoalResponse[]).map((g) => g.title);
       expect(goalTitles).toContain('Bob Public Goal');
       expect(res.body.length).toBe(1);
     });
@@ -371,7 +372,7 @@ describe('Profiles API (E2E)', () => {
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
-      const goalTitles = res.body.map((g) => g.title);
+      const goalTitles = (res.body as GoalResponse[]).map((g) => g.title);
       expect(goalTitles).toContain('Alice Public Goal');
       expect(goalTitles).not.toContain('Alice Private Goal');
     });
