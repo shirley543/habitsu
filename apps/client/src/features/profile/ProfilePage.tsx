@@ -7,7 +7,7 @@ import {
   SkeletonGoalCard,
 } from '../goals/components/GoalCard'
 import type { IconName } from 'lucide-react/dynamic'
-import { useProfileGoals } from '@/apis/GoalApi'
+import { useProfileGoals } from '@/apis/ProfileApi'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useProfile } from '@/apis/ProfileApi'
 import { TopBarConfig } from '@/components/custom/TopBar'
