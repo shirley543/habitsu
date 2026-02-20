@@ -106,7 +106,6 @@ export const ProfilePage = () => {
       )}
 
       {/* Goals data/ heatmaps container */}
-      {/* TODOs #30: Replace these goals data with actual profile user's goal data */}
       {(goalsData || goalsIsLoading) && (
         <div className="flex flex-col gap-3">
           {goalsData &&
