@@ -68,10 +68,10 @@ describe('Goal Entries API (E2E)', () => {
       parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
     );
     alice = await prisma.user.create({
-      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash },
+      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash, profilePublicity: ProfilePublicity.PUBLIC },
     });
     bob = await prisma.user.create({
-      data: { email: 'bob@test.com', username: 'Bob', password: bobHash },
+      data: { email: 'bob@test.com', username: 'Bob', password: bobHash, profilePublicity: ProfilePublicity.PUBLIC },
     });
 
     // Login users and get agents
@@ -635,6 +635,13 @@ describe('Goal Entries API (E2E)', () => {
         });
       });
 
+      beforeEach(async () => {
+        await prisma.user.update({
+          where: { id: alice.id },
+          data: { profilePublicity: ProfilePublicity.PUBLIC },
+        });
+      });
+
       it('allows owner to access entries (200)', async () => {
         const res = await aliceAgent
           .get(`/goals/${aliceGoal.id}/entries`)
@@ -664,6 +671,13 @@ describe('Goal Entries API (E2E)', () => {
         await prisma.user.update({
           where: { id: bob.id },
           data: { profilePublicity: ProfilePublicity.PRIVATE },
+        });
+      });
+
+      beforeEach(async () => {
+        await prisma.user.update({
+          where: { id: bob.id },
+          data: { profilePublicity: ProfilePublicity.PUBLIC },
         });
       });
 
@@ -1116,8 +1130,6 @@ describe('Goal Entries API (E2E)', () => {
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
-
-    it('returns 404 when profile is public, goal is ')
   });
 
   /**
