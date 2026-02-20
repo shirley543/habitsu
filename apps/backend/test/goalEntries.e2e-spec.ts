@@ -1048,16 +1048,6 @@ describe('Goal Entries API (E2E)', () => {
    * GET /entries/monthly-averages
    */
   describe('GET /entries/monthly-averages', () => {
-    // TODOs #30: Add checks to confirm that:
-    // - Alice sees full values across all their own (Alice's) public + private goal entries
-    // - Bob sees only values across other people's (Alice's) public goal entries
-
-    // TODOs #30: Split into:
-    // Basic validation
-    // Profile Public / Goal Public scenarios
-    // Profile Public / Goal Private scenarios
-    // Profile Private / Goal Public scenarios
-    // Profile Private / Goal Private scenarios
     beforeEach(async () => {
       await prisma.goalEntry.createMany({
         data: [
