@@ -94,9 +94,8 @@ export class GoalEntriesController {
     @Query(new ZodValidationPipe(SearchParamsGoalEntrySchema))
     searchParamsGoalEntryDto: SearchParamsGoalEntryDto,
   ) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
-    // TODOs #30: Need to ensure findMany respects profile publicity (all other places also need to respect profile publicity)
     // TODOs #32: refactor this to use Zod validation pipe instead of manual call to .safeParse
     const parsed = SearchParamsGoalEntrySchema.safeParse(
       searchParamsGoalEntryDto,

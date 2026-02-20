@@ -16,8 +16,8 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { GoalsService } from '../goals/goals.service';
 import {
   assertGoalCanModify,
-  assertGoalCanView,
   assertGoalFound,
+  assertGoalCanView,
 } from '../goals/errors/goalAssertions';
 import { assertGoalEntryFound } from './errors/goalEntryAssertions';
 
@@ -80,12 +80,16 @@ export class GoalEntriesService {
     const goalId = searchParamsGoalEntryDto.goalId;
     const year = searchParamsGoalEntryDto.year;
 
+    // Load profile information for privacy enforcement
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
       select: {
         id: true,
         userId: true,
         publicity: true,
+        user: {
+          select: { id: true, profilePublicity: true },
+        },
       },
     });
     assertGoalFound(goal);
@@ -113,6 +117,7 @@ export class GoalEntriesService {
             id: true,
             userId: true,
             publicity: true,
+            user: { select: { id: true, profilePublicity: true } },
           },
         },
       },
@@ -220,10 +225,10 @@ export class GoalEntriesService {
    * Statistics-specific
    */
   async getStatistics(goalId: number, year: number, userId: number) {
-    // Validate ownership. If goal is private, only the goal's owner can view.
-    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    // Validate ownership through profile publicity and goal publicity
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
+      include: { user: { select: { id: true, profilePublicity: true } } },
     });
     assertGoalFound(goal);
     assertGoalCanView(goal, userId);
@@ -249,10 +254,10 @@ export class GoalEntriesService {
   }
 
   async getMonthlyAverages(goalId: number, year: number, userId: number) {
-    // Validate ownership. If goal is private, only the goal's owner can view.
-    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    // Validate ownership through profile publicity and goal publicity
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
+      include: { user: { select: { id: true, profilePublicity: true } } },
     });
     assertGoalFound(goal);
     assertGoalCanView(goal, userId);
@@ -282,10 +287,10 @@ export class GoalEntriesService {
   }
 
   async getMonthlyCounts(goalId: number, year: number, userId: number) {
-    // Validate ownership. If goal is private, only the goal's owner can view.
-    // if goal is public, any user can view it (and including any derived data e.g. statistics of it)
+    // Validate ownership through profile publicity and goal publicity
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
+      include: { user: { select: { id: true, profilePublicity: true } } },
     });
     assertGoalFound(goal);
     assertGoalCanView(goal, userId);

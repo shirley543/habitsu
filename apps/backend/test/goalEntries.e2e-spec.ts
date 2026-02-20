@@ -12,6 +12,7 @@ import {
   GoalPublicity,
   GoalQuantify,
   User,
+  ProfilePublicity,
 } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import {
@@ -393,6 +394,36 @@ describe('Goal Entries API (E2E)', () => {
       expect(res.body.message).toBe('Goal not found');
     });
 
+    it('rejects access to public goal entries when owner profile is private (non-owner)', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const searchParams: SearchParamsGoalEntryDto = {
+        goalId: aliceGoal.id,
+      };
+      const res = await bobAgent
+        .get('/entries')
+        .query(searchParams)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('rejects unauthenticated access when profile is private (404)', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const searchParams: SearchParamsGoalEntryDto = {
+        goalId: aliceGoal.id,
+      };
+      const res = await request(app.getHttpServer())
+        .get('/entries')
+        .query(searchParams)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
     it('rejects missing required query params (400)', async () => {
       const res = await aliceAgent.get('/entries').expect(400);
       expect(res.body.message).toBe('Validation failed');
@@ -453,6 +484,23 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
       const res = await aliceAgent.get(`/entries/${bobEntry.id}`).expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('returns 404 for public entry if owner profile is private and user is not owner', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const newEntry = await prisma.goalEntry.create({
+        data: {
+          goalId: aliceGoal.id,
+          entryDate: new Date('2025-03-01'),
+          numericValue: 7,
+          note: 'Should not be visible',
+        },
+      });
+      const res = await bobAgent.get(`/entries/${newEntry.id}`).expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
@@ -533,6 +581,28 @@ describe('Goal Entries API (E2E)', () => {
     it('returns 404 if user is not private goal owner', async () => {
       const res = await aliceAgent
         .get(`/goals/${bobPrivateGoal.id}/entries`)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('returns 404 for public goal entries when profile is private and viewer is not owner', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const res = await bobAgent
+        .get(`/goals/${aliceGoal.id}/entries`)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('rejects unauthenticated access when profile is private (404)', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const res = await request(app.getHttpServer())
+        .get(`/goals/${aliceGoal.id}/entries`)
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
@@ -887,6 +957,18 @@ describe('Goal Entries API (E2E)', () => {
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
+
+    it('returns 404 when profile is private and caller is not owner', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const res = await bobAgent
+        .get('/entries/statistics')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
   });
 
   /**
@@ -946,6 +1028,18 @@ describe('Goal Entries API (E2E)', () => {
         .expect(400);
       expect(res.body.message).toBe('Goal type must be NUMERIC');
     });
+
+    it('returns 404 when profile is private and caller is not owner', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const res = await bobAgent
+        .get('/entries/monthly-averages')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
   });
 
   /**
@@ -999,6 +1093,18 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get('/entries/monthly-counts')
         .query({ goalId: 999999, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('returns 404 when profile is private and caller is not owner', async () => {
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const res = await bobAgent
+        .get('/entries/monthly-counts')
+        .query({ goalId: aliceGoal.id, year: 2025 })
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
