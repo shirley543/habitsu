@@ -16,14 +16,16 @@ import type { GoalStatisticsReponse } from '@habit-tracker/validation-schemas'
 import IconButton from '@/components/custom/IconButton'
 import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
+import { useCurrentDate } from '@/hooks/useCurrentDate'
 
 export const GoalDetailsPage = () => {
   const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId')
 
   // TODOs #12 Improve loading display + error display
+  const currentYear = useCurrentDate().getFullYear()
   const { goalId } = route.useParams()
-  const [selectedYear, setSelectedYear] = useState<number>(2025)
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   // Un-used variables to be addressed in #12
   /* eslint-disable @typescript-eslint/no-unused-vars */

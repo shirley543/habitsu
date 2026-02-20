@@ -11,12 +11,14 @@ import { useProfile, useProfileGoals } from '@/apis/ProfileApi'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 import { TopBarConfig } from '@/components/custom/TopBar'
+import { useCurrentYear } from '@/hooks/useCurrentDate'
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
   const route = getRouteApi('/profile_/$profileName')
 
-  const [selectedYear, setSelectedYear] = useState<number>(2025)
+  const currentYear = useCurrentYear()
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   const { profileName } = route.useParams()
 
