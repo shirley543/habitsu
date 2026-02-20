@@ -62,7 +62,7 @@ export const ProfilePage = () => {
               navigate({ to: '/settings' })
             },
           },
-          // TODOs #30: Avatar
+          // TODOs #42: Avatar
         ]}
       />
 
