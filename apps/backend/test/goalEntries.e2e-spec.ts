@@ -1051,6 +1051,13 @@ describe('Goal Entries API (E2E)', () => {
     // TODOs #30: Add checks to confirm that:
     // - Alice sees full values across all their own (Alice's) public + private goal entries
     // - Bob sees only values across other people's (Alice's) public goal entries
+
+    // TODOs #30: Split into:
+    // Basic validation
+    // Profile Public / Goal Public scenarios
+    // Profile Public / Goal Private scenarios
+    // Profile Private / Goal Public scenarios
+    // Profile Private / Goal Private scenarios
     beforeEach(async () => {
       await prisma.goalEntry.createMany({
         data: [
@@ -1073,12 +1080,18 @@ describe('Goal Entries API (E2E)', () => {
       });
     });
 
+    // Basic validation
     it('rejects unauthenticated requests', async () => {
       const res = await request(app.getHttpServer())
         .get('/entries/monthly-averages')
         .query({ goalId: aliceGoal.id, year: 2025 })
         .expect(401);
       expect(res.body.message).toBe('Unauthorized');
+    });
+
+    it('returns 404 for non-existent goal', async () => {
+      const res = await aliceAgent.get(`/entries/monthly-averages`).expect(404);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns monthly averages for numeric goal', async () => {
@@ -1102,7 +1115,7 @@ describe('Goal Entries API (E2E)', () => {
       expect(res.body.message).toBe('Goal type must be NUMERIC');
     });
 
-    it('returns 404 when profile is private and caller is not owner', async () => {
+    it('returns 404 when profile is private, goal is public, and caller is not owner', async () => {
       await prisma.user.update({
         where: { id: alice.id },
         data: { profilePublicity: ProfilePublicity.PRIVATE },
@@ -1113,6 +1126,8 @@ describe('Goal Entries API (E2E)', () => {
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
+
+    it('returns 404 when profile is public, goal is ')
   });
 
   /**

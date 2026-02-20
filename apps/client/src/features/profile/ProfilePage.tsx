@@ -37,7 +37,6 @@ export const ProfilePage = () => {
     error: goalsError,
   } = useProfileGoals(profileName)
   /* eslint-enable @typescript-eslint/no-unused-vars */
-  // TODOs #30: don't bother calling useGoals if profile is private, pass in to hook as disabled
 
   const formatDateToString = (date: Date | undefined) => {
     return date ? `${date}` : undefined
