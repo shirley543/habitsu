@@ -62,6 +62,7 @@ interface CellProps {
   date: Date
   goalData: ColourGoalData
   entryData: GoalEntryResponse | undefined
+  viewOnly: boolean
 }
 
 const cellVariants = cva('transition-all disabled:pointer-events-none', {
@@ -84,7 +85,7 @@ const cellVariants = cva('transition-all disabled:pointer-events-none', {
 
 const Cell = React.memo(
   forwardRef<HTMLDivElement, CellProps & VariantProps<typeof cellVariants>>(
-    ({ date, goalData, entryData, variant, size }, ref) => {
+    ({ date, goalData, entryData, viewOnly, variant, size }, ref) => {
       const navigate = useNavigate()
 
       const cellColor: string = computeCellColour(goalData, entryData)
@@ -112,7 +113,7 @@ const Cell = React.memo(
               style={{
                 backgroundColor: cellColor,
               }}
-              onClick={() => {
+              onClick={viewOnly ? undefined : () => {
                 navigateToCreateOrEdit(goalData.id, entryData, date, navigate)
               }}
             />
@@ -146,6 +147,7 @@ interface HeatmapProps {
   entriesData: Array<GoalEntryResponse>
   year: number
   displayState?: HeatmapDisplayState
+  viewOnly: boolean
 }
 
 const Heatmap: React.FC<HeatmapProps> = ({
@@ -153,6 +155,7 @@ const Heatmap: React.FC<HeatmapProps> = ({
   entriesData,
   year,
   displayState = HeatmapDisplayState.NO_LABELS,
+  viewOnly,
 }) => {
   const selectedYear = year
   const daysInYear = getDaysInYear(selectedYear)
@@ -192,6 +195,7 @@ const Heatmap: React.FC<HeatmapProps> = ({
           goalData={goalData}
           entryData={entryDataForCell}
           variant={isCellForTodaysDate ? 'outlined' : 'default'}
+          viewOnly={viewOnly}
         />
       )
     })

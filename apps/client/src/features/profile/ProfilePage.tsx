@@ -118,6 +118,7 @@ export const ProfilePage = () => {
                   iconName={d.icon as IconName}
                   goalData={d}
                   selectedYear={selectedYear}
+                  viewOnly={true}
                 />
               )
             })}
