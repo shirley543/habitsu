@@ -6,7 +6,7 @@ import { prisma } from './helpers/prisma';
 import { loginWithCookie } from './helpers/login';
 import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
-import { Goal, GoalPublicity, GoalQuantify, User } from '@prisma/client';
+import { Goal, GoalPublicity, GoalQuantify, User, ProfilePublicity } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import {
   CreateGoalDto,
@@ -197,6 +197,7 @@ describe('Goals API (E2E)', () => {
    * GET /goals
    */
   describe('GET /goals', () => {
+    // Note: said endpoint returns goals for current logged in user only
     it('rejects unauthenticated requests', async () => {
       await request(app.getHttpServer()).get('/goals').expect(401);
     });
@@ -307,6 +308,28 @@ describe('Goals API (E2E)', () => {
         },
       });
       const res = await aliceAgent.get(`/goals/${other.id}`).expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('returns 404 for public goal if owner profile is private and requester is not owner', async () => {
+      // Update alice's profile to be private
+      await prisma.user.update({
+        where: { id: alice.id },
+        data: { profilePublicity: ProfilePublicity.PRIVATE },
+      });
+      const publicGoal = await prisma.goal.create({
+        data: {
+          title: 'Alice Public Goal With Private Profile',
+          userId: alice.id,
+          goalType: GoalQuantify.NUMERIC,
+          publicity: GoalPublicity.PUBLIC,
+          order: 2,
+          colour: 'FFFFFF',
+          icon: 'a2',
+        },
+      });
+
+      const res = await bobAgent.get(`/goals/${publicGoal.id}`).expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 

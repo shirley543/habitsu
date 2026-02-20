@@ -5,13 +5,13 @@ import {
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import { Goal, GoalPublicity, GoalQuantify, Prisma } from '@prisma/client';
+import { Goal, GoalPublicity, GoalQuantify, Prisma, ProfilePublicity } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 import {
   assertGoalCanModify,
-  assertGoalCanView,
   assertGoalFound,
+  assertGoalCanView,
 } from './errors/goalAssertions';
 import { assertUserFound } from '../users/errors/userAssertions';
 import { GoalReorderInputInvalidError } from './errors/goalReorderInputInvalid.error';
@@ -89,20 +89,27 @@ export class GoalsService {
     targetUsername: string,
     requestingUserId: number,
   ): Promise<Goal[]> {
-    // Fetch user to get their userId
+    // Fetch user to get their userId and publicity status
     const user = await this.prisma.user.findUnique({
       where: { username: targetUsername },
     });
     assertUserFound(user, targetUsername);
 
-    // TODOs #30 add check here so that if profile publicity is private, no goals are shown.
-    // Confirm e2e test fixed/ working for profiles.e2e
-
     const isOwner = requestingUserId === user.id;
+    const isProfilePublic =
+      user.profilePublicity === ProfilePublicity.PUBLIC;
+
+    // If requester is not owner and profile private,
+    // early-return empty list
+    if (!isOwner && !isProfilePublic) {
+      return [];
+    }
+
+    // If requester is not owner, filter in only public goals
+    // (don't return any private goals)
     const goals = await this.prisma.goal.findMany({
       where: {
         userId: user.id,
-        // If owner, no publicity filter; otherwise only public goals
         ...(isOwner ? {} : { publicity: GoalPublicity.PUBLIC }),
       },
       orderBy: { order: 'asc' },
@@ -112,11 +119,23 @@ export class GoalsService {
   }
 
   async findOne(id: number, userId: number): Promise<Goal> {
-    const goal = await this.prisma.goal.findUnique({ where: { id } });
+    // Include owner's profile publicity to enforce publicity
+    const goal = await this.prisma.goal.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { id: true, profilePublicity: true },
+        },
+      },
+    });
     assertGoalFound(goal);
+
+    // Assert on profile publicity and goal publicity 
     assertGoalCanView(goal, userId);
 
-    return goal;
+    // Strip `user` field
+    const { user, ...goalWithoutUser } = goal;
+    return goalWithoutUser;
   }
 
   async update(
