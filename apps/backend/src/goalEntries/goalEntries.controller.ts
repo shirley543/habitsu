@@ -125,11 +125,11 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto
    * @returns
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('goals/:goalId/entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyByGoalId(@Req() req, @Param('goalId', ParseIntPipe) goalId: number) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     return this.goalEntriesService.findMany(
       { goalId: goalId, year: undefined },
       userId,

@@ -591,13 +591,6 @@ describe('Goal Entries API (E2E)', () => {
     });
 
     // Basic validation
-    it('rejects unauthenticated requests (401)', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/goals/${aliceGoal.id}/entries`)
-        .expect(401);
-      expect(res.body.message).toBe('Unauthorized');
-    });
-
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get(`/goals/999999/entries`).expect(404);
       expect(res.body.message).toBe('Goal not found');
@@ -679,11 +672,11 @@ describe('Goal Entries API (E2E)', () => {
         expect(res.body.message).toBe('Goal not found');
       });
 
-      it('denies unauthenticated access (401)', async () => {
+      it('denies unauthenticated access (404)', async () => {
         const res = await request(app.getHttpServer())
           .get(`/goals/${bobPrivateGoal.id}/entries`)
-          .expect(401);
-        expect(res.body.message).toBe('Unauthorized');
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
       });
     });
 
@@ -708,11 +701,11 @@ describe('Goal Entries API (E2E)', () => {
         expect(res.body.message).toBe('Goal not found');
       });
 
-      it('denies unauthenticated access (401)', async () => {
+      it('denies unauthenticated access (404)', async () => {
         const res = await request(app.getHttpServer())
           .get(`/goals/${aliceGoal.id}/entries`)
-          .expect(401);
-        expect(res.body.message).toBe('Unauthorized');
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
       });
     });
 
@@ -1132,7 +1125,10 @@ describe('Goal Entries API (E2E)', () => {
     });
 
     it('returns 404 for non-existent goal', async () => {
-      const res = await aliceAgent.get(`/entries/monthly-averages`).expect(404);
+      const res = await aliceAgent
+        .get(`/entries/monthly-averages`)
+        .query({ goalId: 999999, year: 2025 })
+        .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
