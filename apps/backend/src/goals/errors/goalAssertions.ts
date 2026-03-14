@@ -76,10 +76,7 @@ export function assertGoalCanModify<T extends GoalWithIdsPublicity>(
  * @param userId - The ID of the requesting user (or undefined for unauthenticated)
  * @throws GoalNotFoundError if the user is not allowed to view the goal
  */
-export function assertGoalCanView(
-  goal: GoalWithUserProfile,
-  userId?: number,
-) {
+export function assertGoalCanView(goal: GoalWithUserProfile, userId?: number) {
   const isOwner = goal.userId === userId;
   const isProfilePrivate =
     goal.user.profilePublicity === ProfilePublicity.PRIVATE;

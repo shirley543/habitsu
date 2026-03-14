@@ -5,7 +5,13 @@ import {
   ReorderGoalDto,
   UpdateGoalDto,
 } from '@habit-tracker/validation-schemas';
-import { Goal, GoalPublicity, GoalQuantify, Prisma, ProfilePublicity } from '@prisma/client';
+import {
+  Goal,
+  GoalPublicity,
+  GoalQuantify,
+  Prisma,
+  ProfilePublicity,
+} from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas';
 import {
@@ -96,8 +102,7 @@ export class GoalsService {
     assertUserFound(user, targetUsername);
 
     const isOwner = requestingUserId === user.id;
-    const isProfilePublic =
-      user.profilePublicity === ProfilePublicity.PUBLIC;
+    const isProfilePublic = user.profilePublicity === ProfilePublicity.PUBLIC;
 
     // If requester is not owner and profile private,
     // early-return empty list
@@ -130,7 +135,7 @@ export class GoalsService {
     });
     assertGoalFound(goal);
 
-    // Assert on profile publicity and goal publicity 
+    // Assert on profile publicity and goal publicity
     assertGoalCanView(goal, userId);
 
     // Strip `user` field

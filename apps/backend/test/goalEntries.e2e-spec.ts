@@ -68,10 +68,20 @@ describe('Goal Entries API (E2E)', () => {
       parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
     );
     alice = await prisma.user.create({
-      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash, profilePublicity: ProfilePublicity.PRIVATE },
+      data: {
+        email: 'alice@test.com',
+        username: 'Alice',
+        password: aliceHash,
+        profilePublicity: ProfilePublicity.PRIVATE,
+      },
     });
     bob = await prisma.user.create({
-      data: { email: 'bob@test.com', username: 'Bob', password: bobHash, profilePublicity: ProfilePublicity.PUBLIC },
+      data: {
+        email: 'bob@test.com',
+        username: 'Bob',
+        password: bobHash,
+        profilePublicity: ProfilePublicity.PUBLIC,
+      },
     });
 
     // Login users and get agents
@@ -717,7 +727,10 @@ describe('Goal Entries API (E2E)', () => {
         const entries: GoalEntryResponse[] = res.body;
         expect(entries.length).toBe(2);
         expect(entries.map((e) => e.id)).toEqual(
-          expect.arrayContaining([alicePrivateEntry1.id, alicePrivateEntry2.id]),
+          expect.arrayContaining([
+            alicePrivateEntry1.id,
+            alicePrivateEntry2.id,
+          ]),
         );
       });
 

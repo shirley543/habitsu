@@ -6,7 +6,13 @@ import { prisma } from './helpers/prisma';
 import { loginWithCookie } from './helpers/login';
 import * as bcrypt from 'bcrypt';
 import * as cookieParser from 'cookie-parser';
-import { Goal, GoalPublicity, GoalQuantify, User, ProfilePublicity } from '@prisma/client';
+import {
+  Goal,
+  GoalPublicity,
+  GoalQuantify,
+  User,
+  ProfilePublicity,
+} from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import {
   CreateGoalDto,
@@ -56,10 +62,20 @@ describe('Goals API (E2E)', () => {
       parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
     );
     alice = await prisma.user.create({
-      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash, profilePublicity: ProfilePublicity.PRIVATE },
+      data: {
+        email: 'alice@test.com',
+        username: 'Alice',
+        password: aliceHash,
+        profilePublicity: ProfilePublicity.PRIVATE,
+      },
     });
     bob = await prisma.user.create({
-      data: { email: 'bob@test.com', username: 'Bob', password: bobHash, profilePublicity: ProfilePublicity.PUBLIC },
+      data: {
+        email: 'bob@test.com',
+        username: 'Bob',
+        password: bobHash,
+        profilePublicity: ProfilePublicity.PUBLIC,
+      },
     });
 
     // Login users and get agents
