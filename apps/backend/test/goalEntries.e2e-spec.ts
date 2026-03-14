@@ -277,9 +277,7 @@ describe('Goal Entries API (E2E)', () => {
   describe('GET /entries', () => {
     let alicePublicEntry1: GoalEntry;
     let alicePublicEntry2: GoalEntry;
-    let alicePrivateEntry: GoalEntry;
     let bobPublicEntry: GoalEntry;
-    let bobPrivateEntry: GoalEntry;
 
     beforeEach(async () => {
       // Create entries for testing
@@ -301,7 +299,7 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      alicePrivateEntry = await prisma.goalEntry.create({
+      await prisma.goalEntry.create({
         data: {
           goalId: alicePrivateGoal.id,
           entryDate: new Date('2025-02-01'),
@@ -318,7 +316,7 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      bobPrivateEntry = await prisma.goalEntry.create({
+      await prisma.goalEntry.create({
         data: {
           goalId: bobPrivateGoal.id,
           entryDate: new Date('2025-02-05'),
