@@ -3,8 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseDto } from '@habit-tracker/validation-schemas';
-import { JwtPayload } from './jwt-auth.types';
+import { JwtPayload, JwtRequestUser } from './jwt-auth.types';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,7 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<UserResponseDto | null> {
+  ): Promise<JwtRequestUser | null> {
     const user = await this.usersService.findOneByEmailFull(email);
     const passwordValid = user
       ? await bcrypt.compare(password, user.password)
@@ -35,7 +34,7 @@ export class AuthService {
    * @param user - user to generate JWT with
    * @returns - obj with `access_token`
    */
-  login(user: UserResponseDto) {
+  login(user: JwtRequestUser) {
     const payload: JwtPayload = {
       email: user.email,
       username: user.username,

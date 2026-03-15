@@ -16,11 +16,17 @@ import {
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
+import {
+  mapUserPrismaModelOrNullToDto,
+  mapUserPrismaModelToDto,
+  PROFILE_PUBLICITY_TYPE_TO_ENUM,
+} from './users.mapping';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
   username: true,
   email: true,
+  profilePublicity: true,
 };
 
 @Injectable()
@@ -29,7 +35,6 @@ export class UsersService {
     private prisma: PrismaService,
     private envService: EnvService,
   ) {}
-
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
@@ -41,10 +46,11 @@ export class UsersService {
       password: hashedPassword,
     };
     try {
-      return await this.prisma.user.create({
+      const userModel = await this.prisma.user.create({
         data: prismaInput,
         select: userResponseSelect,
       });
+      return mapUserPrismaModelToDto(userModel);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (
@@ -62,24 +68,30 @@ export class UsersService {
   }
 
   findOne(id: number): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { id },
-      select: userResponseSelect,
-    });
+    return this.prisma.user
+      .findUnique({
+        where: { id },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByUsername(username: string): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { username },
-      select: userResponseSelect,
-    });
+    return this.prisma.user
+      .findUnique({
+        where: { username },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByEmail(email: string): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { email },
-      select: userResponseSelect,
-    });
+    return this.prisma.user
+      .findUnique({
+        where: { email },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByEmailFull(email: string): Promise<User | null> {
@@ -100,9 +112,24 @@ export class UsersService {
       throw new UserNotFoundError(id);
     }
 
-    const passwordValid = user
-      ? await bcrypt.compare(updateUserDto.currentPassword, user.password)
-      : false;
+    // Require current password for sensitive updates (username, email, password)
+    const requiresPassword =
+      updateUserDto.username !== undefined ||
+      updateUserDto.email !== undefined ||
+      updateUserDto.password !== undefined;
+
+    let passwordValid = true;
+    if (requiresPassword) {
+      if (!updateUserDto.currentPassword) {
+        throw new UserPasswordInputInvalidError(
+          'Current password is required for this update',
+        );
+      }
+      passwordValid = await bcrypt.compare(
+        updateUserDto.currentPassword,
+        user.password,
+      );
+    }
     if (!passwordValid) {
       throw new UserPasswordInputInvalidError('Invalid current password');
     }
@@ -114,17 +141,27 @@ export class UsersService {
         this.envService.get('SALT_ROUNDS'),
       ));
 
-    const prismaInput: Prisma.UserUpdateInput = {
-      username: updateUserDto.username,
-      email: updateUserDto.email,
-      password: hashedPassword,
-    };
+    const prismaInput: Prisma.UserUpdateInput = {};
+    if (updateUserDto.username !== undefined) {
+      prismaInput.username = updateUserDto.username;
+    }
+    if (updateUserDto.email !== undefined) {
+      prismaInput.email = updateUserDto.email;
+    }
+    if (hashedPassword !== undefined) {
+      prismaInput.password = hashedPassword;
+    }
+    if (updateUserDto.profilePublicity !== undefined) {
+      prismaInput.profilePublicity =
+        PROFILE_PUBLICITY_TYPE_TO_ENUM[updateUserDto.profilePublicity];
+    }
     try {
-      return await this.prisma.user.update({
+      const userModel = await this.prisma.user.update({
         where: { id },
         data: prismaInput,
         select: userResponseSelect,
       });
+      return mapUserPrismaModelToDto(userModel);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (
@@ -141,10 +178,12 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({
-      where: { id },
-      select: userResponseSelect,
-    });
+  remove(id: number): Promise<UserResponseDto> {
+    return this.prisma.user
+      .delete({
+        where: { id },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelToDto);
   }
 }

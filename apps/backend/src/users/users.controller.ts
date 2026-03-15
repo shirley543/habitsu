@@ -16,6 +16,7 @@ import {
   CreateUserSchema,
   UpdateUserSchema,
   UserResponseDto,
+  ProfilePublicityType,
 } from '@habit-tracker/validation-schemas';
 import {
   ApiBearerAuth,
@@ -42,6 +43,9 @@ class UserResponseDtoClass implements UserResponseDto {
 
   @ApiProperty({ example: 'alice@alice.com' })
   email: string;
+
+  @ApiProperty({ example: ProfilePublicityType.Public })
+  profilePublicity: ProfilePublicityType;
 }
 
 class CreateUserDtoClass implements CreateUserDto {

@@ -2,7 +2,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserResponseDto } from '@habit-tracker/validation-schemas';
+import { JwtRequestUser } from './jwt-auth.types';
 
 /**
  * Local-type Passport strategy.
@@ -19,7 +19,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(
     email: string,
     password: string,
-  ): Promise<UserResponseDto | null> {
+  ): Promise<JwtRequestUser | null> {
     const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
