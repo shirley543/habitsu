@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import ky from 'ky'
 import type { HTTPError } from 'ky'
-import type { ProfileResponseDto, GoalResponse } from '@habit-tracker/validation-schemas'
+import type {
+  GoalResponse,
+  ProfileResponseDto,
+} from '@habit-tracker/validation-schemas'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0
@@ -32,9 +35,9 @@ export function useProfile(username: string) {
 
 /**
  * /profile/:username/goals
- * 
- * @param username 
- * @returns 
+ *
+ * @param username
+ * @returns
  */
 async function fetchProfileGoalsByUsername(
   username: string,

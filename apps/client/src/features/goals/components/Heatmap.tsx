@@ -113,9 +113,18 @@ const Cell = React.memo(
               style={{
                 backgroundColor: cellColor,
               }}
-              onClick={viewOnly ? undefined : () => {
-                navigateToCreateOrEdit(goalData.id, entryData, date, navigate)
-              }}
+              onClick={
+                viewOnly
+                  ? undefined
+                  : () => {
+                      navigateToCreateOrEdit(
+                        goalData.id,
+                        entryData,
+                        date,
+                        navigate,
+                      )
+                    }
+              }
             />
           }
           contentElem={

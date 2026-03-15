@@ -89,7 +89,7 @@ const GoalCardStatic: React.FC<GoalCardStaticProps> = ({
   goalData,
   selectedYear,
   entriesData,
-  viewOnly
+  viewOnly,
 }) => {
   const descriptionTypeContent = (() => {
     return (
@@ -127,7 +127,7 @@ interface GoalCardDescriptiveProps extends GoalCardBaseProps {
   title: string
   description: string
   iconName: IconName
-  viewOnly: boolean,
+  viewOnly: boolean
 }
 
 const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({
@@ -159,49 +159,49 @@ const GoalCardDescriptive: React.FC<GoalCardDescriptiveProps> = ({
             iconName={iconName}
           />
           {/* Buttons */}
-          {!viewOnly && 
-          <>
-            <div className="buttons-container flex flex-row gap-1">
-              <IconButton
-                iconName="pencil"
-                tooltip="Edit Goal"
-                onClickCallback={() => {
-                  if (goalId) {
+          {!viewOnly && (
+            <>
+              <div className="buttons-container flex flex-row gap-1">
+                <IconButton
+                  iconName="pencil"
+                  tooltip="Edit Goal"
+                  onClickCallback={() => {
+                    if (goalId) {
+                      navigate({
+                        to: '/goals/$goalId/edit',
+                        params: { goalId: goalId.toString() },
+                      })
+                    } else {
+                      console.log('Undefined goal ID')
+                    }
+                  }}
+                />
+                <IconButton
+                  iconName="square-plus"
+                  tooltip="Log Today"
+                  onClickCallback={() => {
+                    // Log today: check whether today's date has an entry or not
+                    navigateToCreateOrEdit(
+                      goalId,
+                      existingEntryToday,
+                      todayDate,
+                      navigate,
+                    )
+                  }}
+                />
+                <IconButton
+                  iconName="square-chevron-right"
+                  tooltip="Goal Details"
+                  onClickCallback={() => {
                     navigate({
-                      to: '/goals/$goalId/edit',
+                      to: '/goals/$goalId',
                       params: { goalId: goalId.toString() },
                     })
-                  } else {
-                    console.log('Undefined goal ID')
-                  }
-                }}
-              />
-              <IconButton
-                iconName="square-plus"
-                tooltip="Log Today"
-                onClickCallback={() => {
-                  // Log today: check whether today's date has an entry or not
-                  navigateToCreateOrEdit(
-                    goalId,
-                    existingEntryToday,
-                    todayDate,
-                    navigate,
-                  )
-                }}
-              />
-              <IconButton
-                iconName="square-chevron-right"
-                tooltip="Goal Details"
-                onClickCallback={() => {
-                  navigate({
-                    to: '/goals/$goalId',
-                    params: { goalId: goalId.toString() },
-                  })
-                }}
-              />
-            </div>
-          </>
-          }
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
       </>
     )
