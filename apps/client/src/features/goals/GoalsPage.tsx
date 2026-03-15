@@ -13,11 +13,13 @@ import { EmptyStateBodyComponent } from '@/components/custom/EmptyStateComponent
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuOptions from '@/components/custom/DropdownMenuOptions'
 import { useLogoutUserMutation } from '@/apis/UserApi'
+import { useCurrentYear } from '@/hooks/useCurrentDate'
 
 // TODOs #17: investigate if lazy loading will help with initial render speed of goals page
 export const GoalsPage = () => {
   const navigate = useNavigate()
-  const [selectedYear, setSelectedYear] = useState<number>(2025)
+  const currentYear = useCurrentYear()
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   const { data, isLoading, error } = useGoals()
   const displayedData = data

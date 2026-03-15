@@ -24,6 +24,7 @@ import {
 } from '@/components/custom/ErrorComponents'
 import { capitalizeFirstLetter } from '@/lib/stringUtils'
 import { Button } from '@/components/ui/button'
+import { useCurrentYear } from '@/hooks/useCurrentDate'
 
 interface EntryFormProps {
   isCreate: boolean
@@ -43,6 +44,9 @@ const EntryForm: React.FC<EntryFormProps> = ({
   defaultValues,
 }) => {
   const navigate = useNavigate()
+
+  const currentYear = useCurrentYear()
+  const entryDatePlaceholder = `e.g. 01 January ${currentYear}`
 
   const initialValues = defaultValues
     ? {
@@ -150,7 +154,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
       >
         <form.AppField name="entryDate">
           {(field) => (
-            <field.DateField label="Date" placeholder="e.g. 11 July 2025" />
+            <field.DateField label="Date" placeholder={entryDatePlaceholder} />
           )}
         </form.AppField>
 

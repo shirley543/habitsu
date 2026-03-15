@@ -11,6 +11,7 @@ import type {
 } from '@habit-tracker/validation-schemas'
 import { Calendar } from '@/components/ui/calendar'
 import { computeBinAndColorArrays } from '@/lib/colourUtils'
+import { useCurrentDate } from '@/hooks/useCurrentDate'
 
 /**
  * Modifier config, for grouping modifier-related properties
@@ -32,9 +33,8 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
 }) => {
   const navigate = useNavigate()
 
-  const [date, setDate] = React.useState<Date | undefined>(
-    new Date(2025, 6, 12),
-  )
+  const currentDate = useCurrentDate()
+  const [date, setDate] = React.useState<Date | undefined>(currentDate)
 
   const { data: goalData } = useGoal(goalId.toString())
   const { data: entriesData } = useGoalEntries(searchParams)
