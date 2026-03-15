@@ -12,6 +12,7 @@ import {
   GoalPublicity,
   GoalQuantify,
   User,
+  ProfilePublicity,
 } from '@prisma/client';
 import TestAgent from 'supertest/lib/agent';
 import {
@@ -67,10 +68,20 @@ describe('Goal Entries API (E2E)', () => {
       parseInt(process.env.TEST_BCRYPT_SALT_ROUNDS || '1'),
     );
     alice = await prisma.user.create({
-      data: { email: 'alice@test.com', username: 'Alice', password: aliceHash },
+      data: {
+        email: 'alice@test.com',
+        username: 'Alice',
+        password: aliceHash,
+        profilePublicity: ProfilePublicity.PRIVATE,
+      },
     });
     bob = await prisma.user.create({
-      data: { email: 'bob@test.com', username: 'Bob', password: bobHash },
+      data: {
+        email: 'bob@test.com',
+        username: 'Bob',
+        password: bobHash,
+        profilePublicity: ProfilePublicity.PUBLIC,
+      },
     });
 
     // Login users and get agents
@@ -274,43 +285,52 @@ describe('Goal Entries API (E2E)', () => {
    * GET /entries
    */
   describe('GET /entries', () => {
-    let aliceEntry1: GoalEntry;
-    let aliceEntry2: GoalEntry;
+    let alicePublicEntry1: GoalEntry;
+    let alicePublicEntry2: GoalEntry;
+    let bobPublicEntry: GoalEntry;
 
     beforeEach(async () => {
       // Create entries for testing
-      aliceEntry1 = await prisma.goalEntry.create({
+      alicePublicEntry1 = await prisma.goalEntry.create({
         data: {
           goalId: aliceGoal.id,
           entryDate: new Date('2025-01-01'),
           numericValue: 5,
-          note: 'Alice Entry 1',
+          note: 'Alice Public Goal Entry 1',
         },
       });
 
-      aliceEntry2 = await prisma.goalEntry.create({
+      alicePublicEntry2 = await prisma.goalEntry.create({
         data: {
           goalId: aliceGoal.id,
           entryDate: new Date('2025-02-01'),
-          numericValue: 10,
-          note: 'Alice Entry 2',
+          numericValue: 5,
+          note: 'Alice Public Goal Entry 2',
         },
       });
 
       await prisma.goalEntry.create({
         data: {
           goalId: alicePrivateGoal.id,
-          entryDate: new Date('2025-01-10'),
-          note: 'Private entry',
+          entryDate: new Date('2025-02-01'),
+          note: 'Alice Private Goal Entry',
+        },
+      });
+
+      bobPublicEntry = await prisma.goalEntry.create({
+        data: {
+          goalId: bobGoal.id,
+          entryDate: new Date('2025-01-05'),
+          numericValue: 3,
+          note: 'Bob Public Goal Entry',
         },
       });
 
       await prisma.goalEntry.create({
         data: {
-          goalId: bobGoal.id,
-          entryDate: new Date('2025-01-05'),
-          numericValue: 3,
-          note: 'Bob Entry',
+          goalId: bobPrivateGoal.id,
+          entryDate: new Date('2025-02-05'),
+          note: 'Bob Private Goal Entry',
         },
       });
     });
@@ -327,7 +347,7 @@ describe('Goal Entries API (E2E)', () => {
       const entries: GoalEntryResponse[] = res.body;
       expect(entries.length).toBe(2);
       expect(entries.map((e) => e.id)).toEqual(
-        expect.arrayContaining([aliceEntry1.id, aliceEntry2.id]),
+        expect.arrayContaining([alicePublicEntry1.id, alicePublicEntry2.id]),
       );
     });
 
@@ -360,7 +380,7 @@ describe('Goal Entries API (E2E)', () => {
 
     it('allows unauthenticated access to public goal entries', async () => {
       const searchParams: SearchParamsGoalEntryDto = {
-        goalId: aliceGoal.id,
+        goalId: bobGoal.id,
       };
       const res = await request(app.getHttpServer())
         .get('/entries')
@@ -368,12 +388,15 @@ describe('Goal Entries API (E2E)', () => {
         .expect(200);
 
       const entries: GoalEntryResponse[] = res.body;
-      expect(entries.length).toBe(2);
+      expect(entries.length).toBe(1);
+      expect(entries.map((e) => e.id)).toEqual(
+        expect.arrayContaining([bobPublicEntry.id]),
+      );
     });
 
     it('rejects unauthenticated access to private goal entries (404)', async () => {
       const searchParams: SearchParamsGoalEntryDto = {
-        goalId: alicePrivateGoal.id,
+        goalId: bobPrivateGoal.id,
       };
       const res = await request(app.getHttpServer())
         .get('/entries')
@@ -384,9 +407,31 @@ describe('Goal Entries API (E2E)', () => {
 
     it('rejects access to other user private goals (404)', async () => {
       const searchParams: SearchParamsGoalEntryDto = {
-        goalId: alicePrivateGoal.id,
+        goalId: bobPrivateGoal.id,
+      };
+      const res = await aliceAgent
+        .get('/entries')
+        .query(searchParams)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('rejects access to public goal entries when owner profile is private (404)', async () => {
+      const searchParams: SearchParamsGoalEntryDto = {
+        goalId: aliceGoal.id,
       };
       const res = await bobAgent
+        .get('/entries')
+        .query(searchParams)
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('rejects unauthenticated access when profile is private (404)', async () => {
+      const searchParams: SearchParamsGoalEntryDto = {
+        goalId: aliceGoal.id,
+      };
+      const res = await request(app.getHttpServer())
         .get('/entries')
         .query(searchParams)
         .expect(404);
@@ -456,6 +501,19 @@ describe('Goal Entries API (E2E)', () => {
       expect(res.body.message).toBe('Goal not found');
     });
 
+    it('returns 404 if entry belongs public goal but profile is private', async () => {
+      const newEntry = await prisma.goalEntry.create({
+        data: {
+          goalId: aliceGoal.id,
+          entryDate: new Date('2025-03-01'),
+          numericValue: 7,
+          note: 'Should not be visible',
+        },
+      });
+      const res = await bobAgent.get(`/entries/${newEntry.id}`).expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
     it('returns entry if authorized', async () => {
       const res = await aliceAgent.get(`/entries/${entry.id}`).expect(200);
       expect(res.body.id).toBe(entry.id);
@@ -469,11 +527,17 @@ describe('Goal Entries API (E2E)', () => {
    * GET /goals/:goalId/entries
    */
   describe('GET /goals/:goalId/entries', () => {
-    let entry1: GoalEntry;
-    let entry2: GoalEntry;
+    let alicePublicEntry1: GoalEntry;
+    let alicePublicEntry2: GoalEntry;
+    let alicePrivateEntry1: GoalEntry;
+    let alicePrivateEntry2: GoalEntry;
+    let bobPublicEntry1: GoalEntry;
+    let bobPublicEntry2: GoalEntry;
+    let bobPrivateEntry1: GoalEntry;
+    let bobPrivateEntry2: GoalEntry;
 
     beforeEach(async () => {
-      entry1 = await prisma.goalEntry.create({
+      alicePublicEntry1 = await prisma.goalEntry.create({
         data: {
           goalId: aliceGoal.id,
           entryDate: new Date('2025-01-01'),
@@ -481,7 +545,7 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      entry2 = await prisma.goalEntry.create({
+      alicePublicEntry2 = await prisma.goalEntry.create({
         data: {
           goalId: aliceGoal.id,
           entryDate: new Date('2025-02-01'),
@@ -489,55 +553,194 @@ describe('Goal Entries API (E2E)', () => {
         },
       });
 
-      await prisma.goalEntry.create({
+      alicePrivateEntry1 = await prisma.goalEntry.create({
+        data: {
+          goalId: alicePrivateGoal.id,
+          entryDate: new Date('2025-01-01'),
+        },
+      });
+
+      alicePrivateEntry2 = await prisma.goalEntry.create({
+        data: {
+          goalId: alicePrivateGoal.id,
+          entryDate: new Date('2025-02-01'),
+        },
+      });
+
+      bobPublicEntry1 = await prisma.goalEntry.create({
         data: {
           goalId: bobGoal.id,
           entryDate: new Date('2025-01-05'),
           numericValue: 3,
         },
       });
+
+      bobPublicEntry2 = await prisma.goalEntry.create({
+        data: {
+          goalId: bobGoal.id,
+          entryDate: new Date('2025-02-05'),
+          numericValue: 4,
+        },
+      });
+
+      bobPrivateEntry1 = await prisma.goalEntry.create({
+        data: {
+          goalId: bobPrivateGoal.id,
+          entryDate: new Date('2025-01-01'),
+        },
+      });
+
+      bobPrivateEntry2 = await prisma.goalEntry.create({
+        data: {
+          goalId: bobPrivateGoal.id,
+          entryDate: new Date('2025-02-01'),
+        },
+      });
     });
 
-    it('rejects unauthenticated requests', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/goals/${aliceGoal.id}/entries`)
-        .expect(401);
-      expect(res.body.message).toBe('Unauthorized');
-    });
-
-    it('returns all entries for a goal', async () => {
-      const res = await aliceAgent
-        .get(`/goals/${aliceGoal.id}/entries`)
-        .expect(200);
-
-      const entries: GoalEntryResponse[] = res.body;
-      expect(entries.length).toBe(2);
-      expect(entries.map((e) => e.id)).toEqual(
-        expect.arrayContaining([entry1.id, entry2.id]),
-      );
-    });
-
-    it('returns empty array if no entries for goal', async () => {
-      const res = await aliceAgent
-        .get(`/goals/${alicePrivateGoal.id}/entries`)
-        .expect(200);
-
-      expect(res.body).toEqual([]);
-    });
-
+    // Basic validation
     it('returns 404 for non-existent goal', async () => {
       const res = await aliceAgent.get(`/goals/999999/entries`).expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
 
-    it('returns 404 if user is not private goal owner', async () => {
+    it('returns empty array if no entries for goal', async () => {
+      const aliceNewGoal = await prisma.goal.create({
+        data: {
+          title: 'Alice New Goal',
+          userId: alice.id,
+          goalType: GoalQuantify.BOOLEAN,
+          publicity: GoalPublicity.PRIVATE,
+          order: 2,
+          colour: 'FFFFFF',
+          icon: 'a2',
+        },
+      });
+
       const res = await aliceAgent
-        .get(`/goals/${bobPrivateGoal.id}/entries`)
-        .expect(404);
-      expect(res.body.message).toBe('Goal not found');
+        .get(`/goals/${aliceNewGoal.id}/entries`)
+        .expect(200);
+      expect(res.body).toEqual([]);
     });
 
-    // TODOs #30 add testcases for user accessing public goals
+    // Profile Public / Goal Public scenarios
+    describe('Profile public, Goal public', () => {
+      it('allows owner to access entries (200)', async () => {
+        const res = await bobAgent
+          .get(`/goals/${bobGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+        expect(entries.map((e) => e.id)).toEqual(
+          expect.arrayContaining([bobPublicEntry1.id, bobPublicEntry2.id]),
+        );
+      });
+
+      it('allows non-owner to access entries (200)', async () => {
+        const res = await aliceAgent
+          .get(`/goals/${bobGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+        expect(entries.map((e) => e.id)).toEqual(
+          expect.arrayContaining([bobPublicEntry1.id, bobPublicEntry2.id]),
+        );
+      });
+
+      it('allows unauthenticated access (200)', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/goals/${bobGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+      });
+    });
+
+    // Profile Public / Goal Private scenarios
+    describe('Profile public, Goal private', () => {
+      it('allows owner to access entries (200)', async () => {
+        const res = await bobAgent
+          .get(`/goals/${bobPrivateGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+        expect(entries.map((e) => e.id)).toEqual(
+          expect.arrayContaining([bobPrivateEntry1.id, bobPrivateEntry2.id]),
+        );
+      });
+
+      it('denies non-owner access (404)', async () => {
+        const res = await aliceAgent
+          .get(`/goals/${bobPrivateGoal.id}/entries`)
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
+      });
+
+      it('denies unauthenticated access (404)', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/goals/${bobPrivateGoal.id}/entries`)
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
+      });
+    });
+
+    // Profile Private / Goal Public scenarios
+    describe('Profile private, Goal public', () => {
+      it('allows owner to access entries (200)', async () => {
+        const res = await aliceAgent
+          .get(`/goals/${aliceGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+        expect(entries.map((e) => e.id)).toEqual(
+          expect.arrayContaining([alicePublicEntry1.id, alicePublicEntry2.id]),
+        );
+      });
+
+      it('denies non-owner access (404)', async () => {
+        const res = await bobAgent
+          .get(`/goals/${aliceGoal.id}/entries`)
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
+      });
+
+      it('denies unauthenticated access (404)', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/goals/${aliceGoal.id}/entries`)
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
+      });
+    });
+
+    // Profile Private / Goal Private scenarios
+    describe('Profile private, Goal private', () => {
+      it('allows owner to access entries (200)', async () => {
+        const res = await aliceAgent
+          .get(`/goals/${alicePrivateGoal.id}/entries`)
+          .expect(200);
+
+        const entries: GoalEntryResponse[] = res.body;
+        expect(entries.length).toBe(2);
+        expect(entries.map((e) => e.id)).toEqual(
+          expect.arrayContaining([
+            alicePrivateEntry1.id,
+            alicePrivateEntry2.id,
+          ]),
+        );
+      });
+
+      it('denies non-owner access (404)', async () => {
+        const res = await bobAgent
+          .get(`/goals/${alicePrivateGoal.id}/entries`)
+          .expect(404);
+        expect(res.body.message).toBe('Goal not found');
+      });
+    });
   });
 
   /**
@@ -887,15 +1090,20 @@ describe('Goal Entries API (E2E)', () => {
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });
+
+    it('returns 404 when profile is private and caller is not owner', async () => {
+      const res = await bobAgent
+        .get('/entries/statistics')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
   });
 
   /**
    * GET /entries/monthly-averages
    */
   describe('GET /entries/monthly-averages', () => {
-    // TODOs #30: Add checks to confirm that:
-    // - Alice sees full values across all their own (Alice's) public + private goal entries
-    // - Bob sees only values across other people's (Alice's) public goal entries
     beforeEach(async () => {
       await prisma.goalEntry.createMany({
         data: [
@@ -918,12 +1126,21 @@ describe('Goal Entries API (E2E)', () => {
       });
     });
 
+    // Basic validation
     it('rejects unauthenticated requests', async () => {
       const res = await request(app.getHttpServer())
         .get('/entries/monthly-averages')
         .query({ goalId: aliceGoal.id, year: 2025 })
         .expect(401);
       expect(res.body.message).toBe('Unauthorized');
+    });
+
+    it('returns 404 for non-existent goal', async () => {
+      const res = await aliceAgent
+        .get(`/entries/monthly-averages`)
+        .query({ goalId: 999999, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
     });
 
     it('returns monthly averages for numeric goal', async () => {
@@ -945,6 +1162,14 @@ describe('Goal Entries API (E2E)', () => {
         .query({ goalId: alicePrivateGoal.id, year: 2025 })
         .expect(400);
       expect(res.body.message).toBe('Goal type must be NUMERIC');
+    });
+
+    it('returns 404 when profile is private, goal is public, and caller is not owner', async () => {
+      const res = await bobAgent
+        .get('/entries/monthly-averages')
+        .query({ goalId: aliceGoal.id, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
     });
   });
 
@@ -999,6 +1224,14 @@ describe('Goal Entries API (E2E)', () => {
       const res = await aliceAgent
         .get('/entries/monthly-counts')
         .query({ goalId: 999999, year: 2025 })
+        .expect(404);
+      expect(res.body.message).toBe('Goal not found');
+    });
+
+    it('returns 404 when profile is private and caller is not owner', async () => {
+      const res = await bobAgent
+        .get('/entries/monthly-counts')
+        .query({ goalId: aliceGoal.id, year: 2025 })
         .expect(404);
       expect(res.body.message).toBe('Goal not found');
     });

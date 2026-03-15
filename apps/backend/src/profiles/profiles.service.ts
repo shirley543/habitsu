@@ -83,22 +83,5 @@ export class ProfilesService {
     })();
 
     return profileEntity;
-
-    // +-----------------+-----------+--------------+---------------------------+
-    // | Profile Privacy | Viewer    | Goal Privacy | Result                    |
-    // +-----------------+-----------+--------------+---------------------------+
-    // | private         | not owner | any          | No goals returned + profile limited, don't calculate days tracked |
-    // | public          | not owner | public       | Goal is visible + profile full           |
-    // | public          | not owner | private      | Goal is hidden + profile full but days tracked only on public goals            |
-    // | any             | owner     | any          | All goals are visible + profile full     |
-    // +-----------------+-----------+--------------+---------------------------+
-
-    // TODOs #30 need to update goals endpoint to have check for profile visibility.
-    // If public:
-    // - All profile data (username, join date, days tracked)
-    // - Some goal data (some goals can still be private)
-    // If private:
-    // - Some profile data (username, join date, but NOT days tracked)\
-    // - No goal data (ALL goals hidden)
   }
 }

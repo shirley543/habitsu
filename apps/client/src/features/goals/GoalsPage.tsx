@@ -28,7 +28,7 @@ export const GoalsPage = () => {
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation()
 
   const profileMenuItems: Array<DropdownMenuOptionsItemConfig> = [
-    // TODOs #30: have navigate of profile name be to logged in user's username
+    // TODOs #42: have navigate of profile name be to logged in user's username
     {
       label: 'View Profile',
       onClick: () =>

@@ -7,9 +7,9 @@ import {
   SkeletonGoalCard,
 } from '../goals/components/GoalCard'
 import type { IconName } from 'lucide-react/dynamic'
-import { useProfileGoals } from '@/apis/GoalApi'
+import { useProfile, useProfileGoals } from '@/apis/ProfileApi'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useProfile } from '@/apis/ProfileApi'
+
 import { TopBarConfig } from '@/components/custom/TopBar'
 
 export const ProfilePage = () => {
@@ -37,7 +37,6 @@ export const ProfilePage = () => {
     error: goalsError,
   } = useProfileGoals(profileName)
   /* eslint-enable @typescript-eslint/no-unused-vars */
-  // TODOs #30: don't bother calling useGoals if profile is private, pass in to hook as disabled
 
   const formatDateToString = (date: Date | undefined) => {
     return date ? `${date}` : undefined
@@ -63,7 +62,7 @@ export const ProfilePage = () => {
               navigate({ to: '/settings' })
             },
           },
-          // TODOs #30: Avatar
+          // TODOs #42: Avatar
         ]}
       />
 
@@ -106,7 +105,6 @@ export const ProfilePage = () => {
       )}
 
       {/* Goals data/ heatmaps container */}
-      {/* TODOs #30: Replace these goals data with actual profile user's goal data */}
       {(goalsData || goalsIsLoading) && (
         <div className="flex flex-col gap-3">
           {goalsData &&
@@ -119,6 +117,7 @@ export const ProfilePage = () => {
                   iconName={d.icon as IconName}
                   goalData={d}
                   selectedYear={selectedYear}
+                  viewOnly={true}
                 />
               )
             })}

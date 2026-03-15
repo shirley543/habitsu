@@ -57,11 +57,4 @@ export class AppController {
 
 // TODOs #29 Check if any routes missing JwtAuthGuard
 
-// TODOs #30 How to handle profiles being:
-// - private (only goal's creator user, i.e. check logged in user is goal's creator user)
-// - public (profile visible to all users)
-// As well as goals being
-// - private (only shown on profile if profile viewer user is the creator)
-// - public (shown on profile for all users)
-
 // TODOs #31 Refactor .env so that there are local, dev, and prod versions of variables

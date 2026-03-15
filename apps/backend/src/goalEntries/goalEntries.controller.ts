@@ -94,9 +94,8 @@ export class GoalEntriesController {
     @Query(new ZodValidationPipe(SearchParamsGoalEntrySchema))
     searchParamsGoalEntryDto: SearchParamsGoalEntryDto,
   ) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
-    // TODOs #30: Need to ensure findMany respects profile publicity (all other places also need to respect profile publicity)
     // TODOs #32: refactor this to use Zod validation pipe instead of manual call to .safeParse
     const parsed = SearchParamsGoalEntrySchema.safeParse(
       searchParamsGoalEntryDto,
@@ -126,11 +125,11 @@ export class GoalEntriesController {
    * @param searchParamsGoalEntryDto
    * @returns
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('goals/:goalId/entries')
   @ApiOkResponse({ type: GoalEntryEntity, isArray: true })
   findManyByGoalId(@Req() req, @Param('goalId', ParseIntPipe) goalId: number) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     return this.goalEntriesService.findMany(
       { goalId: goalId, year: undefined },
       userId,
