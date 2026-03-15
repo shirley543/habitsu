@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, ProfilePublicity, $Enums } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,11 +16,13 @@ import {
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
+import { mapUserPrismaModelOrNullToDto, mapUserPrismaModelToDto } from './users.mapping';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
   username: true,
   email: true,
+  profilePublicity: true,
 };
 
 @Injectable()
@@ -29,7 +31,6 @@ export class UsersService {
     private prisma: PrismaService,
     private envService: EnvService,
   ) {}
-
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
@@ -41,10 +42,11 @@ export class UsersService {
       password: hashedPassword,
     };
     try {
-      return await this.prisma.user.create({
+      const userModel = await this.prisma.user.create({
         data: prismaInput,
         select: userResponseSelect,
       });
+      return mapUserPrismaModelToDto(userModel);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (
@@ -61,25 +63,31 @@ export class UsersService {
     }
   }
 
-  findOne(id: number): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { id },
-      select: userResponseSelect,
-    });
+    findOne(id: number): Promise<UserResponseDto | null> {
+    return this.prisma.user
+      .findUnique({
+        where: { id },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByUsername(username: string): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { username },
-      select: userResponseSelect,
-    });
+    return this.prisma.user
+      .findUnique({
+        where: { username },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByEmail(email: string): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
-      where: { email },
-      select: userResponseSelect,
-    });
+    return this.prisma.user
+      .findUnique({
+        where: { email },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelOrNullToDto);
   }
 
   findOneByEmailFull(email: string): Promise<User | null> {
@@ -120,11 +128,12 @@ export class UsersService {
       password: hashedPassword,
     };
     try {
-      return await this.prisma.user.update({
+      const userModel = await this.prisma.user.update({
         where: { id },
         data: prismaInput,
         select: userResponseSelect,
       });
+      return mapUserPrismaModelToDto(userModel);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (
@@ -141,10 +150,11 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
+  remove(id: number): Promise<UserResponseDto> {
     return this.prisma.user.delete({
       where: { id },
       select: userResponseSelect,
-    });
+    })
+    .then(mapUserPrismaModelToDto);
   }
 }

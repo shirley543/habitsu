@@ -31,10 +31,18 @@ export type LoginUserDto = z.infer<typeof LoginUserSchema>;
 /**
  * Output Schemas
  */
+export enum ProfilePublicityType {
+  Public = "PUBLIC",
+  Private = "PRIVATE",
+}
+
+const ProfilePublicityTypeSchema = z.nativeEnum(ProfilePublicityType);
+
 export const UserResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
   email: z.string().email(),
+  profilePublicity: ProfilePublicityTypeSchema
 });
 
 /**

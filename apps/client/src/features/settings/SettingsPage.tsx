@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
+import { useUser } from '@/apis/UserApi'
 
 enum SettingGroupStyle {
   Default = 'default',
@@ -37,12 +38,14 @@ interface ToggleConfig {
 interface RadioGroupCompactConfig {
   label: string
   values: Array<{ label: string; value: string }>
+  currentValue: string
   onValueChange: (val: string) => void
 }
 
 interface RadioGroupDetailedConfig {
   label: string
   values: Array<{ label: string; detail: string; value: string }>
+  currentValue: string
   onValueChange: (val: string) => void
 }
 
@@ -66,6 +69,9 @@ type SettingItem =
 
 export function SettingsPage() {
   const navigate = useNavigate()
+  const { data: userData, isLoading: userLoading, error: userError } = useUser()
+
+  const userPublicity = userData?.profilePublicity;
 
   const SETTING_GROUPS: Array<SettingGroup> = [
     // Appearance
@@ -80,8 +86,10 @@ export function SettingsPage() {
               { label: 'Light', value: 'light' },
               { label: 'Dark', value: 'dark' },
             ],
+            currentValue: 'light', // TODO: Get from theme context or state
             onValueChange: (val: string) => {
               console.log('value changed', val)
+              // TODOs #xx?? add control for changing theme
             },
           },
         },
@@ -115,6 +123,7 @@ export function SettingsPage() {
             label: 'Show Descriptions',
             onToggleChange: () => {
               console.log('value changed')
+              // TODOs #xx?? add control for showing/ hiding descriptions
             },
           },
         },
@@ -140,8 +149,10 @@ export function SettingsPage() {
                 value: 'private',
               },
             ],
+            currentValue: userPublicity || 'private', // Default to private if not loaded
             onValueChange: (val: string) => {
               console.log('value changed', val)
+              // TODOs #42 actually mutate user profile publicity...
             },
           },
         },
@@ -239,6 +250,8 @@ export function SettingsPage() {
                         <>
                           <RadioGroup
                             className={`flex flex-col gap-2 ${settingItemPaddingClass}`}
+                            value={item.config.currentValue}
+                            onValueChange={item.config.onValueChange}
                           >
                             <h2 className="text-sm font-semibold">
                               {item.config.label}
@@ -269,6 +282,8 @@ export function SettingsPage() {
                         <>
                           <RadioGroup
                             className={`flex flex-col gap-2 ${settingItemPaddingClass}`}
+                            value={item.config.currentValue}
+                            onValueChange={item.config.onValueChange}
                           >
                             <h2 className="text-sm font-semibold">
                               {item.config.label}
