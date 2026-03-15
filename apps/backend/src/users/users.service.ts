@@ -16,7 +16,7 @@ import {
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
-import { mapUserPrismaModelOrNullToDto, mapUserPrismaModelToDto } from './users.mapping';
+import { mapUserPrismaModelOrNullToDto, mapUserPrismaModelToDto, PROFILE_PUBLICITY_TYPE_TO_ENUM } from './users.mapping';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
@@ -108,9 +108,18 @@ export class UsersService {
       throw new UserNotFoundError(id);
     }
 
-    const passwordValid = user
-      ? await bcrypt.compare(updateUserDto.currentPassword, user.password)
-      : false;
+    // Require current password for sensitive updates (username, email, password)
+    const requiresPassword = updateUserDto.username !== undefined ||
+                             updateUserDto.email !== undefined ||
+                             updateUserDto.password !== undefined;
+
+    let passwordValid = true;
+    if (requiresPassword) {
+      if (!updateUserDto.currentPassword) {
+        throw new UserPasswordInputInvalidError('Current password is required for this update');
+      }
+      passwordValid = await bcrypt.compare(updateUserDto.currentPassword, user.password);
+    }
     if (!passwordValid) {
       throw new UserPasswordInputInvalidError('Invalid current password');
     }
@@ -122,11 +131,19 @@ export class UsersService {
         this.envService.get('SALT_ROUNDS'),
       ));
 
-    const prismaInput: Prisma.UserUpdateInput = {
-      username: updateUserDto.username,
-      email: updateUserDto.email,
-      password: hashedPassword,
-    };
+    const prismaInput: Prisma.UserUpdateInput = {};
+    if (updateUserDto.username !== undefined) {
+      prismaInput.username = updateUserDto.username;
+    }
+    if (updateUserDto.email !== undefined) {
+      prismaInput.email = updateUserDto.email;
+    }
+    if (hashedPassword !== undefined) {
+      prismaInput.password = hashedPassword;
+    }
+    if (updateUserDto.profilePublicity !== undefined) {
+      prismaInput.profilePublicity = PROFILE_PUBLICITY_TYPE_TO_ENUM[updateUserDto.profilePublicity];
+    }
     try {
       const userModel = await this.prisma.user.update({
         where: { id },

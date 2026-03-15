@@ -5,7 +5,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { useUser } from '@/apis/UserApi'
+import { useUser, useUpdateUserMutation } from '@/apis/UserApi'
+import { ProfilePublicityType } from '@habit-tracker/validation-schemas'
 
 enum SettingGroupStyle {
   Default = 'default',
@@ -70,6 +71,7 @@ type SettingItem =
 export function SettingsPage() {
   const navigate = useNavigate()
   const { data: userData, isLoading: userLoading, error: userError } = useUser()
+  const updateUserMutation = useUpdateUserMutation()
 
   const userPublicity = userData?.profilePublicity;
 
@@ -141,18 +143,21 @@ export function SettingsPage() {
               {
                 label: 'Public',
                 detail: 'Anyone can see your profile info',
-                value: 'public',
+                value: ProfilePublicityType.Public,
               },
               {
                 label: 'Private',
                 detail: 'Only you can see your profile',
-                value: 'private',
+                value: ProfilePublicityType.Private,
               },
             ],
-            currentValue: userPublicity || 'private', // Default to private if not loaded
+            currentValue: userPublicity || ProfilePublicityType.Private, // Default to private if not loaded
             onValueChange: (val: string) => {
-              console.log('value changed', val)
-              // TODOs #42 actually mutate user profile publicity...
+              updateUserMutation.mutate({
+                update: {
+                  profilePublicity: val,
+                },
+              })
             },
           },
         },

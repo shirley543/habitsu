@@ -5,9 +5,14 @@
 import { ProfilePublicityType, UserResponseDto } from "@habit-tracker/validation-schemas";
 import { $Enums, User } from "@prisma/client";
 
-const PROFILE_PUBLICITY_ENUM_TO_TYPE: Record<$Enums.ProfilePublicity, ProfilePublicityType> = {
+export const PROFILE_PUBLICITY_ENUM_TO_TYPE: Record<$Enums.ProfilePublicity, ProfilePublicityType> = {
   [$Enums.ProfilePublicity.PRIVATE]: ProfilePublicityType.Private,
   [$Enums.ProfilePublicity.PUBLIC]: ProfilePublicityType.Public,
+};
+
+export const PROFILE_PUBLICITY_TYPE_TO_ENUM: Record<ProfilePublicityType, $Enums.ProfilePublicity> = {
+  [ProfilePublicityType.Private]: $Enums.ProfilePublicity.PRIVATE,
+  [ProfilePublicityType.Public]: $Enums.ProfilePublicity.PUBLIC,
 };
 
 export function mapUserPrismaModelToDto(userPrisma: User): UserResponseDto {

@@ -1,6 +1,17 @@
 import { z } from "zod";
 
 /**
+ * Enums
+ */
+export enum ProfilePublicityType {
+  Public = "PUBLIC",
+  Private = "PRIVATE",
+}
+
+const ProfilePublicityTypeSchema = z.nativeEnum(ProfilePublicityType);
+
+
+/**
  * Input Schemas
  */
 const UserSchema = z.object({
@@ -12,7 +23,8 @@ const UserSchema = z.object({
 export const CreateUserSchema = UserSchema;
 export const UpdateUserSchema = CreateUserSchema.partial().and(
   z.object({
-    currentPassword: z.string(),
+    currentPassword: z.string().optional(),
+    profilePublicity: ProfilePublicityTypeSchema.optional(),
   }),
 );
 
@@ -31,13 +43,6 @@ export type LoginUserDto = z.infer<typeof LoginUserSchema>;
 /**
  * Output Schemas
  */
-export enum ProfilePublicityType {
-  Public = "PUBLIC",
-  Private = "PRIVATE",
-}
-
-const ProfilePublicityTypeSchema = z.nativeEnum(ProfilePublicityType);
-
 export const UserResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
