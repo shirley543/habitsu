@@ -45,7 +45,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
 }) => {
   const navigate = useNavigate()
 
-  const currentYear = useCurrentYear();
+  const currentYear = useCurrentYear()
   const entryDatePlaceholder = `e.g. 01 January ${currentYear}`
 
   const initialValues = defaultValues

@@ -12,16 +12,17 @@ const YearDropdown: React.FC<YearDropdownProps> = ({
   selectedYear,
   onSelect,
 }) => {
-  const startYear = 2024;
-  const currentYear = useCurrentYear();
-  const yearMenuConfig: Array<DropdownMenuCheckboxesItemConfig<number>> = Array.from({ length: currentYear - startYear + 1 }, (_, i) => {
-    const yearValue = startYear + i;
-    return {
-      label: `Y${yearValue}`,
-      value: yearValue,
-    }
-  });
-  
+  const startYear = 2024
+  const currentYear = useCurrentYear()
+  const yearMenuConfig: Array<DropdownMenuCheckboxesItemConfig<number>> =
+    Array.from({ length: currentYear - startYear + 1 }, (_, i) => {
+      const yearValue = startYear + i
+      return {
+        label: `Y${yearValue}`,
+        value: yearValue,
+      }
+    })
+
   return (
     <div className="year-calendar-container flex flex-row gap-1">
       <h2 className="text-xl font-bold">{selectedYear}</h2>

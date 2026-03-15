@@ -33,7 +33,7 @@ const EntryCalendar: React.FC<EntryCalendarProps> = ({
 }) => {
   const navigate = useNavigate()
 
-  const currentDate = useCurrentDate();
+  const currentDate = useCurrentDate()
   const [date, setDate] = React.useState<Date | undefined>(currentDate)
 
   const { data: goalData } = useGoal(goalId.toString())

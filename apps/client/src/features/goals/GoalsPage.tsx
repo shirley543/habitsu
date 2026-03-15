@@ -18,7 +18,7 @@ import { useCurrentYear } from '@/hooks/useCurrentDate'
 // TODOs #17: investigate if lazy loading will help with initial render speed of goals page
 export const GoalsPage = () => {
   const navigate = useNavigate()
-  const currentYear = useCurrentYear();
+  const currentYear = useCurrentYear()
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   const { data, isLoading, error } = useGoals()
