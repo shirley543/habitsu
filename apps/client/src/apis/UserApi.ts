@@ -70,13 +70,13 @@ async function patchUpdateUser(
 }
 
 export function useUpdateUserMutation() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ update }: { update: UpdateUserDto }) => {
       return patchUpdateUser(update)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] })
     },
   })
 }

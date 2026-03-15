@@ -10,7 +10,6 @@ export enum ProfilePublicityType {
 
 const ProfilePublicityTypeSchema = z.nativeEnum(ProfilePublicityType);
 
-
 /**
  * Input Schemas
  */
@@ -47,7 +46,7 @@ export const UserResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
   email: z.string().email(),
-  profilePublicity: ProfilePublicityTypeSchema
+  profilePublicity: ProfilePublicityTypeSchema,
 });
 
 /**

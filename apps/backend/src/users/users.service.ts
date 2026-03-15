@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User, ProfilePublicity, $Enums } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,7 +16,11 @@ import {
 import { UserNotFoundError } from './errors/userNotFound.error';
 import { UserPasswordInputInvalidError } from './errors/userPasswordInputInvalid.error';
 import { UserAlreadyExistsError } from './errors/userAlreadyExists.error';
-import { mapUserPrismaModelOrNullToDto, mapUserPrismaModelToDto, PROFILE_PUBLICITY_TYPE_TO_ENUM } from './users.mapping';
+import {
+  mapUserPrismaModelOrNullToDto,
+  mapUserPrismaModelToDto,
+  PROFILE_PUBLICITY_TYPE_TO_ENUM,
+} from './users.mapping';
 
 export const userResponseSelect: Prisma.UserSelect = {
   id: true,
@@ -63,7 +67,7 @@ export class UsersService {
     }
   }
 
-    findOne(id: number): Promise<UserResponseDto | null> {
+  findOne(id: number): Promise<UserResponseDto | null> {
     return this.prisma.user
       .findUnique({
         where: { id },
@@ -109,16 +113,22 @@ export class UsersService {
     }
 
     // Require current password for sensitive updates (username, email, password)
-    const requiresPassword = updateUserDto.username !== undefined ||
-                             updateUserDto.email !== undefined ||
-                             updateUserDto.password !== undefined;
+    const requiresPassword =
+      updateUserDto.username !== undefined ||
+      updateUserDto.email !== undefined ||
+      updateUserDto.password !== undefined;
 
     let passwordValid = true;
     if (requiresPassword) {
       if (!updateUserDto.currentPassword) {
-        throw new UserPasswordInputInvalidError('Current password is required for this update');
+        throw new UserPasswordInputInvalidError(
+          'Current password is required for this update',
+        );
       }
-      passwordValid = await bcrypt.compare(updateUserDto.currentPassword, user.password);
+      passwordValid = await bcrypt.compare(
+        updateUserDto.currentPassword,
+        user.password,
+      );
     }
     if (!passwordValid) {
       throw new UserPasswordInputInvalidError('Invalid current password');
@@ -142,7 +152,8 @@ export class UsersService {
       prismaInput.password = hashedPassword;
     }
     if (updateUserDto.profilePublicity !== undefined) {
-      prismaInput.profilePublicity = PROFILE_PUBLICITY_TYPE_TO_ENUM[updateUserDto.profilePublicity];
+      prismaInput.profilePublicity =
+        PROFILE_PUBLICITY_TYPE_TO_ENUM[updateUserDto.profilePublicity];
     }
     try {
       const userModel = await this.prisma.user.update({
@@ -168,10 +179,11 @@ export class UsersService {
   }
 
   remove(id: number): Promise<UserResponseDto> {
-    return this.prisma.user.delete({
-      where: { id },
-      select: userResponseSelect,
-    })
-    .then(mapUserPrismaModelToDto);
+    return this.prisma.user
+      .delete({
+        where: { id },
+        select: userResponseSelect,
+      })
+      .then(mapUserPrismaModelToDto);
   }
 }

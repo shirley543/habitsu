@@ -3,9 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseDto } from '@habit-tracker/validation-schemas';
 import { JwtPayload, JwtRequestUser } from './jwt-auth.types';
-import { mapUserPrismaModelToDto } from 'src/users/users.mapping';
 
 @Injectable()
 export class AuthService {

@@ -28,9 +28,11 @@ export const GoalsPage = () => {
     .sort((a, b) => a.order - b.order)
   // TODOs #16: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
+  // Un-used variables to be addressed in #12
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { data: userData, isLoading: userLoading, error: userError } = useUser()
   const username = userData?.username || 'Unknown'
-  const usernameInitials = getInitials(username);
+  const usernameInitials = getInitials(username)
 
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation()
 

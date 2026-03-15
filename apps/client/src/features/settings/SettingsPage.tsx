@@ -1,12 +1,12 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
+import { ProfilePublicityType } from '@habit-tracker/validation-schemas'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { TopBarClose } from '@/components/custom/TopBar'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { useUser, useUpdateUserMutation } from '@/apis/UserApi'
-import { ProfilePublicityType } from '@habit-tracker/validation-schemas'
+import { useUpdateUserMutation, useUser } from '@/apis/UserApi'
 
 enum SettingGroupStyle {
   Default = 'default',
@@ -70,10 +70,13 @@ type SettingItem =
 
 export function SettingsPage() {
   const navigate = useNavigate()
+
+  // Un-used variables to be addressed in #12
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { data: userData, isLoading: userLoading, error: userError } = useUser()
   const updateUserMutation = useUpdateUserMutation()
 
-  const userPublicity = userData?.profilePublicity;
+  const userPublicity = userData?.profilePublicity
 
   const SETTING_GROUPS: Array<SettingGroup> = [
     // Appearance

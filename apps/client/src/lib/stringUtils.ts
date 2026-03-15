@@ -9,7 +9,7 @@ export function capitalizeFirstLetter(str: string): string {
 export function getInitials(username: string): string {
   return username
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase())
+    .map((word) => word.charAt(0).toUpperCase())
     .join('')
-    .slice(0, 2); // Limit to 2 initials if needed
+    .slice(0, 2) // Limit to 2 initials if needed
 }
