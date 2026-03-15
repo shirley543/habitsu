@@ -12,8 +12,9 @@ import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 import { EmptyStateBodyComponent } from '@/components/custom/EmptyStateComponents'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuOptions from '@/components/custom/DropdownMenuOptions'
-import { useLogoutUserMutation } from '@/apis/UserApi'
+import { useLogoutUserMutation, useUser } from '@/apis/UserApi'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
+import { getInitials } from '@/lib/stringUtils'
 
 // TODOs #17: investigate if lazy loading will help with initial render speed of goals page
 export const GoalsPage = () => {
@@ -27,6 +28,10 @@ export const GoalsPage = () => {
     .sort((a, b) => a.order - b.order)
   // TODOs #16: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
+  const { data: userData, isLoading: userLoading, error: userError } = useUser()
+  const username = userData?.username || 'Unknown'
+  const usernameInitials = getInitials(username);
+
   const { mutate: logoutUserMutateFn } = useLogoutUserMutation()
 
   const profileMenuItems: Array<DropdownMenuOptionsItemConfig> = [
@@ -36,7 +41,7 @@ export const GoalsPage = () => {
       onClick: () =>
         navigate({
           to: '/profile/$profileName',
-          params: { profileName: 'me' },
+          params: { profileName: username },
         }),
     },
     { label: 'Settings', onClick: () => navigate({ to: '/settings' }) },
@@ -91,7 +96,7 @@ export const GoalsPage = () => {
               itemsConfig={profileMenuItems}
             >
               <Avatar>
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{usernameInitials}</AvatarFallback>
               </Avatar>
             </DropdownMenuOptions>
           </>

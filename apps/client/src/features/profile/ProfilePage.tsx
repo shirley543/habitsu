@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 import { TopBarConfig } from '@/components/custom/TopBar'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
+import { getInitials } from '@/lib/stringUtils'
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
@@ -21,6 +22,7 @@ export const ProfilePage = () => {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   const { profileName } = route.useParams()
+  const profileNameInitials = getInitials(profileName);
 
   // Un-used variables to be addressed in #12
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -72,7 +74,7 @@ export const ProfilePage = () => {
       {profileData && (
         <div className="bg-white rounded-xl p-2.5 flex flex-row gap-3">
           <Avatar className="size-20">
-            <AvatarFallback className="text-2xl">CN</AvatarFallback>
+            <AvatarFallback className="text-2xl">{profileNameInitials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-1.5">
             <h2>{profileData.username}</h2>
