@@ -155,7 +155,7 @@ export function SettingsPage() {
             onValueChange: (val: string) => {
               updateUserMutation.mutate({
                 update: {
-                  profilePublicity: val,
+                  profilePublicity: val as ProfilePublicityType,
                 },
               })
             },
