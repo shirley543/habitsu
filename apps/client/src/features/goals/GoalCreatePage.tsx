@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   getRouteApi,
   useCanGoBack,
@@ -26,10 +26,51 @@ import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
+import { useSmartBack } from '@/hooks/useSmartBack'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
+/**
+ * Private components
+ */
+
+
+/**
+ * Goal Page:
+ * Presentational layout component for page to display children
+ */
+interface GoalPageProps {
+  children: React.ReactNode
+}
+
+const GoalPage: React.FC<GoalPageProps> = ({ children }) => {
+  return <div className="flex flex-col gap-3">
+    {children}
+  </div>
+}
+
+/**
+ * Goal Header:
+ * Contains title create/ edit + back button
+ */
+interface GoalHeaderProps {
+  isCreate: boolean
+}
+
+const GoalHeader: React.FC<GoalHeaderProps> = ({ isCreate }) => {
+  const navigateBack = useSmartBack();
+
+  return <TopBarClose
+    title={isCreate ? 'Create Goal' : 'Edit Goal'}
+    closeCallback={navigateBack}
+  />
+}
+
+/**
+ * Goal Form:
+ * Contains goal create/ edit fields + cancel/ save buttons
+ */
 interface GoalFormProps {
   isCreate: boolean
   defaultValues?: GoalResponse
@@ -37,8 +78,7 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
+  const navigateBack = useSmartBack();
 
   const initialValues =
     defaultValues ||
@@ -56,14 +96,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const { mutate: createGoalMutateFn } = useCreateGoalMutation()
   const { mutate: updateGoalMutateFn } = useUpdateGoalMutation()
   const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation()
-
-  const navigateBack = () => {
-    if (canGoBack) {
-      router.history.back()
-    } else {
-      navigate({ to: '/goals' })
-    }
-  }
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -97,161 +129,170 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarClose
-        title={isCreate ? 'Create Goal' : 'Edit Goal'}
-        closeCallback={navigateBack}
-      />
-      {/* Form controls container */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          form.handleSubmit()
-        }}
-        className="space-y-6"
-      >
-        <form.AppField name="title">
-          {(field) => (
-            <field.TextField
-              label="Title"
-              placeholder="e.g. Run a half marathon"
-            />
-          )}
-        </form.AppField>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      form.handleSubmit()
+    }}
+    className="space-y-6"
+  >
+    <form.AppField name="title">
+      {(field) => (
+        <field.TextField
+          label="Title"
+          placeholder="e.g. Run a half marathon"
+        />
+      )}
+    </form.AppField>
 
-        <form.AppField name="description">
-          {(field) => (
-            <field.TextField
-              label="Description"
-              placeholder="Optional. Add more details if needed"
-            />
-          )}
-        </form.AppField>
+    <form.AppField name="description">
+      {(field) => (
+        <field.TextField
+          label="Description"
+          placeholder="Optional. Add more details if needed"
+        />
+      )}
+    </form.AppField>
 
-        {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
-        {isCreate && (
-          <form.AppField name="goalType">
-            {(field) => (
-              <field.RadioGroup
-                label="Goal Type"
-                values={[
-                  { label: 'Numeric', value: GoalQuantifyType.Numeric },
-                  { label: 'Boolean', value: GoalQuantifyType.Boolean },
-                ]}
-              />
-            )}
-          </form.AppField>
+    {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
+    {isCreate && (
+      <form.AppField name="goalType">
+        {(field) => (
+          <field.RadioGroup
+            label="Goal Type"
+            values={[
+              { label: 'Numeric', value: GoalQuantifyType.Numeric },
+              { label: 'Boolean', value: GoalQuantifyType.Boolean },
+            ]}
+          />
         )}
+      </form.AppField>
+    )}
 
-        <form.Subscribe selector={(state) => state.values.goalType}>
-          {(goalType) => {
-            if (goalType === GoalQuantifyType.Numeric) {
-              return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <form.AppField name="numericTarget">
-                    {(field) => (
-                      <field.NumberField
-                        label="Daily Target"
-                        placeholder="e.g. 30"
-                      />
-                    )}
-                  </form.AppField>
-                  <form.AppField name="numericUnit">
-                    {(field) => (
-                      <field.TextField
-                        label="Units"
-                        placeholder="e.g. km, hours, sessions"
-                      />
-                    )}
-                  </form.AppField>
-                </div>
-              )
-            } else {
-              return null
-            }
-          }}
-        </form.Subscribe>
+    <form.Subscribe selector={(state) => state.values.goalType}>
+      {(goalType) => {
+        if (goalType === GoalQuantifyType.Numeric) {
+          return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <form.AppField name="numericTarget">
+                {(field) => (
+                  <field.NumberField
+                    label="Daily Target"
+                    placeholder="e.g. 30"
+                  />
+                )}
+              </form.AppField>
+              <form.AppField name="numericUnit">
+                {(field) => (
+                  <field.TextField
+                    label="Units"
+                    placeholder="e.g. km, hours, sessions"
+                  />
+                )}
+              </form.AppField>
+            </div>
+          )
+        } else {
+          return null
+        }
+      }}
+    </form.Subscribe>
 
-        <form.AppField name="publicity">
-          {(field) => (
-            <field.Select
-              label="Privacy"
-              values={[
-                { label: 'Public', value: GoalPublicityType.Public },
-                { label: 'Private', value: GoalPublicityType.Private },
-              ]}
-              placeholder="Select a publicity type"
-            />
-          )}
-        </form.AppField>
+    <form.AppField name="publicity">
+      {(field) => (
+        <field.Select
+          label="Privacy"
+          values={[
+            { label: 'Public', value: GoalPublicityType.Public },
+            { label: 'Private', value: GoalPublicityType.Private },
+          ]}
+          placeholder="Select a publicity type"
+        />
+      )}
+    </form.AppField>
 
-        {/* Color selection */}
-        <form.AppField name="colour">
-          {(field) => <field.ColourSelect label="Colour" />}
-        </form.AppField>
+    {/* Color selection */}
+    <form.AppField name="colour">
+      {(field) => <field.ColourSelect label="Colour" />}
+    </form.AppField>
 
-        {/* Icon selection */}
-        <form.AppField name="icon">
-          {(field) => <field.IconSelect label="Icon" />}
-        </form.AppField>
+    {/* Icon selection */}
+    <form.AppField name="icon">
+      {(field) => <field.IconSelect label="Icon" />}
+    </form.AppField>
 
-        <div className="flex flex-row gap-1.5 justify-end">
-          <form.AppForm>
-            {!isCreate && (
-              <DeleteDialog
-                title="Delete Goal"
-                description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
-                onDelete={handleDelete}
-              >
-                <Button type="button" variant={'ghostDestructive'}>
-                  Delete
-                </Button>
-              </DeleteDialog>
-            )}
-            <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
-          </form.AppForm>
-        </div>
-      </form>
+    <div className="flex flex-row gap-1.5 justify-end">
+      <form.AppForm>
+        {!isCreate && (
+          <DeleteDialog
+            title="Delete Goal"
+            description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
+            onDelete={handleDelete}
+          >
+            <Button type="button" variant={'ghostDestructive'}>
+              Delete
+            </Button>
+          </DeleteDialog>
+        )}
+        <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
+      </form.AppForm>
     </div>
+  </form>
   )
 }
 
 export const SkeletonGoalForm: React.FC = () => {
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar skeleton */}
-      <Skeleton className="h-12 w-full rounded-md" />
-      {/* Form skeleton */}
-      <div className="space-y-6">
-        {/* Title */}
+    <div className="space-y-6">
+      {/* Title */}
+      <Skeleton className="h-10 w-full" />
+      {/* Description */}
+      <Skeleton className="h-20 w-full" />
+      {/* Numeric fields grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Skeleton className="h-10 w-full" />
-        {/* Description */}
-        <Skeleton className="h-20 w-full" />
-        {/* Numeric fields grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        {/* Publicity */}
         <Skeleton className="h-10 w-full" />
-        {/* Colour */}
-        <Skeleton className="h-10 w-full" />
-        {/* Icon */}
-        <Skeleton className="h-10 w-full" />
-        {/* Buttons */}
-        <div className="flex flex-row gap-1.5 justify-end">
-          <Skeleton className="h-10 w-20" />
-          <Skeleton className="h-10 w-20" />
-        </div>
+      </div>
+      {/* Publicity */}
+      <Skeleton className="h-10 w-full" />
+      {/* Colour */}
+      <Skeleton className="h-10 w-full" />
+      {/* Icon */}
+      <Skeleton className="h-10 w-full" />
+      {/* Buttons */}
+      <div className="flex flex-row gap-1.5 justify-end">
+        <Skeleton className="h-10 w-20" />
+        <Skeleton className="h-10 w-20" />
       </div>
     </div>
   )
 }
 
+
+/**
+ * Public components
+ */
+
+export function SkeletonGoalCreatePage() {
+  return <GoalPage>
+    <GoalHeader isCreate={true} />
+    <SkeletonGoalForm />
+  </GoalPage>
+}
+
+export function SkeletonGoalEditPage() {
+  return <GoalPage>
+    <GoalHeader isCreate={false} />
+    <SkeletonGoalForm />
+  </GoalPage>
+}
+
 export function GoalCreatePage() {
-  return <GoalForm isCreate={true} />
+  return <GoalPage>
+    <GoalHeader isCreate={true} />
+    <GoalForm isCreate={true}/>
+  </GoalPage>
 }
 
 export function GoalEditPage() {
@@ -261,12 +302,14 @@ export function GoalEditPage() {
   const navigate = useNavigate()
 
   return (
-    <>
+    <GoalPage>
+      <GoalHeader isCreate={false} />
     {/* TODOs #12 update so that
       - Message is more unique (not just generic Oops! But related to error e.g. Not Found)
-      - Have topbar always be shown as static, across both Error + Loading component
     */}
-      {isLoading && <SkeletonGoalForm />}
+      {isLoading && 
+        <SkeletonGoalForm />
+      }
       {error && (
         <ErrorBodyComponent
           error={error}
@@ -279,6 +322,6 @@ export function GoalEditPage() {
       {!isLoading && !error && (
         <GoalForm isCreate={false} defaultValues={data} />
       )}
-    </>
+    </GoalPage>
   )
 }
