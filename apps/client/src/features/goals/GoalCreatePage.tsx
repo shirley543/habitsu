@@ -304,9 +304,6 @@ export function GoalEditPage() {
   return (
     <GoalPage>
       <GoalHeader isCreate={false} />
-    {/* TODOs #12 update so that
-      - Message is more unique (not just generic Oops! But related to error e.g. Not Found)
-    */}
       {isLoading && 
         <SkeletonGoalForm />
       }
