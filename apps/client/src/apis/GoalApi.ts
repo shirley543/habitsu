@@ -262,11 +262,14 @@ async function fetchGoalStatisticsBySearchParams(
   return api.get(`entries/statistics?${searchSegment}`).json()
 }
 
-export function useGoalStatistics(searchParams: SearchParamsGoalEntryDto) {
+export function useGoalStatistics(
+  searchParams: SearchParamsGoalEntryDto,
+  enabled: boolean
+) {
   return useQuery<GoalStatisticsReponse, HTTPError>({
     queryKey: ['goalStatistics', searchParams],
     queryFn: () => fetchGoalStatisticsBySearchParams(searchParams),
-    enabled: !!searchParams.goalId,
+    enabled: enabled,
     retry: REACT_QUERY_RETRY_NUM,
   })
 }

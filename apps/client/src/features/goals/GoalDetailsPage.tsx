@@ -15,9 +15,10 @@ import type { IconName } from 'lucide-react/dynamic'
 import type { GoalStatisticsReponse } from '@habit-tracker/validation-schemas'
 import IconButton from '@/components/custom/IconButton'
 import { TopBarBack } from '@/components/custom/TopBar'
-import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
+import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
 import { useCurrentDate } from '@/hooks/useCurrentDate'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 
 
 /**
@@ -45,6 +46,7 @@ const GoalPanel: React.FC<GoalPanelProps> = ({
     data: goalData,
     isLoading: goalIsLoading,
     error: goalError,
+    refetch
   } = useGoal(goalId);
 
   return <>
@@ -60,7 +62,7 @@ const GoalPanel: React.FC<GoalPanelProps> = ({
       <ErrorBodyComponent
         error={goalError}
         onRefreshClick={() => {
-          console.log('Have refresh do something')
+          refetch()
         }}
         onBackClick={() => {
           navigate({ to: '/goals' })
@@ -129,7 +131,11 @@ const GoalStats: React.FC<GoalStatsProps> = ({
     data: statsData,
     isLoading: statsIsLoading,
     error: statsError,
-  } = useGoalStatistics({ goalId: parseInt(goalId), year: selectedYear })
+    refetch: statsRefetch,
+  } = useGoalStatistics(
+    { goalId: parseInt(goalId), year: selectedYear },
+    goalData !== undefined,
+  )
 
   type GoalStatsKeys = keyof GoalStatisticsReponse
   interface GoalStatsDisplay {
@@ -169,27 +175,23 @@ const GoalStats: React.FC<GoalStatsProps> = ({
 
   return <>
     {/* Gridded summary statistics */}
-    <div className="grid grid-cols-2 grid-rows-2 gap-3">
+    <>
       {/* Stats loading */}
-      {(goalIsLoading || statsIsLoading) && <>
+      {(goalIsLoading || statsIsLoading) && <div className="grid grid-cols-2 grid-rows-2 gap-3">
         {Object.entries(GOAL_STATS_DISPLAYS).map(() => {
           return <Skeleton className="h-[100px] w-full" />
         })}
-      </>}
+      </div>}
       {/* Stats error */}
-      {statsError && (
-        <ErrorBodyComponent
-          error={statsError}
-          onRefreshClick={() => {
-            console.log('Have refresh do something')
-          }}
-          onBackClick={() => {
-            navigate({ to: '/goals' })
-          }}
-        />
-      )}
+      {statsError && 
+        <div
+          className="bg-white rounded-xl p-2.5 shadow-sm h-[200px] w-full justify-center items-center"
+        >
+          <ErrorBodyComponent error={statsError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => statsRefetch()} />
+        </div>
+      }
       {/* Stats content */}
-      {(goalData && statsData) && <>
+      {(goalData && statsData) && <div className="grid grid-cols-2 grid-rows-2 gap-3">
         {Object.entries(statsData).map(([key, value]) => {
           const display = GOAL_STATS_DISPLAYS[key as GoalStatsKeys]
           return (
@@ -231,8 +233,8 @@ const GoalStats: React.FC<GoalStatsProps> = ({
             </div>
           )
         })}
-      </>}
-    </div>
+      </div>}
+    </>
   </>
 }
 
@@ -259,9 +261,10 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
     data: monthlyAvgsData,
     isLoading: monthlyAvgsIsLoading,
     error: monthlyAvgsError,
+    refetch: monthlyAvgsRefetch,
   } = useGoalMonthlyAvgs(
     { goalId: parseInt(goalId), year: selectedYear },
-    goalData?.goalType === GoalQuantifyType.Numeric,
+    goalData !== undefined && goalData.goalType === GoalQuantifyType.Numeric,
   )
   
   return <>
@@ -269,17 +272,13 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
     {/* Averages loading */}
     {(goalIsLoading || monthlyAvgsIsLoading) && <Skeleton className="h-[300px] w-full" />}
     {/* Averages error */}
-    {monthlyAvgsError && (
-      <ErrorBodyComponent
-        error={monthlyAvgsError}
-        onRefreshClick={() => {
-          console.log('Have refresh do something')
-        }}
-        onBackClick={() => {
-          navigate({ to: '/goals' })
-        }}
-      />
-    )}
+    {monthlyAvgsError && 
+      <div
+        className="bg-white rounded-xl p-2.5 shadow-sm h-[200px] w-full justify-center items-center"
+      >
+        <ErrorBodyComponent error={monthlyAvgsError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => monthlyAvgsRefetch()} />
+      </div>
+    }
     {/* Averages data */}
     {(goalData && monthlyAvgsData) && (
       <MonthAreaChart
@@ -320,9 +319,10 @@ const GoalMonthlyCountsChart: React.FC<GoalMonthlyCountsChartProps> = ({
     data: monthlyCountsData,
     isLoading: monthlyCountsIsLoading,
     error: monthlyCountsError,
+    refetch: monthlyCountsRefetch
   } = useGoalMonthlyCounts(
     { goalId: parseInt(goalId), year: selectedYear },
-    goalData?.goalType === GoalQuantifyType.Boolean,
+    goalData !== undefined && goalData.goalType === GoalQuantifyType.Boolean,
   )
   
   return <>
@@ -330,17 +330,13 @@ const GoalMonthlyCountsChart: React.FC<GoalMonthlyCountsChartProps> = ({
     {/* Counts loading */}
     {(goalIsLoading || monthlyCountsIsLoading) && <Skeleton className="h-[300px] w-full" />}
     {/* Counts error */}
-    {monthlyCountsError && (
-      <ErrorBodyComponent
-        error={monthlyCountsError}
-        onRefreshClick={() => {
-          console.log('Have refresh do something')
-        }}
-        onBackClick={() => {
-          navigate({ to: '/goals' })
-        }}
-      />
-    )}
+    {monthlyCountsError && 
+      <div
+        className="bg-white rounded-xl p-2.5 shadow-sm h-[200px] w-full justify-center items-center"
+      >
+        <ErrorBodyComponent error={monthlyCountsError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => monthlyCountsRefetch()} />
+      </div>
+    }
     {/* Counts data */}
     {(goalData && monthlyCountsData) && (
       <MonthAreaChart
@@ -367,6 +363,7 @@ export const GoalDetailsPage = () => {
   const route = getRouteApi('/goals_/$goalId')
 
   // TODOs #12 Improve error display
+  // Update text to be less generic than "Oops! Something went wrong"
   const currentYear = useCurrentDate().getFullYear()
   const { goalId } = route.useParams()
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)

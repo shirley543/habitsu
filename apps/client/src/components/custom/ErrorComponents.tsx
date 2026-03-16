@@ -4,20 +4,35 @@ import { HTTPError } from 'ky'
 import { Dialog, DialogTriggerSubtype } from './DialogComponents'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import clsx from 'clsx'
 
 interface ErrorBaseProps {
   error: Error | HTTPError
 }
 
+export enum ErrorBodyComponentSize {
+  Small = "small",
+  Large = "large",
+}
+
+export enum ErrorBodyComponentPosition {
+  TopMargin = "top-margin",
+  Centered = "centered"
+}
+
 interface ErrorBodyComponentProps extends ErrorBaseProps {
   onRefreshClick: () => void
   onBackClick?: () => void
+  size?: ErrorBodyComponentSize
+  position?: ErrorBodyComponentPosition
 }
 
 function ErrorBodyComponent({
   error,
   onRefreshClick,
   onBackClick,
+  size=ErrorBodyComponentSize.Large,
+  position=ErrorBodyComponentPosition.TopMargin
 }: ErrorBodyComponentProps) {
   const errorText = (() => {
     if (error instanceof HTTPError) {
@@ -28,8 +43,14 @@ function ErrorBodyComponent({
   })()
 
   return (
-    <div className="flex flex-col gap-4 pt-18 items-center">
-      <CircleAlert size={`64px`} strokeWidth={2.5} />
+    <div className={
+      clsx(
+        "flex flex-col items-center",
+        size === ErrorBodyComponentSize.Large ? "gap-4" : "gap-2",
+        position === ErrorBodyComponentPosition.TopMargin ? "pt-18" : "justify-center h-full",
+      )
+      }>
+      <CircleAlert size={size === ErrorBodyComponentSize.Large ? '64px' : '32px'} strokeWidth={size === ErrorBodyComponentSize.Large ? 2.5 : 2} />
       <div>
         <h2 className="text-base font-black text-center">
           Oops! Something went wrong
