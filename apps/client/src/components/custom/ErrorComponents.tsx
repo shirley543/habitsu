@@ -138,7 +138,7 @@ function triggerErrorToast(error: unknown) {
   const errorMessage = getErrorMessage(error);
   toast.error(errorMessage, {
     position: 'top-center',
-    duration: 7000,
+    duration: 5000,
   })
 }
 

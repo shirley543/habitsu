@@ -10,6 +10,7 @@ import { routeTree } from './routeTree.gen.ts'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import { Toaster } from 'sonner'
+import { Spinner } from './components/ui/spinner.tsx'
 
 // Create a new router instance
 const router = createRouter({
@@ -24,7 +25,9 @@ const router = createRouter({
   // TODOs #23 investigate slow loading
   defaultPendingMs: 0,
   defaultPendingMinMs: 0,
-  defaultPendingComponent: () => 'loading...',
+  defaultPendingComponent: () => <div className="flex justify-center items-center w-full h-full">
+    <Spinner className="size-28" />
+  </div>,
 })
 
 // Register the router instance for type safety
