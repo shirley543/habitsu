@@ -17,6 +17,7 @@ import IconButton from '@/components/custom/IconButton'
 import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 import { useCurrentDate } from '@/hooks/useCurrentDate'
+import { Skeleton } from '@/components/ui/skeleton'
 
 
 /**
@@ -47,7 +48,14 @@ const GoalPanel: React.FC<GoalPanelProps> = ({
   } = useGoal(goalId);
 
   return <>
-    {goalIsLoading && <div>Goal Loading...</div>}
+    {/* Goal data skeleton */}
+    {goalIsLoading && <>
+      {/* Goal description */}
+      <Skeleton className="h-[60px] w-full" />
+      {/* Heatmap container */}
+      <Skeleton className="h-[240px] w-full" />
+    </>}
+    {/* Goal data error */}
     {goalError && (
       <ErrorBodyComponent
         error={goalError}
@@ -59,6 +67,7 @@ const GoalPanel: React.FC<GoalPanelProps> = ({
         }}
       />
     )}
+    {/* Goal data content */}
     {goalData && <>
       {/* Goal description */}
       <div className="header-container flex flex-row justify-between items-center bg-white rounded-xl p-2.5 shadow-sm">
@@ -110,8 +119,10 @@ const GoalStats: React.FC<GoalStatsProps> = ({
   goalId,
   selectedYear,
 }) => {
+  const navigate = useNavigate()
   const {
-    data: goalData
+    data: goalData,
+    isLoading: goalIsLoading
   } = useGoal(goalId)
 
   const {
@@ -158,8 +169,27 @@ const GoalStats: React.FC<GoalStatsProps> = ({
 
   return <>
     {/* Gridded summary statistics */}
-    {(goalData && statsData) && (
-      <div className="grid grid-cols-2 grid-rows-2 gap-3">
+    <div className="grid grid-cols-2 grid-rows-2 gap-3">
+      {/* Stats loading */}
+      {(goalIsLoading || statsIsLoading) && <>
+        {Object.entries(GOAL_STATS_DISPLAYS).map(() => {
+          return <Skeleton className="h-[100px] w-full" />
+        })}
+      </>}
+      {/* Stats error */}
+      {statsError && (
+        <ErrorBodyComponent
+          error={statsError}
+          onRefreshClick={() => {
+            console.log('Have refresh do something')
+          }}
+          onBackClick={() => {
+            navigate({ to: '/goals' })
+          }}
+        />
+      )}
+      {/* Stats content */}
+      {(goalData && statsData) && <>
         {Object.entries(statsData).map(([key, value]) => {
           const display = GOAL_STATS_DISPLAYS[key as GoalStatsKeys]
           return (
@@ -201,8 +231,8 @@ const GoalStats: React.FC<GoalStatsProps> = ({
             </div>
           )
         })}
-      </div>
-    )}
+      </>}
+    </div>
   </>
 }
 
@@ -219,8 +249,10 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
   goalId,
   selectedYear,
 }) => {
+  const navigate = useNavigate()
   const {
-    data: goalData
+    data: goalData,
+    isLoading: goalIsLoading,
   } = useGoal(goalId)
 
   const {
@@ -234,6 +266,21 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
   
   return <>
     {/* Line graph: monthly averages */}
+    {/* Averages loading */}
+    {(goalIsLoading || monthlyAvgsIsLoading) && <Skeleton className="h-[300px] w-full" />}
+    {/* Averages error */}
+    {monthlyAvgsError && (
+      <ErrorBodyComponent
+        error={monthlyAvgsError}
+        onRefreshClick={() => {
+          console.log('Have refresh do something')
+        }}
+        onBackClick={() => {
+          navigate({ to: '/goals' })
+        }}
+      />
+    )}
+    {/* Averages data */}
     {(goalData && monthlyAvgsData) && (
       <MonthAreaChart
         baseColour={goalData.colour}
@@ -252,7 +299,7 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
 
 /**
  * Goal Monthly Counts Chart:
- * Displays line chart with x-axis being month, y-axis being goal average value for that month
+ * Displays line chart with x-axis being month, y-axis being goal count value for that month
  */
 interface GoalMonthlyCountsChartProps {
   goalId: string,
@@ -263,8 +310,10 @@ const GoalMonthlyCountsChart: React.FC<GoalMonthlyCountsChartProps> = ({
   goalId,
   selectedYear,
 }) => {
+  const navigate = useNavigate()
   const {
-    data: goalData
+    data: goalData,
+    isLoading: goalIsLoading,
   } = useGoal(goalId)
 
   const {
@@ -278,6 +327,21 @@ const GoalMonthlyCountsChart: React.FC<GoalMonthlyCountsChartProps> = ({
   
   return <>
     {/* Line graph: monthly counts */}
+    {/* Counts loading */}
+    {(goalIsLoading || monthlyCountsIsLoading) && <Skeleton className="h-[300px] w-full" />}
+    {/* Counts error */}
+    {monthlyCountsError && (
+      <ErrorBodyComponent
+        error={monthlyCountsError}
+        onRefreshClick={() => {
+          console.log('Have refresh do something')
+        }}
+        onBackClick={() => {
+          navigate({ to: '/goals' })
+        }}
+      />
+    )}
+    {/* Counts data */}
     {(goalData && monthlyCountsData) && (
       <MonthAreaChart
         baseColour={goalData.colour}
@@ -302,7 +366,7 @@ export const GoalDetailsPage = () => {
   const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId')
 
-  // TODOs #12 Improve loading display + error display
+  // TODOs #12 Improve error display
   const currentYear = useCurrentDate().getFullYear()
   const { goalId } = route.useParams()
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)
