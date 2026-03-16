@@ -22,10 +22,6 @@ import type {
   GoalResponse,
 } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
-import {
-  ErrorDialogCategory,
-  ErrorDialogComponent,
-} from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
 
@@ -59,10 +55,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const { mutate: updateGoalMutateFn } = useUpdateGoalMutation()
   const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation()
 
-  const [displayedError, setDisplayedError] = useState<
-    { category: ErrorDialogCategory; error: Error } | undefined
-  >(undefined)
-
   const navigateBack = () => {
     if (canGoBack) {
       router.history.back()
@@ -80,11 +72,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       if (isCreate) {
         createGoalMutateFn(value, {
           onSuccess: navigateBack,
-          onError: (error) =>
-            setDisplayedError({
-              error: error,
-              category: ErrorDialogCategory.FormSubmissionFailed,
-            }),
         })
       } else {
         if (defaultValues?.id) {
@@ -92,11 +79,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
             { id: defaultValues.id, update: value },
             {
               onSuccess: navigateBack,
-              onError: (error) =>
-                setDisplayedError({
-                  error: error,
-                  category: ErrorDialogCategory.FormSubmissionFailed,
-                }),
             },
           )
         }
@@ -108,11 +90,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     if (defaultValues?.id) {
       deleteGoalMutateFn(defaultValues.id, {
         onSuccess: () => navigate({ to: '/goals' }),
-        onError: (error) =>
-          setDisplayedError({
-            error: error,
-            category: ErrorDialogCategory.DeleteFailed,
-          }),
       })
     }
   }
@@ -235,15 +212,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
           </form.AppForm>
         </div>
       </form>
-      {displayedError && (
-        <ErrorDialogComponent
-          error={displayedError.error}
-          category={displayedError.category}
-          onClose={() => {
-            setDisplayedError(undefined)
-          }}
-        />
-      )}
     </div>
   )
 }
@@ -259,6 +227,7 @@ export function GoalEditPage() {
 
   return (
     <>
+    {/* TODOs #12 update loading behavior + error display for when goal edit fails to get goal */}
       {isLoading && <div>Loading...</div>}
       {error && <div>{error.message}</div>}
       {!isLoading && !error && (

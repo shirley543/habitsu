@@ -3,6 +3,7 @@ import { CircleAlert } from 'lucide-react'
 import { HTTPError } from 'ky'
 import { Dialog, DialogTriggerSubtype } from './DialogComponents'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 interface ErrorBaseProps {
   error: Error | HTTPError
@@ -107,4 +108,38 @@ function ErrorDialogComponent({
   )
 }
 
-export { ErrorBodyComponent, ErrorDialogComponent }
+function triggerErrorToast(error: unknown) {
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof HTTPError) {
+      const httpErrorLabel = (() => {
+        switch (error.response.status) {
+          case 400:
+            return 'Invalid input. Please check and try again.'
+          case 401:
+            return 'You are not logged in. Please log in again.'
+          case 403:
+            return 'You do not have permission to perform this action.'
+          case 500:
+            return 'Server error. Please try again later.'
+          default:
+            return 'Something went wrong. Please try again.'
+        }
+      })();
+      const httpErrorMessage = `${httpErrorLabel} (${error.response.status})`
+      return httpErrorMessage;
+    } else if (error instanceof TypeError) {
+      // e.g. Network failed
+      return 'Network error. Please check your connection.'
+    } else {
+      return 'An unexpected error occurred.'
+    };
+  };
+
+  const errorMessage = getErrorMessage(error);
+  toast.error(errorMessage, {
+    position: 'top-center',
+    duration: 7000,
+  })
+}
+
+export { ErrorBodyComponent, ErrorDialogComponent, triggerErrorToast }

@@ -58,6 +58,7 @@ async function postCreateUser(
 
 export function useCreateUserMutation() {
   return useMutation({
+    mutationKey: ['createUser'],
     mutationFn: (newUser: CreateUserDto) => {
       return postCreateUser(newUser)
     },
@@ -73,6 +74,7 @@ async function patchUpdateUser(
 export function useUpdateUserMutation() {
   const queryClient = useQueryClient()
   return useMutation({
+    mutationKey: ['updateUser'],
     mutationFn: ({ update }: { update: UpdateUserDto }) => {
       return patchUpdateUser(update)
     },
@@ -88,6 +90,7 @@ async function deleteUser(): Promise<UserResponseDto> {
 
 export function useDeleteUserMutation() {
   return useMutation({
+    mutationKey: ['deleteUser'],
     mutationFn: () => {
       return deleteUser()
     },
@@ -100,6 +103,7 @@ async function postLoginUser(user: LoginUserDto): Promise<UserResponseDto> {
 
 export function useLoginUserMutation() {
   return useMutation({
+    mutationKey: ['loginUser'],
     mutationFn: (user: LoginUserDto) => {
       return postLoginUser(user)
     },
@@ -112,6 +116,7 @@ async function postLogoutUser() {
 
 export function useLogoutUserMutation() {
   return useMutation({
+    mutationKey: ['logoutUser'],
     mutationFn: () => {
       return postLogoutUser()
     },

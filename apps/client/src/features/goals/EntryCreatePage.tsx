@@ -18,10 +18,6 @@ import {
 } from '../../apis/GoalApi'
 import type { GoalEntryResponse } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
-import {
-  ErrorDialogCategory,
-  ErrorDialogComponent,
-} from '@/components/custom/ErrorComponents'
 import { capitalizeFirstLetter } from '@/lib/stringUtils'
 import { Button } from '@/components/ui/button'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
@@ -68,10 +64,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
   const { mutate: updateGoalEntryMutateFn } = useUpdateGoalEntryMutation()
   const { mutate: deleteGoalEntryMutateFn } = useDeleteGoalEntryMutation()
 
-  const [displayedError, setDisplayedError] = useState<
-    { category: ErrorDialogCategory; error: Error } | undefined
-  >(undefined)
-
   const handleDelete = () => {
     if (defaultValues?.id) {
       deleteGoalEntryMutateFn(
@@ -81,12 +73,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
         },
         {
           onSuccess: () => navigate({ to: '/goals' }),
-          onError: (error) => {
-            setDisplayedError({
-              error: error,
-              category: ErrorDialogCategory.DeleteFailed,
-            })
-          },
         },
       )
     }
@@ -109,11 +95,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
           { goalId: goalId, createDto: parsed },
           {
             onSuccess: () => navigate({ to: '/goals' }),
-            onError: (error) =>
-              setDisplayedError({
-                error: error,
-                category: ErrorDialogCategory.FormSubmissionFailed,
-              }),
           },
         )
       } else {
@@ -122,11 +103,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
             { goalId: goalId, entryId: defaultValues.id, updateDto: parsed },
             {
               onSuccess: () => navigate({ to: '/goals' }),
-              onError: (error) =>
-                setDisplayedError({
-                  error: error,
-                  category: ErrorDialogCategory.FormSubmissionFailed,
-                }),
             },
           )
         }
@@ -193,15 +169,6 @@ const EntryForm: React.FC<EntryFormProps> = ({
           </form.AppForm>
         </div>
       </form>
-      {displayedError && (
-        <ErrorDialogComponent
-          error={displayedError.error}
-          category={displayedError.category}
-          onClose={() => {
-            setDisplayedError(undefined)
-          }}
-        />
-      )}
     </div>
   )
 }
@@ -222,6 +189,7 @@ export function EntryCreatePage() {
 
   return (
     <>
+    {/* TODOs #12 handle loading + goal error better */}
       {!goalIsLoading && goalData && (
         <EntryForm
           isCreate={true}
@@ -265,6 +233,7 @@ export function EntryEditPage() {
 
   return (
     <>
+    {/* TODOs #12 handle loading + goal error */}
       {goalIsLoading && <div>Loading...</div>}
       {goalError && <div>{goalError.message}</div>}
       {displayEntryForm && (

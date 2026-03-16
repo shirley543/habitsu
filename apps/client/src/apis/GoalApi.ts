@@ -60,6 +60,7 @@ async function postCreateGoal(newGoal: CreateGoalDto): Promise<GoalResponse> {
 
 export function useCreateGoalMutation() {
   return useMutation({
+    mutationKey: ['createGoal'],
     mutationFn: (newGoal: CreateGoalDto) => {
       return postCreateGoal(newGoal)
     },
@@ -75,6 +76,7 @@ async function patchUpdateGoal(
 
 export function useUpdateGoalMutation() {
   return useMutation({
+    mutationKey: ['updateGoal'],
     mutationFn: ({ id, update }: { id: number; update: UpdateGoalDto }) => {
       return patchUpdateGoal(id, update)
     },
@@ -141,6 +143,7 @@ async function deleteGoal(goalId: number): Promise<GoalResponse> {
 
 export function useDeleteGoalMutation() {
   return useMutation({
+    mutationKey: ['deleteGoal'],
     mutationFn: (goalId: number) => {
       return deleteGoal(goalId)
     },
@@ -153,6 +156,7 @@ async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<void> {
 
 export function useReorderGoalsMutation() {
   return useMutation({
+    mutationKey: ['reorderGoals'],
     mutationFn: (reorder: ReorderGoalDto) => {
       return reorderGoals(reorder)
     },
@@ -322,6 +326,7 @@ async function postCreateGoalEntry(
 
 export function useCreateGoalEntryMutation() {
   return useMutation({
+    mutationKey: ['createGoalEntry'],
     mutationFn: ({
       goalId,
       createDto,
@@ -346,6 +351,7 @@ async function patchUpdateGoalEntry(
 
 export function useUpdateGoalEntryMutation() {
   return useMutation({
+    mutationKey: ['updateGoalEntry'],
     mutationFn: ({
       goalId,
       entryId,
@@ -369,6 +375,7 @@ async function deleteGoalEntry(
 
 export function useDeleteGoalEntryMutation() {
   return useMutation({
+    mutationKey: ['deleteGoalEntry'],
     mutationFn: ({ goalId, entryId }: { goalId: number; entryId: number }) => {
       return deleteGoalEntry(goalId, entryId)
     },
