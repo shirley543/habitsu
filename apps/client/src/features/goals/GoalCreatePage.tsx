@@ -93,23 +93,23 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       icon: '',
     } as CreateGoalDto)
 
-  const { mutate: createGoalMutateFn } = useCreateGoalMutation()
-  const { mutate: updateGoalMutateFn } = useUpdateGoalMutation()
-  const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation()
+  const { mutateAsync: createGoalMutateFn } = useCreateGoalMutation()
+  const { mutateAsync: updateGoalMutateFn } = useUpdateGoalMutation()
+  const { mutateAsync: deleteGoalMutateFn } = useDeleteGoalMutation()
 
   const form = useAppForm({
     defaultValues: initialValues,
     validators: {
       onChange: CreateGoalSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isCreate) {
-        createGoalMutateFn(value, {
+        return createGoalMutateFn(value, {
           onSuccess: navigateBack,
         })
       } else {
         if (defaultValues?.id) {
-          updateGoalMutateFn(
+          return updateGoalMutateFn(
             { id: defaultValues.id, update: value },
             {
               onSuccess: navigateBack,

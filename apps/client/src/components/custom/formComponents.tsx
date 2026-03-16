@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { Spinner } from '../ui/spinner'
 
 export const StandardIcons: Array<IconName> = [
   'biceps-flexed',
@@ -93,6 +94,7 @@ export function SubscribeButton({ label, variant }: SubscribeButtonProps) {
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <Button type="submit" disabled={isSubmitting} variant={variant}>
+          {isSubmitting && <Spinner data-icon="inline-start" className="mr-2" />}
           {label}
         </Button>
       )}
