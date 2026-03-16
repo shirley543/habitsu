@@ -94,7 +94,7 @@ export function SubscribeButton({ label, variant }: SubscribeButtonProps) {
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <Button type="submit" disabled={isSubmitting} variant={variant}>
-          {isSubmitting && <Spinner data-icon="inline-start" className="mr-2" />}
+          {isSubmitting && <Spinner data-icon="inline-start" />}
           {label}
         </Button>
       )}

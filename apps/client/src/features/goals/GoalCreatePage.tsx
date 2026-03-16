@@ -120,11 +120,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     },
   })
 
-  const handleDelete = () => {
-    if (defaultValues?.id) {
-      deleteGoalMutateFn(defaultValues.id, {
-        onSuccess: () => navigate({ to: '/goals' }),
-      })
+  const handleDelete = async () => {
+    if (!defaultValues?.id) return
+
+    try {
+      await deleteGoalMutateFn(defaultValues.id)
+      navigate({ to: '/goals' })
+    } catch (err) {
+      console.error(err)
     }
   }
 
