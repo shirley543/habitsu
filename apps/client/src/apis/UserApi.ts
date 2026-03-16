@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import ky, { HTTPError } from 'ky'
+import ky, { HTTPError, isHTTPError } from 'ky'
 import type {
   CreateUserDto,
   LoginUserDto,
@@ -23,19 +23,20 @@ const api = ky.create({
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
   try {
-    return await api.get('users/me').json()
+    const data = await api.get('users/me').json<UserResponseDto | null>();
+    return data;
   } catch (err: unknown) {
     if (err instanceof HTTPError) {
-      const errorJson = await err.response.json()
-      console.error('HTTP Error:', err.response.status, errorJson)
+      console.error('HTTP Error:', err.response.status)
       if (err.response.status === 401) {
         return null
       }
-    } else if (err instanceof Error) {
-      console.error('General Error:', err.message)
+    } else if (err instanceof TypeError) {
+      console.error('Network error:', err.message)
     } else {
-      console.error('An unknown error occurred', err)
+      console.error('Unexpected error:', err)
     }
+
     // TODOs #12 fix error handling if other error occurs e.g. backend down hence no HTTPError
     throw err
   }
