@@ -24,6 +24,8 @@ import type {
 import { TopBarClose } from '@/components/custom/TopBar'
 import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
@@ -216,6 +218,38 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   )
 }
 
+export const SkeletonGoalForm: React.FC = () => {
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Topbar skeleton */}
+      <Skeleton className="h-12 w-full rounded-md" />
+      {/* Form skeleton */}
+      <div className="space-y-6">
+        {/* Title */}
+        <Skeleton className="h-10 w-full" />
+        {/* Description */}
+        <Skeleton className="h-20 w-full" />
+        {/* Numeric fields grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        {/* Publicity */}
+        <Skeleton className="h-10 w-full" />
+        {/* Colour */}
+        <Skeleton className="h-10 w-full" />
+        {/* Icon */}
+        <Skeleton className="h-10 w-full" />
+        {/* Buttons */}
+        <div className="flex flex-row gap-1.5 justify-end">
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-10 w-20" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function GoalCreatePage() {
   return <GoalForm isCreate={true} />
 }
@@ -223,13 +257,25 @@ export function GoalCreatePage() {
 export function GoalEditPage() {
   const route = getRouteApi('/goals_/$goalId_/edit')
   const { goalId: goalId } = route.useParams()
-  const { data, isLoading, error } = useGoal(goalId)
+  const { data, isLoading, error, refetch } = useGoal(goalId)
+  const navigate = useNavigate()
 
   return (
     <>
-    {/* TODOs #12 update loading behavior + error display for when goal edit fails to get goal */}
-      {isLoading && <div>Loading...</div>}
-      {error && <div>{error.message}</div>}
+    {/* TODOs #12 update so that
+      - Message is more unique (not just generic Oops! But related to error e.g. Not Found)
+      - Have topbar always be shown as static, across both Error + Loading component
+    */}
+      {isLoading && <SkeletonGoalForm />}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          onRefreshClick={() => refetch()}
+          onBackClick={() => {
+            navigate({ to: '/goals' })
+          }}
+        />
+      )}
       {!isLoading && !error && (
         <GoalForm isCreate={false} defaultValues={data} />
       )}

@@ -24,8 +24,8 @@ const router = createRouter({
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
   // TODOs #23 investigate slow loading
-  defaultPendingMs: 0,
-  defaultPendingMinMs: 0,
+  defaultPendingMs: 1000,
+  defaultPendingMinMs: 500,
   defaultPendingComponent: () => <div className="flex justify-center items-center w-full h-full">
     <Spinner className="size-28" />
   </div>,
