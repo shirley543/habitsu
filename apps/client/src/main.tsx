@@ -9,6 +9,7 @@ import { routeTree } from './routeTree.gen.ts'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { Toaster } from 'sonner'
 
 // Create a new router instance
 const router = createRouter({
@@ -43,7 +44,10 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider>
+        {/* Routes */}
         <RouterProvider router={router} />
+        {/* Global toast, not part of any particular route */}
+        <Toaster />
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )
