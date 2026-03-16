@@ -11,6 +11,7 @@ import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import { Toaster } from 'sonner'
 import { Spinner } from './components/ui/spinner.tsx'
+import { NotFoundComponent } from './components/custom/NotFoundComponent.tsx'
 
 // Create a new router instance
 const router = createRouter({
@@ -28,6 +29,10 @@ const router = createRouter({
   defaultPendingComponent: () => <div className="flex justify-center items-center w-full h-full">
     <Spinner className="size-28" />
   </div>,
+  defaultNotFoundComponent: () => <NotFoundComponent />,
+  defaultErrorComponent: () => <div>
+    ERROR COMPOENT DEFAULT
+  </div>
 })
 
 // Register the router instance for type safety
