@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import ky, { HTTPError, isHTTPError } from 'ky'
+import ky, { HTTPError } from 'ky'
 import type {
   CreateUserDto,
   LoginUserDto,
   UpdateUserDto,
   UserResponseDto,
 } from '@habit-tracker/validation-schemas'
+import { queryClient } from '@/integrations/tanstack-query/root-provider'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0
@@ -16,6 +17,29 @@ const api = ky.create({
   credentials: 'include',
   retry: KY_FETCH_RETRY_NUM,
 })
+
+
+/**
+ * Helper functions
+ */
+
+export async function checkAuthUser() {
+  const user = await queryClient.ensureQueryData({
+    queryKey: ['user'],
+    queryFn: fetchUser,
+  })
+  return user
+}
+
+export function clearAuthUser() {
+  // Remove user query (used for determining if logged in)
+  queryClient.removeQueries({
+    queryKey: ['user']
+  });
+  // Also clear whole cache (ensure e.g. 'goals' data is cleared as only relevant to logged in user)
+  queryClient.clear()
+}
+
 
 /**
  * /users
@@ -118,6 +142,8 @@ export function useLogoutUserMutation() {
   return useMutation({
     mutationKey: ['logoutUser'],
     mutationFn: () => {
+      // Clear user data when log out is requested
+      clearAuthUser()
       return postLogoutUser()
     },
   })
