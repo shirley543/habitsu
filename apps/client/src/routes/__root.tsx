@@ -8,6 +8,7 @@ import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import type { QueryClient } from '@tanstack/react-query'
 import { queryClient } from '@/integrations/tanstack-query/root-provider.tsx'
 import { fetchUser } from '@/apis/UserApi.ts'
+import { ErrorBodyComponent } from '@/components/custom/ErrorComponents.tsx'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -48,4 +49,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       throw redirect({ to: '/login' })
     }
   },
+  errorComponent: ({ error }) => {
+    return <ErrorBodyComponent
+      error={error}
+      onRefreshClick={() => {
+        // Reload current web page
+        window.location.reload(); 
+      }}
+    />
+  }
 })
