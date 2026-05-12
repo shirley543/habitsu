@@ -7,7 +7,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import type { QueryClient } from '@tanstack/react-query'
 import { ErrorBodyComponent } from '@/components/custom/ErrorComponents.tsx'
-import { checkAuthUser, clearAuthUser } from '@/apis/UserApi.ts'
+import { checkAuthUser } from '@/apis/UserApi.ts'
 
 interface MyRouterContext {
   queryClient: QueryClient

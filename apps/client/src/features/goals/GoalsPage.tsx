@@ -1,6 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { HTTPError } from 'ky'
 import { useGoals } from '../../apis/GoalApi'
 import { GoalCardDescriptive, SkeletonGoalCard } from './components/GoalCard'
 import { YearDropdown } from './components/YearDropdown'

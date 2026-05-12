@@ -4,6 +4,7 @@ import { DynamicIcon } from 'lucide-react/dynamic'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
+import { Spinner } from '../ui/spinner'
 import type { ChangeEvent } from 'react'
 import type { IconName } from 'lucide-react/dynamic'
 
@@ -21,7 +22,6 @@ import {
 } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { Spinner } from '../ui/spinner'
 
 export const StandardIcons: Array<IconName> = [
   'biceps-flexed',

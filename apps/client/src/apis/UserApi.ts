@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 import type {
   CreateUserDto,
@@ -28,8 +28,8 @@ export async function checkAuthUser() {
     queryKey: ['user'],
     queryFn: async () => {
       try {
-        const user = await fetchUser();
-        return user;
+        const fetchedUser = await fetchUser();
+        return fetchedUser;
       }
       catch (err: unknown) {
         if (err instanceof HTTPError) {
@@ -92,7 +92,6 @@ async function patchUpdateUser(
 }
 
 export function useUpdateUserMutation() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['updateUser'],
     mutationFn: ({ update }: { update: UpdateUserDto }) => {

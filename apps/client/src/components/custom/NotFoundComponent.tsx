@@ -1,6 +1,6 @@
 import { FileQuestion } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { useRouter } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 import { useUser } from '@/apis/UserApi'
 
 interface NotFoundComponentProps {

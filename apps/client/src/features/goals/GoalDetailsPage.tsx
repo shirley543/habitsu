@@ -1,4 +1,4 @@
-import { useState, type Dispatch } from 'react'
+import {  useState } from 'react'
 import { DynamicIcon } from 'lucide-react/dynamic'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { GoalQuantifyType } from '@habit-tracker/validation-schemas'
@@ -11,6 +11,7 @@ import {
 import { GoalCardControlled } from './components/GoalCard'
 import { GoalIconText } from './components/GoalIconText'
 import MonthAreaChart from './components/MonthAreaChart'
+import type {Dispatch} from 'react';
 import type { IconName } from 'lucide-react/dynamic'
 import type { GoalStatisticsReponse } from '@habit-tracker/validation-schemas'
 import IconButton from '@/components/custom/IconButton'
@@ -18,7 +19,6 @@ import { TopBarBack } from '@/components/custom/TopBar'
 import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
 import { useCurrentDate } from '@/hooks/useCurrentDate'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
 
 
 /**
@@ -121,7 +121,6 @@ const GoalStats: React.FC<GoalStatsProps> = ({
   goalId,
   selectedYear,
 }) => {
-  const navigate = useNavigate()
   const {
     data: goalData,
     isLoading: goalIsLoading
@@ -251,7 +250,6 @@ const GoalMonthlyAveragesChart: React.FC<GoalMonthlyAveragesChartProps> = ({
   goalId,
   selectedYear,
 }) => {
-  const navigate = useNavigate()
   const {
     data: goalData,
     isLoading: goalIsLoading,
@@ -309,7 +307,6 @@ const GoalMonthlyCountsChart: React.FC<GoalMonthlyCountsChartProps> = ({
   goalId,
   selectedYear,
 }) => {
-  const navigate = useNavigate()
   const {
     data: goalData,
     isLoading: goalIsLoading,

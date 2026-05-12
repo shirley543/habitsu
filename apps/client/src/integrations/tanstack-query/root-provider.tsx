@@ -1,8 +1,8 @@
-import { clearAuthUser } from '@/apis/UserApi'
-import { triggerErrorToast } from '@/components/custom/ErrorComponents'
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { redirect } from '@tanstack/react-router'
 import { HTTPError } from 'ky'
+import { triggerErrorToast } from '@/components/custom/ErrorComponents'
+import { clearAuthUser } from '@/apis/UserApi'
 
 // Handle mid-way unauthorized errors,
 // by checking for 401 status and if so,

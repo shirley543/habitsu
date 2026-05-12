@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Spinner } from '../ui/spinner'
 import {
   DialogClose,
   DialogContent,
@@ -9,8 +11,6 @@ import {
   Dialog as ShadcnDialog,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Spinner } from '../ui/spinner'
-import { useState } from 'react'
 
 enum DialogTriggerSubtype {
   Slot = 'slot',

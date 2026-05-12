@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -9,7 +10,6 @@ import { routeTree } from './routeTree.gen.ts'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
-import { Toaster } from 'sonner'
 import { Spinner } from './components/ui/spinner.tsx'
 import { NotFoundComponent } from './components/custom/NotFoundComponent.tsx'
 

@@ -1,10 +1,10 @@
 import { CircleAlert } from 'lucide-react'
 
 import { HTTPError } from 'ky'
-import { Dialog, DialogTriggerSubtype } from './DialogComponents'
-import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import clsx from 'clsx'
+import { Dialog, DialogTriggerSubtype } from './DialogComponents'
+import { Button } from '@/components/ui/button'
 
 interface ErrorBaseProps {
   error: Error | HTTPError
@@ -130,10 +130,10 @@ function ErrorDialogComponent({
 }
 
 function triggerErrorToast(error: unknown) {
-  const getErrorMessage = (error: unknown): string => {
-    if (error instanceof HTTPError) {
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof HTTPError) {
       const httpErrorLabel = (() => {
-        switch (error.response.status) {
+        switch (err.response.status) {
           case 400:
             return 'Invalid input. Please check and try again.'
           case 401:
@@ -146,9 +146,9 @@ function triggerErrorToast(error: unknown) {
             return 'Something went wrong. Please try again.'
         }
       })();
-      const httpErrorMessage = `${httpErrorLabel} (${error.response.status})`
-      return httpErrorMessage;
-    } else if (error instanceof TypeError) {
+      const msg = `${httpErrorLabel} (${err.response.status})`
+      return msg;
+    } else if (err instanceof TypeError) {
       // e.g. Network failed
       return 'Network error. Please check your connection.'
     } else {
