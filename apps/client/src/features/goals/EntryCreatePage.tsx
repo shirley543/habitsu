@@ -21,6 +21,8 @@ import { TopBarClose } from '@/components/custom/TopBar'
 import { capitalizeFirstLetter } from '@/lib/stringUtils'
 import { Button } from '@/components/ui/button'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
+import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
+import { Spinner } from '@/components/ui/spinner'
 
 interface EntryFormProps {
   isCreate: boolean
@@ -29,6 +31,7 @@ interface EntryFormProps {
   goalUnit: string
   entryDate?: Date
   defaultValues?: GoalEntryResponse
+  closeCallback: () => void;
 }
 
 const EntryForm: React.FC<EntryFormProps> = ({
@@ -38,9 +41,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
   goalUnit,
   entryDate,
   defaultValues,
+  closeCallback,
 }) => {
-  const navigate = useNavigate()
-
   const currentYear = useCurrentYear()
   const entryDatePlaceholder = `e.g. 01 January ${currentYear}`
 
@@ -72,7 +74,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
           entryId: defaultValues.id,
         },
         {
-          onSuccess: () => navigate({ to: '/goals' }),
+          onSuccess: closeCallback
         },
       )
     }
@@ -94,7 +96,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
         createGoalEntryMutateFn(
           { goalId: goalId, createDto: parsed },
           {
-            onSuccess: () => navigate({ to: '/goals' }),
+            onSuccess: closeCallback
           },
         )
       } else {
@@ -102,7 +104,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
           updateGoalEntryMutateFn(
             { goalId: goalId, entryId: defaultValues.id, updateDto: parsed },
             {
-              onSuccess: () => navigate({ to: '/goals' }),
+              onSuccess: closeCallback
             },
           )
         }
@@ -111,69 +113,60 @@ const EntryForm: React.FC<EntryFormProps> = ({
   })
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarClose
-        title={isCreate ? 'Create Entry' : 'Edit Entry'}
-        closeCallback={() => {
-          navigate({ to: '/goals' })
-        }}
-      />
-      {/* Form controls container */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          form.handleSubmit()
-        }}
-        className="space-y-6"
-      >
-        <form.AppField name="entryDate">
-          {(field) => (
-            <field.DateField label="Date" placeholder={entryDatePlaceholder} />
-          )}
-        </form.AppField>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        form.handleSubmit()
+      }}
+      className="space-y-6"
+    >
+      <form.AppField name="entryDate">
+        {(field) => (
+          <field.DateField label="Date" placeholder={entryDatePlaceholder} />
+        )}
+      </form.AppField>
 
-        <form.AppField name="note">
+      <form.AppField name="note">
+        {(field) => (
+          <field.TextField
+            label="Notes"
+            placeholder="Optional. Add more details if needed"
+          />
+        )}
+      </form.AppField>
+
+      {goalType === GoalQuantifyType.Numeric && (
+        <form.AppField name="numericValue">
           {(field) => (
-            <field.TextField
-              label="Notes"
-              placeholder="Optional. Add more details if needed"
+            <field.NumberField
+              label={capitalizeFirstLetter(goalUnit)}
+              placeholder="e.g. 30"
             />
           )}
         </form.AppField>
+      )}
 
-        {goalType === GoalQuantifyType.Numeric && (
-          <form.AppField name="numericValue">
-            {(field) => (
-              <field.NumberField
-                label={capitalizeFirstLetter(goalUnit)}
-                placeholder="e.g. 30"
-              />
-            )}
-          </form.AppField>
-        )}
-
-        <div className="flex justify-end">
-          <form.AppForm>
-            {!isCreate && (
-              <Button
-                type="button"
-                variant={'ghostDestructive'}
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-            )}
-            <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
-          </form.AppForm>
-        </div>
-      </form>
-    </div>
+      <div className="flex justify-end">
+        <form.AppForm>
+          {!isCreate && (
+            <Button
+              type="button"
+              variant={'ghostDestructive'}
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
+          )}
+          <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
+        </form.AppForm>
+      </div>
+    </form>
   )
 }
 
 export function EntryCreatePage() {
+  const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId_/entries/create')
   const { goalId: goalId } = route.useParams()
 
@@ -182,33 +175,41 @@ export function EntryCreatePage() {
   const date = dateStr ? new Date(dateStr) : undefined
 
   const {
-    data: goalData,
-    isLoading: goalIsLoading,
-    error: goalError,
+    data,
+    isLoading,
+    error,
+    refetch: goalRefetch
   } = useGoal(goalId)
 
+  const navigateToGoals = () => {
+    navigate({ to: '/goals' })
+  }
+
   return (
-    <>
-    {/* TODOs #12 handle loading + goal error better */}
-      {!goalIsLoading && goalData && (
-        <EntryForm
-          isCreate={true}
-          goalId={goalData.id}
-          goalType={goalData.goalType}
-          goalUnit={
-            goalData.goalType === GoalQuantifyType.Numeric
-              ? goalData.numericUnit
-              : ''
-          }
-          entryDate={date}
-        />
-      )}
-      {goalError && 'Goal Error'}
-    </>
+    <div className="flex flex-col gap-3">
+      <TopBarClose title='Create Entry' closeCallback={navigateToGoals} />
+      {isLoading && <div className="flex justify-center items-center w-full h-full">
+        <Spinner className="size-28" />
+      </div>}
+      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalRefetch()} />}
+      {!isLoading && !error && data && <EntryForm
+        isCreate={true}
+        goalId={data.id}
+        goalType={data.goalType}
+        goalUnit={
+          data.goalType === GoalQuantifyType.Numeric
+            ? data.numericUnit
+            : ''
+        }
+        entryDate={date}
+        closeCallback={navigateToGoals}
+      />}
+    </div>
   )
 }
 
 export function EntryEditPage() {
+  const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId_/entries_/$entryId/edit')
 
   const { goalId: goalId, entryId: entryId } = route.useParams()
@@ -223,7 +224,13 @@ export function EntryEditPage() {
     error: entryError,
   } = useGoalEntry(entryId)
 
-  const displayEntryForm =
+  const navigateToGoals = () => {
+    navigate({ to: '/goals' })
+  }
+
+  const isLoading = goalIsLoading || entryIsLoading;
+  const error = goalError || entryError;
+  const displayForm =
     !goalIsLoading &&
     !goalError &&
     goalData &&
@@ -232,23 +239,24 @@ export function EntryEditPage() {
     entryData
 
   return (
-    <>
-    {/* TODOs #12 handle loading + goal error */}
-      {goalIsLoading && <div>Loading...</div>}
-      {goalError && <div>{goalError.message}</div>}
-      {displayEntryForm && (
-        <EntryForm
-          isCreate={false}
-          goalId={Number(goalId)}
-          goalType={goalData.goalType}
-          goalUnit={
-            goalData.goalType === GoalQuantifyType.Numeric
-              ? goalData.numericUnit
-              : ''
-          }
-          defaultValues={entryData}
-        />
-      )}
-    </>
+    <div className="flex flex-col gap-3">
+      <TopBarClose title='Edit Entry' closeCallback={navigateToGoals} />
+      {isLoading && <div className="flex justify-center items-center w-full h-full">
+        <Spinner className="size-28" />
+      </div>}
+      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalRefetch()} />}
+      {displayForm && <EntryForm
+        isCreate={false}
+        goalId={Number(goalId)}
+        goalType={goalData.goalType}
+        goalUnit={
+          goalData.goalType === GoalQuantifyType.Numeric
+            ? goalData.numericUnit
+            : ''
+        }
+        defaultValues={entryData}
+        closeCallback={navigateToGoals}
+      />}
+    </div>
   )
 }

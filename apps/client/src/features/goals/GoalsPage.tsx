@@ -53,13 +53,8 @@ export const GoalsPage = () => {
         console.log('Log out requested')
         logoutUserMutateFn(undefined, {
           onSuccess: () => navigate({ to: '/' }),
-          onError: (err: Error) => {
-            if (err instanceof HTTPError) {
-              // Open generic error component
-              // TODOs #12 Improve loading display + error display
-              console.log('Error on logout')
-            }
-          },
+          // Note: generic error snackbar/ toast will appear,
+          // hence deliberately not using onError
         })
       },
     },

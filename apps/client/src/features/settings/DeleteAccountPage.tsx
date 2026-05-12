@@ -6,22 +6,25 @@ import { useDeleteUserMutation, useUser } from '../../apis/UserApi'
 import type { UserResponseDto } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
+  ErrorBodyComponent,
+  ErrorBodyComponentPosition,
+  ErrorBodyComponentSize,
   ErrorDialogCategory,
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface DeleteAccountFormProps {
-  user: UserResponseDto | null | undefined
+  user: UserResponseDto | null | undefined,
+  closeCallback: () => void,
 }
 
-const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
+const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user, closeCallback }) => {
   const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
 
   const DeleteFormSchema = z
     .object({
@@ -42,14 +45,6 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
   const [displayedError, setDisplayedError] = useState<
     { category: ErrorDialogCategory; error: Error } | undefined
   >(undefined)
-
-  const navigateBack = () => {
-    if (canGoBack) {
-      router.history.back()
-    } else {
-      navigate({ to: '/goals' })
-    }
-  }
 
   const form = useAppForm({
     defaultValues: {
@@ -74,10 +69,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
   })
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarClose title="Delete Account" closeCallback={navigateBack} />
-      {/* Form controls container */}
+    <>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -110,7 +102,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
 
         <div className="flex justify-end">
           <form.AppForm>
-            <Button type="button" variant={'ghost'} onClick={navigateBack}>
+            <Button type="button" variant={'ghost'} onClick={closeCallback}>
               Cancel
             </Button>
             <form.SubscribeButton variant={'destructive'} label={'Delete'} />
@@ -126,18 +118,33 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user }) => {
           }}
         />
       )}
-    </div>
+    </>
   )
 }
 
 export function DeleteAccountPage() {
-  const { data, isLoading, error } = useUser()
+  const { data, isLoading, error, refetch: userRefetch } = useUser()
+  const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+
+  const navigateBack = () => {
+    if (canGoBack) {
+      router.history.back()
+    } else {
+      navigate({ to: '/goals' })
+    }
+  }
 
   return (
-    <>
-      {isLoading && <div>Loading...</div>}
-      {error && <div>{error.message}</div>}
-      {!isLoading && !error && <DeleteAccountForm user={data} />}
-    </>
+    <div className="flex flex-col gap-3">
+      {/* Topbar config */}
+      <TopBarClose title="Delete Account" closeCallback={navigateBack} />
+      {isLoading && <div className="flex justify-center items-center w-full h-full">
+        <Spinner className="size-28" />
+      </div>}
+      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => userRefetch()} />}
+      {!isLoading && !error && <DeleteAccountForm user={data} closeCallback={navigateBack}/>}
+    </div>
   )
 }

@@ -362,8 +362,6 @@ export const GoalDetailsPage = () => {
   const navigate = useNavigate()
   const route = getRouteApi('/goals_/$goalId')
 
-  // TODOs #12 Improve error display
-  // Update text to be less generic than "Oops! Something went wrong"
   const currentYear = useCurrentDate().getFullYear()
   const { goalId } = route.useParams()
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)
