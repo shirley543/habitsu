@@ -14,7 +14,7 @@ export const queryClient = new QueryClient({
 
       if (error instanceof HTTPError && error.response.status === 401) {
         clearAuthUser()
-        throw redirect({ to: '/login' }) // TODOs #12 fix this; ideally redirect via router.navigate instead of redirect (intended for loader/beforeLoad)
+        throw redirect({ to: '/login' })
       }
 
       triggerErrorToast(error)
@@ -26,7 +26,7 @@ export const queryClient = new QueryClient({
 
       if (error instanceof HTTPError && error.response.status === 401) {
         clearAuthUser()
-        throw redirect({ to: '/login' }) // TODOs #12 fix this; ideally redirect via router.navigate instead of redirect (intended for loader/beforeLoad)
+        throw redirect({ to: '/login' })
       }
 
       triggerErrorToast(error)
