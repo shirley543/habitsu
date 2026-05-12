@@ -185,9 +185,8 @@ export function GoalOrderPage() {
       // No issues during parsing, hence send to backend
       reorderGoalsMutateFn(reorderData, {
         onSuccess: navigateBack,
-        onError: (err) => console.log('Error on reordering', err),
-        // TODOs #8 toast? Error modal?
-        // TODOs #12 Improve loading display + error display
+        // Note: generic error snackbar/ toast will appear,
+        // hence deliberately not using onError
       })
     }
   }

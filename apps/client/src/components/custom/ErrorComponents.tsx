@@ -1,6 +1,8 @@
 import { CircleAlert } from 'lucide-react'
 
 import { HTTPError } from 'ky'
+import { toast } from 'sonner'
+import clsx from 'clsx'
 import { Dialog, DialogTriggerSubtype } from './DialogComponents'
 import { Button } from '@/components/ui/button'
 
@@ -8,15 +10,29 @@ interface ErrorBaseProps {
   error: Error | HTTPError
 }
 
+export enum ErrorBodyComponentSize {
+  Small = 'small',
+  Large = 'large',
+}
+
+export enum ErrorBodyComponentPosition {
+  TopMargin = 'top-margin',
+  Centered = 'centered',
+}
+
 interface ErrorBodyComponentProps extends ErrorBaseProps {
   onRefreshClick: () => void
   onBackClick?: () => void
+  size?: ErrorBodyComponentSize
+  position?: ErrorBodyComponentPosition
 }
 
 function ErrorBodyComponent({
   error,
   onRefreshClick,
   onBackClick,
+  size = ErrorBodyComponentSize.Large,
+  position = ErrorBodyComponentPosition.TopMargin,
 }: ErrorBodyComponentProps) {
   const errorText = (() => {
     if (error instanceof HTTPError) {
@@ -27,8 +43,19 @@ function ErrorBodyComponent({
   })()
 
   return (
-    <div className="flex flex-col gap-4 pt-18 items-center">
-      <CircleAlert size={`64px`} strokeWidth={2.5} />
+    <div
+      className={clsx(
+        'flex flex-col items-center',
+        size === ErrorBodyComponentSize.Large ? 'gap-4' : 'gap-2',
+        position === ErrorBodyComponentPosition.TopMargin
+          ? 'pt-18'
+          : 'justify-center h-full',
+      )}
+    >
+      <CircleAlert
+        size={size === ErrorBodyComponentSize.Large ? '64px' : '32px'}
+        strokeWidth={size === ErrorBodyComponentSize.Large ? 2.5 : 2}
+      />
       <div>
         <h2 className="text-base font-black text-center">
           Oops! Something went wrong
@@ -107,4 +134,38 @@ function ErrorDialogComponent({
   )
 }
 
-export { ErrorBodyComponent, ErrorDialogComponent }
+function triggerErrorToast(error: unknown) {
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof HTTPError) {
+      const httpErrorLabel = (() => {
+        switch (err.response.status) {
+          case 400:
+            return 'Invalid input. Please check and try again.'
+          case 401:
+            return 'You are not logged in. Please log in again.'
+          case 403:
+            return 'You do not have permission to perform this action.'
+          case 500:
+            return 'Server error. Please try again later.'
+          default:
+            return 'Something went wrong. Please try again.'
+        }
+      })()
+      const msg = `${httpErrorLabel} (${err.response.status})`
+      return msg
+    } else if (err instanceof TypeError) {
+      // e.g. Network failed
+      return 'Network error. Please check your connection.'
+    } else {
+      return 'An unexpected error occurred.'
+    }
+  }
+
+  const errorMessage = getErrorMessage(error)
+  toast.error(errorMessage, {
+    position: 'top-center',
+    duration: 5000,
+  })
+}
+
+export { ErrorBodyComponent, ErrorDialogComponent, triggerErrorToast }

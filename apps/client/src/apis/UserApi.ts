@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 import type {
   CreateUserDto,
@@ -6,6 +6,7 @@ import type {
   UpdateUserDto,
   UserResponseDto,
 } from '@habit-tracker/validation-schemas'
+import { queryClient } from '@/integrations/tanstack-query/root-provider'
 
 const KY_FETCH_RETRY_NUM = 0
 const REACT_QUERY_RETRY_NUM = 0
@@ -18,27 +19,44 @@ const api = ky.create({
 })
 
 /**
+ * Helper functions
+ */
+
+export async function checkAuthUser() {
+  const user = await queryClient.ensureQueryData({
+    queryKey: ['user'],
+    queryFn: async () => {
+      try {
+        const fetchedUser = await fetchUser()
+        return fetchedUser
+      } catch (err: unknown) {
+        if (err instanceof HTTPError) {
+          if (err.response.status === 401) {
+            return null
+          }
+        }
+        throw err
+      }
+    },
+  })
+  return user
+}
+
+export function clearAuthUser() {
+  // Remove user query (used for determining if logged in)
+  queryClient.removeQueries({
+    queryKey: ['user'],
+  })
+  // Also clear whole cache (ensure e.g. 'goals' data is cleared as only relevant to logged in user)
+  queryClient.clear()
+}
+
+/**
  * /users
  */
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
-  try {
-    return await api.get('users/me').json()
-  } catch (err: unknown) {
-    if (err instanceof HTTPError) {
-      const errorJson = await err.response.json()
-      console.error('HTTP Error:', err.response.status, errorJson)
-      if (err.response.status === 401) {
-        return null
-      }
-    } else if (err instanceof Error) {
-      console.error('General Error:', err.message)
-    } else {
-      console.error('An unknown error occurred', err)
-    }
-    // TODOs #12 fix error handling if other error occurs e.g. backend down hence no HTTPError
-    throw err
-  }
+  return await api.get('users/me').json<UserResponseDto | null>()
 }
 
 export function useUser() {
@@ -57,6 +75,7 @@ async function postCreateUser(
 
 export function useCreateUserMutation() {
   return useMutation({
+    mutationKey: ['createUser'],
     mutationFn: (newUser: CreateUserDto) => {
       return postCreateUser(newUser)
     },
@@ -70,8 +89,8 @@ async function patchUpdateUser(
 }
 
 export function useUpdateUserMutation() {
-  const queryClient = useQueryClient()
   return useMutation({
+    mutationKey: ['updateUser'],
     mutationFn: ({ update }: { update: UpdateUserDto }) => {
       return patchUpdateUser(update)
     },
@@ -87,6 +106,7 @@ async function deleteUser(): Promise<UserResponseDto> {
 
 export function useDeleteUserMutation() {
   return useMutation({
+    mutationKey: ['deleteUser'],
     mutationFn: () => {
       return deleteUser()
     },
@@ -99,6 +119,7 @@ async function postLoginUser(user: LoginUserDto): Promise<UserResponseDto> {
 
 export function useLoginUserMutation() {
   return useMutation({
+    mutationKey: ['loginUser'],
     mutationFn: (user: LoginUserDto) => {
       return postLoginUser(user)
     },
@@ -111,7 +132,10 @@ async function postLogoutUser() {
 
 export function useLogoutUserMutation() {
   return useMutation({
+    mutationKey: ['logoutUser'],
     mutationFn: () => {
+      // Clear user data when log out is requested
+      clearAuthUser()
       return postLogoutUser()
     },
   })

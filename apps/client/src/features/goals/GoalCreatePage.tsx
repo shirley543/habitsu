@@ -1,10 +1,5 @@
-import { useState } from 'react'
-import {
-  getRouteApi,
-  useCanGoBack,
-  useNavigate,
-  useRouter,
-} from '@tanstack/react-router'
+import React from 'react'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import {
   CreateGoalSchema,
   GoalPublicityType,
@@ -22,16 +17,54 @@ import type {
   GoalResponse,
 } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
-import {
-  ErrorDialogCategory,
-  ErrorDialogComponent,
-} from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
 import { DeleteDialog } from '@/components/custom/DialogComponents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ErrorBodyComponent } from '@/components/custom/ErrorComponents'
+import { useSmartBack } from '@/hooks/useSmartBack'
 
 // TODOs #11:
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
+/**
+ * Private components
+ */
+
+/**
+ * Goal Page:
+ * Presentational layout component for page to display children
+ */
+interface GoalPageProps {
+  children: React.ReactNode
+}
+
+const GoalPage: React.FC<GoalPageProps> = ({ children }) => {
+  return <div className="flex flex-col gap-3">{children}</div>
+}
+
+/**
+ * Goal Header:
+ * Contains title create/ edit + back button
+ */
+interface GoalHeaderProps {
+  isCreate: boolean
+}
+
+const GoalHeader: React.FC<GoalHeaderProps> = ({ isCreate }) => {
+  const navigateBack = useSmartBack()
+
+  return (
+    <TopBarClose
+      title={isCreate ? 'Create Goal' : 'Edit Goal'}
+      closeCallback={navigateBack}
+    />
+  )
+}
+
+/**
+ * Goal Form:
+ * Contains goal create/ edit fields + cancel/ save buttons
+ */
 interface GoalFormProps {
   isCreate: boolean
   defaultValues?: GoalResponse
@@ -39,8 +72,7 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
+  const navigateBack = useSmartBack()
 
   const initialValues =
     defaultValues ||
@@ -55,48 +87,26 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
       icon: '',
     } as CreateGoalDto)
 
-  const { mutate: createGoalMutateFn } = useCreateGoalMutation()
-  const { mutate: updateGoalMutateFn } = useUpdateGoalMutation()
-  const { mutate: deleteGoalMutateFn } = useDeleteGoalMutation()
-
-  const [displayedError, setDisplayedError] = useState<
-    { category: ErrorDialogCategory; error: Error } | undefined
-  >(undefined)
-
-  const navigateBack = () => {
-    if (canGoBack) {
-      router.history.back()
-    } else {
-      navigate({ to: '/goals' })
-    }
-  }
+  const { mutateAsync: createGoalMutateFn } = useCreateGoalMutation()
+  const { mutateAsync: updateGoalMutateFn } = useUpdateGoalMutation()
+  const { mutateAsync: deleteGoalMutateFn } = useDeleteGoalMutation()
 
   const form = useAppForm({
     defaultValues: initialValues,
     validators: {
       onChange: CreateGoalSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isCreate) {
-        createGoalMutateFn(value, {
+        return createGoalMutateFn(value, {
           onSuccess: navigateBack,
-          onError: (error) =>
-            setDisplayedError({
-              error: error,
-              category: ErrorDialogCategory.FormSubmissionFailed,
-            }),
         })
       } else {
         if (defaultValues?.id) {
-          updateGoalMutateFn(
+          return updateGoalMutateFn(
             { id: defaultValues.id, update: value },
             {
               onSuccess: navigateBack,
-              onError: (error) =>
-                setDisplayedError({
-                  error: error,
-                  category: ErrorDialogCategory.FormSubmissionFailed,
-                }),
             },
           )
         }
@@ -104,166 +114,211 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
     },
   })
 
-  const handleDelete = () => {
-    if (defaultValues?.id) {
-      deleteGoalMutateFn(defaultValues.id, {
-        onSuccess: () => navigate({ to: '/goals' }),
-        onError: (error) =>
-          setDisplayedError({
-            error: error,
-            category: ErrorDialogCategory.DeleteFailed,
-          }),
-      })
+  const handleDelete = async () => {
+    if (!defaultValues?.id) return
+
+    try {
+      await deleteGoalMutateFn(defaultValues.id)
+      navigate({ to: '/goals' })
+    } catch (err) {
+      console.error(err)
     }
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarClose
-        title={isCreate ? 'Create Goal' : 'Edit Goal'}
-        closeCallback={navigateBack}
-      />
-      {/* Form controls container */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          form.handleSubmit()
-        }}
-        className="space-y-6"
-      >
-        <form.AppField name="title">
-          {(field) => (
-            <field.TextField
-              label="Title"
-              placeholder="e.g. Run a half marathon"
-            />
-          )}
-        </form.AppField>
-
-        <form.AppField name="description">
-          {(field) => (
-            <field.TextField
-              label="Description"
-              placeholder="Optional. Add more details if needed"
-            />
-          )}
-        </form.AppField>
-
-        {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
-        {isCreate && (
-          <form.AppField name="goalType">
-            {(field) => (
-              <field.RadioGroup
-                label="Goal Type"
-                values={[
-                  { label: 'Numeric', value: GoalQuantifyType.Numeric },
-                  { label: 'Boolean', value: GoalQuantifyType.Boolean },
-                ]}
-              />
-            )}
-          </form.AppField>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        form.handleSubmit()
+      }}
+      className="space-y-6"
+    >
+      <form.AppField name="title">
+        {(field) => (
+          <field.TextField
+            label="Title"
+            placeholder="e.g. Run a half marathon"
+          />
         )}
+      </form.AppField>
 
-        <form.Subscribe selector={(state) => state.values.goalType}>
-          {(goalType) => {
-            if (goalType === GoalQuantifyType.Numeric) {
-              return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <form.AppField name="numericTarget">
-                    {(field) => (
-                      <field.NumberField
-                        label="Daily Target"
-                        placeholder="e.g. 30"
-                      />
-                    )}
-                  </form.AppField>
-                  <form.AppField name="numericUnit">
-                    {(field) => (
-                      <field.TextField
-                        label="Units"
-                        placeholder="e.g. km, hours, sessions"
-                      />
-                    )}
-                  </form.AppField>
-                </div>
-              )
-            } else {
-              return null
-            }
-          }}
-        </form.Subscribe>
+      <form.AppField name="description">
+        {(field) => (
+          <field.TextField
+            label="Description"
+            placeholder="Optional. Add more details if needed"
+          />
+        )}
+      </form.AppField>
 
-        <form.AppField name="publicity">
+      {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
+      {isCreate && (
+        <form.AppField name="goalType">
           {(field) => (
-            <field.Select
-              label="Privacy"
+            <field.RadioGroup
+              label="Goal Type"
               values={[
-                { label: 'Public', value: GoalPublicityType.Public },
-                { label: 'Private', value: GoalPublicityType.Private },
+                { label: 'Numeric', value: GoalQuantifyType.Numeric },
+                { label: 'Boolean', value: GoalQuantifyType.Boolean },
               ]}
-              placeholder="Select a publicity type"
             />
           )}
         </form.AppField>
-
-        {/* Color selection */}
-        <form.AppField name="colour">
-          {(field) => <field.ColourSelect label="Colour" />}
-        </form.AppField>
-
-        {/* Icon selection */}
-        <form.AppField name="icon">
-          {(field) => <field.IconSelect label="Icon" />}
-        </form.AppField>
-
-        <div className="flex flex-row gap-1.5 justify-end">
-          <form.AppForm>
-            {!isCreate && (
-              <DeleteDialog
-                title="Delete Goal"
-                description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
-                onDelete={handleDelete}
-              >
-                <Button type="button" variant={'ghostDestructive'}>
-                  Delete
-                </Button>
-              </DeleteDialog>
-            )}
-            <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
-          </form.AppForm>
-        </div>
-      </form>
-      {displayedError && (
-        <ErrorDialogComponent
-          error={displayedError.error}
-          category={displayedError.category}
-          onClose={() => {
-            setDisplayedError(undefined)
-          }}
-        />
       )}
+
+      <form.Subscribe selector={(state) => state.values.goalType}>
+        {(goalType) => {
+          if (goalType === GoalQuantifyType.Numeric) {
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <form.AppField name="numericTarget">
+                  {(field) => (
+                    <field.NumberField
+                      label="Daily Target"
+                      placeholder="e.g. 30"
+                    />
+                  )}
+                </form.AppField>
+                <form.AppField name="numericUnit">
+                  {(field) => (
+                    <field.TextField
+                      label="Units"
+                      placeholder="e.g. km, hours, sessions"
+                    />
+                  )}
+                </form.AppField>
+              </div>
+            )
+          } else {
+            return null
+          }
+        }}
+      </form.Subscribe>
+
+      <form.AppField name="publicity">
+        {(field) => (
+          <field.Select
+            label="Privacy"
+            values={[
+              { label: 'Public', value: GoalPublicityType.Public },
+              { label: 'Private', value: GoalPublicityType.Private },
+            ]}
+            placeholder="Select a publicity type"
+          />
+        )}
+      </form.AppField>
+
+      {/* Color selection */}
+      <form.AppField name="colour">
+        {(field) => <field.ColourSelect label="Colour" />}
+      </form.AppField>
+
+      {/* Icon selection */}
+      <form.AppField name="icon">
+        {(field) => <field.IconSelect label="Icon" />}
+      </form.AppField>
+
+      <div className="flex flex-row gap-1.5 justify-end">
+        <form.AppForm>
+          {!isCreate && (
+            <DeleteDialog
+              title="Delete Goal"
+              description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
+              onDelete={handleDelete}
+            >
+              <Button type="button" variant={'ghostDestructive'}>
+                Delete
+              </Button>
+            </DeleteDialog>
+          )}
+          <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
+        </form.AppForm>
+      </div>
+    </form>
+  )
+}
+
+export const SkeletonGoalForm: React.FC = () => {
+  return (
+    <div className="space-y-6">
+      {/* Title */}
+      <Skeleton className="h-10 w-full" />
+      {/* Description */}
+      <Skeleton className="h-20 w-full" />
+      {/* Numeric fields grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      {/* Publicity */}
+      <Skeleton className="h-10 w-full" />
+      {/* Colour */}
+      <Skeleton className="h-10 w-full" />
+      {/* Icon */}
+      <Skeleton className="h-10 w-full" />
+      {/* Buttons */}
+      <div className="flex flex-row gap-1.5 justify-end">
+        <Skeleton className="h-10 w-20" />
+        <Skeleton className="h-10 w-20" />
+      </div>
     </div>
   )
 }
 
+/**
+ * Public components
+ */
+
+export function SkeletonGoalCreatePage() {
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={true} />
+      <SkeletonGoalForm />
+    </GoalPage>
+  )
+}
+
+export function SkeletonGoalEditPage() {
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={false} />
+      <SkeletonGoalForm />
+    </GoalPage>
+  )
+}
+
 export function GoalCreatePage() {
-  return <GoalForm isCreate={true} />
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={true} />
+      <GoalForm isCreate={true} />
+    </GoalPage>
+  )
 }
 
 export function GoalEditPage() {
   const route = getRouteApi('/goals_/$goalId_/edit')
   const { goalId: goalId } = route.useParams()
-  const { data, isLoading, error } = useGoal(goalId)
+  const { data, isLoading, error, refetch } = useGoal(goalId)
+  const navigate = useNavigate()
 
   return (
-    <>
-      {isLoading && <div>Loading...</div>}
-      {error && <div>{error.message}</div>}
+    <GoalPage>
+      <GoalHeader isCreate={false} />
+      {isLoading && <SkeletonGoalForm />}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          onRefreshClick={() => refetch()}
+          onBackClick={() => {
+            navigate({ to: '/goals' })
+          }}
+        />
+      )}
       {!isLoading && !error && (
         <GoalForm isCreate={false} defaultValues={data} />
       )}
-    </>
+    </GoalPage>
   )
 }

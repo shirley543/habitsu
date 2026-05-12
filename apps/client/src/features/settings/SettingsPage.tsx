@@ -71,9 +71,7 @@ type SettingItem =
 export function SettingsPage() {
   const navigate = useNavigate()
 
-  // Un-used variables to be addressed in #12
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { data: userData, isLoading: userLoading, error: userError } = useUser()
+  const { data: userData } = useUser()
   const updateUserMutation = useUpdateUserMutation()
 
   const userPublicity = userData?.profilePublicity

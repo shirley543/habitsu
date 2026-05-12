@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -9,6 +10,8 @@ import { routeTree } from './routeTree.gen.ts'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { Spinner } from './components/ui/spinner.tsx'
+import { NotFoundComponent } from './components/custom/NotFoundComponent.tsx'
 
 // Create a new router instance
 const router = createRouter({
@@ -21,9 +24,15 @@ const router = createRouter({
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
   // TODOs #23 investigate slow loading
-  defaultPendingMs: 0,
-  defaultPendingMinMs: 0,
-  defaultPendingComponent: () => 'loading...',
+  defaultPendingMs: 1000,
+  defaultPendingMinMs: 500,
+  defaultPendingComponent: () => (
+    <div className="flex justify-center items-center w-full h-full">
+      <Spinner className="size-28" />
+    </div>
+  ),
+  defaultNotFoundComponent: () => <NotFoundComponent />,
+  defaultErrorComponent: () => <div>ERROR COMPOENT DEFAULT</div>,
 })
 
 // Register the router instance for type safety
@@ -43,7 +52,10 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider>
+        {/* Routes */}
         <RouterProvider router={router} />
+        {/* Global toast, not part of any particular route */}
+        <Toaster />
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )

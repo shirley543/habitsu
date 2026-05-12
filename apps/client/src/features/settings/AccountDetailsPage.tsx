@@ -9,10 +9,14 @@ import type {
 } from '@habit-tracker/validation-schemas'
 import { TopBarClose } from '@/components/custom/TopBar'
 import {
+  ErrorBodyComponent,
+  ErrorBodyComponentPosition,
+  ErrorBodyComponentSize,
   ErrorDialogCategory,
   ErrorDialogComponent,
 } from '@/components/custom/ErrorComponents'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 
 const UpdateUserFormSchema = z
   .object({
@@ -36,15 +40,13 @@ type UpdateUserFormType = z.infer<typeof UpdateUserFormSchema>
 
 interface AccountDetailsFormProps {
   defaultValues: UserResponseDto
+  closeCallback: () => void
 }
 
 const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
   defaultValues,
+  closeCallback,
 }) => {
-  const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
-
   const initialValues: UpdateUserFormType = defaultValues
 
   const { mutate: updateUserMutateFn } = useUpdateUserMutation()
@@ -52,14 +54,6 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
   const [displayedError, setDisplayedError] = useState<
     { category: ErrorDialogCategory; error: Error } | undefined
   >(undefined)
-
-  const navigateBack = () => {
-    if (canGoBack) {
-      router.history.back()
-    } else {
-      navigate({ to: '/settings' })
-    }
-  }
 
   const form = useAppForm({
     defaultValues: initialValues,
@@ -75,7 +69,7 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
       updateUserMutateFn(
         { update: updateValue },
         {
-          onSuccess: navigateBack,
+          onSuccess: closeCallback,
           onError: (error) =>
             setDisplayedError({
               error: error,
@@ -87,9 +81,7 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
   })
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Topbar config */}
-      <TopBarClose title="Account Details" closeCallback={navigateBack} />
+    <>
       {/* Form controls container */}
       <form
         onSubmit={(e) => {
@@ -121,7 +113,7 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
 
         <div className="flex justify-end">
           <form.AppForm>
-            <Button type="button" variant={'ghost'} onClick={navigateBack}>
+            <Button type="button" variant={'ghost'} onClick={closeCallback}>
               Cancel
             </Button>
             <form.SubscribeButton label={'Save'} />
@@ -137,21 +129,43 @@ const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
           }}
         />
       )}
-    </div>
+    </>
   )
 }
 
 export function AccountDetailsPage() {
-  const { data, isLoading, error } = useUser()
+  const { data, isLoading, error, refetch: userRefetch } = useUser()
+  const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+
+  const navigateBack = () => {
+    if (canGoBack) {
+      router.history.back()
+    } else {
+      navigate({ to: '/goals' })
+    }
+  }
 
   return (
-    <>
-      {isLoading && <div>Loading...</div>}
-      {/* // TODOs #12 Improve loading display + error display */}
-      {error && <div>{error.message}</div>}
-      {!isLoading && !error && data && (
-        <AccountDetailsForm defaultValues={data} />
+    <div className="flex flex-col gap-3">
+      <TopBarClose title="Account Details" closeCallback={navigateBack} />
+      {isLoading && (
+        <div className="flex justify-center items-center w-full h-full">
+          <Spinner className="size-28" />
+        </div>
       )}
-    </>
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          size={ErrorBodyComponentSize.Small}
+          position={ErrorBodyComponentPosition.Centered}
+          onRefreshClick={() => userRefetch()}
+        />
+      )}
+      {!isLoading && !error && data && (
+        <AccountDetailsForm defaultValues={data} closeCallback={navigateBack} />
+      )}
+    </div>
   )
 }

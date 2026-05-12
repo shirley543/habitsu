@@ -4,6 +4,7 @@ import { DynamicIcon } from 'lucide-react/dynamic'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useFieldContext, useFormContext } from '../../hooks/form-context'
+import { Spinner } from '../ui/spinner'
 import type { ChangeEvent } from 'react'
 import type { IconName } from 'lucide-react/dynamic'
 
@@ -93,6 +94,7 @@ export function SubscribeButton({ label, variant }: SubscribeButtonProps) {
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <Button type="submit" disabled={isSubmitting} variant={variant}>
+          {isSubmitting && <Spinner data-icon="inline-start" />}
           {label}
         </Button>
       )}

@@ -6,19 +6,11 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import type { QueryClient } from '@tanstack/react-query'
-import { queryClient } from '@/integrations/tanstack-query/root-provider.tsx'
-import { fetchUser } from '@/apis/UserApi.ts'
+import { ErrorBodyComponent } from '@/components/custom/ErrorComponents.tsx'
+import { checkAuthUser } from '@/apis/UserApi.ts'
 
 interface MyRouterContext {
   queryClient: QueryClient
-}
-
-export async function checkAuthUser() {
-  const user = await queryClient.ensureQueryData({
-    queryKey: ['user'],
-    queryFn: fetchUser,
-  })
-  return user
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -40,12 +32,24 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     // Allow /profile and anything under it
     const isProfilePath = location.pathname.startsWith('/profile')
 
-    if (
-      !isLoggedInUser &&
-      !publicPaths.includes(location.pathname) &&
-      !isProfilePath
-    ) {
+    // Handle starting-way unauthorized errors on route load,
+    // by checking whether user is logged in and whether route is public, and if not
+    // redirect to login page
+    const isPublicPath =
+      publicPaths.includes(location.pathname) || isProfilePath
+    if (!isLoggedInUser && !isPublicPath) {
       throw redirect({ to: '/login' })
     }
+  },
+  errorComponent: ({ error }) => {
+    return (
+      <ErrorBodyComponent
+        error={error}
+        onRefreshClick={() => {
+          // Reload current web page
+          window.location.reload()
+        }}
+      />
+    )
   },
 })

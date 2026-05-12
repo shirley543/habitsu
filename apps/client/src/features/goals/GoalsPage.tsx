@@ -1,6 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { HTTPError } from 'ky'
 import { useGoals } from '../../apis/GoalApi'
 import { GoalCardDescriptive, SkeletonGoalCard } from './components/GoalCard'
 import { YearDropdown } from './components/YearDropdown'
@@ -28,9 +27,7 @@ export const GoalsPage = () => {
     .sort((a, b) => a.order - b.order)
   // TODOs #16: handle filtering on backend? how to fit with infinite scroll vs. pagination?
 
-  // Un-used variables to be addressed in #12
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { data: userData, isLoading: userLoading, error: userError } = useUser()
+  const { data: userData } = useUser()
   const username = userData?.username || 'Unknown'
   const usernameInitials = getInitials(username)
 
@@ -53,13 +50,8 @@ export const GoalsPage = () => {
         console.log('Log out requested')
         logoutUserMutateFn(undefined, {
           onSuccess: () => navigate({ to: '/' }),
-          onError: (err: Error) => {
-            if (err instanceof HTTPError) {
-              // Open generic error component
-              // TODOs #12 Improve loading display + error display
-              console.log('Error on logout')
-            }
-          },
+          // Note: generic error snackbar/ toast will appear,
+          // hence deliberately not using onError
         })
       },
     },

@@ -1,6 +1,49 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { redirect } from '@tanstack/react-router'
+import { HTTPError } from 'ky'
+import { triggerErrorToast } from '@/components/custom/ErrorComponents'
+import { clearAuthUser } from '@/apis/UserApi'
 
-export const queryClient = new QueryClient()
+// Handle mid-way unauthorized errors,
+// by checking for 401 status and if so,
+// clear user auth and redirect to login page
+export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error: unknown, query) => {
+      console.error(
+        `Query ${query.options.queryKey ?? '<unknown query>'} failed:`,
+        error,
+      )
+
+      if (error instanceof HTTPError && error.response.status === 401) {
+        clearAuthUser()
+        throw redirect({ to: '/login' })
+      }
+
+      triggerErrorToast(error)
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error: unknown, _variables, _context, mutation) => {
+      console.error(
+        `Mutation ${mutation.options.mutationKey ?? '<unknown mutation>'} failed:`,
+        error,
+      )
+
+      if (error instanceof HTTPError && error.response.status === 401) {
+        clearAuthUser()
+        throw redirect({ to: '/login' })
+      }
+
+      triggerErrorToast(error)
+    },
+  }),
+})
 
 export function getContext() {
   return {

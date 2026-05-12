@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Spinner } from '../ui/spinner'
 import {
   DialogClose,
   DialogContent,
@@ -82,10 +84,10 @@ function Dialog({
   )
 }
 
-interface DeleteDialogComponentProps {
+interface DeleteDialogProps {
   title: string
   description: string
-  onDelete: () => void
+  onDelete: () => Promise<void>
   children: React.ReactNode
 }
 
@@ -94,15 +96,32 @@ function DeleteDialog({
   description,
   onDelete,
   children,
-}: DeleteDialogComponentProps) {
+}: DeleteDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleClick = async () => {
+    setIsDeleting(true)
+    try {
+      await onDelete()
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const buttonsSlot = (
     <div className="flex flex-row gap-1.5">
       <DialogClose asChild>
-        <Button type="button" variant="secondary">
+        <Button type="button" variant="secondary" disabled={isDeleting}>
           Cancel
         </Button>
       </DialogClose>
-      <Button type="button" variant="destructive" onClick={onDelete}>
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={handleClick}
+        disabled={isDeleting}
+      >
+        {isDeleting && <Spinner data-icon="inline-start" />}
         Delete
       </Button>
     </div>
