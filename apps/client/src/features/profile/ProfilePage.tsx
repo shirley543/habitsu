@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { TopBarConfig } from '@/components/custom/TopBar'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
 import { getInitials } from '@/lib/stringUtils'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
@@ -24,12 +26,11 @@ export const ProfilePage = () => {
   const { profileName } = route.useParams()
   const profileNameInitials = getInitials(profileName)
 
-  // Un-used variables to be addressed in #12
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     data: profileData,
     isLoading: profileIsLoading,
     error: profileError,
+    refetch: profileRefetch,
   } = useProfile(profileName)
   const isProfilePrivate =
     profileData?.joinedAt === undefined &&
@@ -39,8 +40,8 @@ export const ProfilePage = () => {
     data: goalsData,
     isLoading: goalsIsLoading,
     error: goalsError,
+    refetch: goalsRefetch,
   } = useProfileGoals(profileName)
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const formatDateToString = (date: Date | undefined) => {
     return date ? `${date}` : undefined
@@ -71,6 +72,16 @@ export const ProfilePage = () => {
       />
 
       {/* Profile data */}
+      {profileIsLoading && (
+        <Skeleton className="h-25 w-full" />
+      )}
+      {profileError && (
+        <div
+          className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center"
+        >
+          <ErrorBodyComponent error={profileError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => profileRefetch()} />
+        </div>
+      )}
       {profileData && (
         <div className="bg-white rounded-xl p-2.5 flex flex-row gap-3">
           <Avatar className="size-20">
@@ -111,28 +122,33 @@ export const ProfilePage = () => {
       )}
 
       {/* Goals data/ heatmaps container */}
-      {(goalsData || goalsIsLoading) && (
-        <div className="flex flex-col gap-3">
-          {goalsData &&
-            goalsData.map((d) => {
-              return (
-                <GoalCardDescriptive
-                  key={`goalCard_${d.id}`}
-                  title={d.title}
-                  description={d.description}
-                  iconName={d.icon as IconName}
-                  goalData={d}
-                  selectedYear={selectedYear}
-                  viewOnly={true}
-                />
-              )
-            })}
-          {goalsIsLoading &&
-            [...Array(3)].map((_, idx) => {
-              return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`} />
-            })}
-        </div>
-      )}
+      <div className="flex flex-col gap-3">
+        {goalsData &&
+          goalsData.map((d) => {
+            return (
+              <GoalCardDescriptive
+                key={`goalCard_${d.id}`}
+                title={d.title}
+                description={d.description}
+                iconName={d.icon as IconName}
+                goalData={d}
+                selectedYear={selectedYear}
+                viewOnly={true}
+              />
+            )
+          })}
+        {goalsIsLoading &&
+          [...Array(3)].map((_, idx) => {
+            return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`} />
+          })}
+        {goalsError && (
+          <div
+            className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center"
+          >
+            <ErrorBodyComponent error={goalsError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalsRefetch()} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
