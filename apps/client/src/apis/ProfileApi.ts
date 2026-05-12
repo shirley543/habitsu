@@ -22,6 +22,12 @@ const api = ky.create({
 async function fetchProfileByUsername(
   username: string,
 ): Promise<ProfileResponseDto> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
+
   return api.get(`profiles/${username}`).json()
 }
 
@@ -42,6 +48,12 @@ export function useProfile(username: string) {
 async function fetchProfileGoalsByUsername(
   username: string,
 ): Promise<Array<GoalResponse>> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
+
   return api.get(`profiles/${username}/goals`).json()
 }
 

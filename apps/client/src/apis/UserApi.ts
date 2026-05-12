@@ -46,6 +46,12 @@ export function clearAuthUser() {
  */
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
+  // return new Promise((_, reject) => {
+  //   setTimeout(() => {
+  //     reject(new Error());
+  //   }, 2 * 1000); // setTimeout takes milliseconds
+  // });
+
   try {
     const data = await api.get('users/me').json<UserResponseDto | null>();
     return data;

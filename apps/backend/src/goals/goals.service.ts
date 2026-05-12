@@ -32,6 +32,8 @@ export class GoalsService {
   ) {}
 
   async create(createGoalDto: CreateGoalDto, userId: number): Promise<Goal> {
+    // throw new Error("AAAAA"); // Testhack: Remove later
+
     // Validate user exists
     const user = await this.usersService.findOne(userId);
     assertUserFound(user, userId);
@@ -85,6 +87,8 @@ export class GoalsService {
   }
 
   async findAll(userId: number): Promise<Goal[]> {
+    // throw new GoalNotFoundError('Dummy goal not found'); // Testhack: Remove later
+
     return this.prisma.goal.findMany({
       where: { userId },
       orderBy: { order: 'asc' },

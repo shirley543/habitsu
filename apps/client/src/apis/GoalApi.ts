@@ -42,7 +42,12 @@ export function useGoals() {
 }
 
 async function fetchGoalById(goalId: number): Promise<GoalResponse> {
-  return api.get(`goals/${goalId}`).json()
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
+  // return api.get(`goals/${goalId}`).json()
 }
 
 export function useGoal(goalId: string) {
@@ -151,6 +156,11 @@ export function useDeleteGoalMutation() {
 }
 
 async function reorderGoals(reorderGoal: ReorderGoalDto): Promise<void> {
+  // return new Promise((_, reject) => {
+  //   setTimeout(() => {
+  //     reject(new Error());
+  //   }, 2 * 1000); // setTimeout takes milliseconds
+  // });
   return api.post('goals/reorder', { json: reorderGoal }).json()
 }
 
@@ -254,6 +264,14 @@ export function useGoalEntry(entryId: string) {
 async function fetchGoalStatisticsBySearchParams(
   searchParams: SearchParamsGoalEntryDto,
 ): Promise<GoalStatisticsReponse> {
+  // throw new Error()
+
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
+
   const searchSegment = Object.entries(searchParams)
     .map(([key, value]) => {
       return `${key}=${value}`
@@ -277,6 +295,11 @@ export function useGoalStatistics(
 async function fetchGoalMonthlyAvgsBySearchParams(
   searchParams: SearchParamsGoalEntryDto,
 ): Promise<GoalMonthlyAveragesResponse> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
   const searchSegment = Object.entries(searchParams)
     .map(([key, value]) => {
       return `${key}=${value}`
@@ -300,6 +323,13 @@ export function useGoalMonthlyAvgs(
 async function fetchGoalMonthlyCountsBySearchParams(
   searchParams: SearchParamsGoalEntryDto,
 ): Promise<GoalMonthlyCountsResponse> {
+  // throw new Error()
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error());
+    }, 2 * 1000); // setTimeout takes milliseconds
+  });
+
   const searchSegment = Object.entries(searchParams)
     .map(([key, value]) => {
       return `${key}=${value}`
