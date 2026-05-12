@@ -91,7 +91,12 @@ interface DeleteDialogProps {
   children: React.ReactNode
 }
 
-function DeleteDialog({ title, description, onDelete, children }: DeleteDialogProps) {
+function DeleteDialog({
+  title,
+  description,
+  onDelete,
+  children,
+}: DeleteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleClick = async () => {
@@ -110,7 +115,12 @@ function DeleteDialog({ title, description, onDelete, children }: DeleteDialogPr
           Cancel
         </Button>
       </DialogClose>
-      <Button type="button" variant="destructive" onClick={handleClick} disabled={isDeleting}>
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={handleClick}
+        disabled={isDeleting}
+      >
         {isDeleting && <Spinner data-icon="inline-start" />}
         Delete
       </Button>

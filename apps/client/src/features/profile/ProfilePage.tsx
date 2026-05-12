@@ -14,7 +14,11 @@ import { TopBarConfig } from '@/components/custom/TopBar'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
 import { getInitials } from '@/lib/stringUtils'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
+import {
+  ErrorBodyComponent,
+  ErrorBodyComponentPosition,
+  ErrorBodyComponentSize,
+} from '@/components/custom/ErrorComponents'
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
@@ -72,14 +76,15 @@ export const ProfilePage = () => {
       />
 
       {/* Profile data */}
-      {profileIsLoading && (
-        <Skeleton className="h-25 w-full" />
-      )}
+      {profileIsLoading && <Skeleton className="h-25 w-full" />}
       {profileError && (
-        <div
-          className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center"
-        >
-          <ErrorBodyComponent error={profileError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => profileRefetch()} />
+        <div className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center">
+          <ErrorBodyComponent
+            error={profileError}
+            size={ErrorBodyComponentSize.Small}
+            position={ErrorBodyComponentPosition.Centered}
+            onRefreshClick={() => profileRefetch()}
+          />
         </div>
       )}
       {profileData && (
@@ -142,10 +147,13 @@ export const ProfilePage = () => {
             return <SkeletonGoalCard key={`skeletonGoalCard_${idx}`} />
           })}
         {goalsError && (
-          <div
-            className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center"
-          >
-            <ErrorBodyComponent error={goalsError} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalsRefetch()} />
+          <div className="bg-white rounded-xl p-2.5 shadow-sm h-fit w-full justify-center items-center">
+            <ErrorBodyComponent
+              error={goalsError}
+              size={ErrorBodyComponentSize.Small}
+              position={ErrorBodyComponentPosition.Centered}
+              onRefreshClick={() => goalsRefetch()}
+            />
           </div>
         )}
       </div>

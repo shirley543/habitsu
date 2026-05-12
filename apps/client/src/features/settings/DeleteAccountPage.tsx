@@ -19,11 +19,14 @@ import { Spinner } from '@/components/ui/spinner'
 // - Fix `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
 
 interface DeleteAccountFormProps {
-  user: UserResponseDto | null | undefined,
-  closeCallback: () => void,
+  user: UserResponseDto | null | undefined
+  closeCallback: () => void
 }
 
-const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({ user, closeCallback }) => {
+const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({
+  user,
+  closeCallback,
+}) => {
   const navigate = useNavigate()
 
   const DeleteFormSchema = z
@@ -140,11 +143,22 @@ export function DeleteAccountPage() {
     <div className="flex flex-col gap-3">
       {/* Topbar config */}
       <TopBarClose title="Delete Account" closeCallback={navigateBack} />
-      {isLoading && <div className="flex justify-center items-center w-full h-full">
-        <Spinner className="size-28" />
-      </div>}
-      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => userRefetch()} />}
-      {!isLoading && !error && <DeleteAccountForm user={data} closeCallback={navigateBack}/>}
+      {isLoading && (
+        <div className="flex justify-center items-center w-full h-full">
+          <Spinner className="size-28" />
+        </div>
+      )}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          size={ErrorBodyComponentSize.Small}
+          position={ErrorBodyComponentPosition.Centered}
+          onRefreshClick={() => userRefetch()}
+        />
+      )}
+      {!isLoading && !error && (
+        <DeleteAccountForm user={data} closeCallback={navigateBack} />
+      )}
     </div>
   )
 }

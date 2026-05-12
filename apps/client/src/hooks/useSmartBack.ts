@@ -1,10 +1,10 @@
-import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router"
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 
 export function useSmartBack(fallback: string = '/goals') {
   const navigate = useNavigate()
   const router = useRouter()
   const canGoBack = useCanGoBack()
-  
+
   const navigateBack = () => {
     if (canGoBack) {
       router.history.back()
@@ -13,5 +13,5 @@ export function useSmartBack(fallback: string = '/goals') {
     }
   }
 
-  return navigateBack;
+  return navigateBack
 }

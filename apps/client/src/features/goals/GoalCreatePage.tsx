@@ -1,8 +1,5 @@
 import React from 'react'
-import {
-  getRouteApi,
-  useNavigate,
-} from '@tanstack/react-router'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import {
   CreateGoalSchema,
   GoalPublicityType,
@@ -33,7 +30,6 @@ import { useSmartBack } from '@/hooks/useSmartBack'
  * Private components
  */
 
-
 /**
  * Goal Page:
  * Presentational layout component for page to display children
@@ -43,9 +39,7 @@ interface GoalPageProps {
 }
 
 const GoalPage: React.FC<GoalPageProps> = ({ children }) => {
-  return <div className="flex flex-col gap-3">
-    {children}
-  </div>
+  return <div className="flex flex-col gap-3">{children}</div>
 }
 
 /**
@@ -57,12 +51,14 @@ interface GoalHeaderProps {
 }
 
 const GoalHeader: React.FC<GoalHeaderProps> = ({ isCreate }) => {
-  const navigateBack = useSmartBack();
+  const navigateBack = useSmartBack()
 
-  return <TopBarClose
-    title={isCreate ? 'Create Goal' : 'Edit Goal'}
-    closeCallback={navigateBack}
-  />
+  return (
+    <TopBarClose
+      title={isCreate ? 'Create Goal' : 'Edit Goal'}
+      closeCallback={navigateBack}
+    />
+  )
 }
 
 /**
@@ -76,7 +72,7 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   const navigate = useNavigate()
-  const navigateBack = useSmartBack();
+  const navigateBack = useSmartBack()
 
   const initialValues =
     defaultValues ||
@@ -130,116 +126,116 @@ const GoalForm: React.FC<GoalFormProps> = ({ isCreate, defaultValues }) => {
   }
 
   return (
-  <form
-    onSubmit={(e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      form.handleSubmit()
-    }}
-    className="space-y-6"
-  >
-    <form.AppField name="title">
-      {(field) => (
-        <field.TextField
-          label="Title"
-          placeholder="e.g. Run a half marathon"
-        />
-      )}
-    </form.AppField>
-
-    <form.AppField name="description">
-      {(field) => (
-        <field.TextField
-          label="Description"
-          placeholder="Optional. Add more details if needed"
-        />
-      )}
-    </form.AppField>
-
-    {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
-    {isCreate && (
-      <form.AppField name="goalType">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        form.handleSubmit()
+      }}
+      className="space-y-6"
+    >
+      <form.AppField name="title">
         {(field) => (
-          <field.RadioGroup
-            label="Goal Type"
-            values={[
-              { label: 'Numeric', value: GoalQuantifyType.Numeric },
-              { label: 'Boolean', value: GoalQuantifyType.Boolean },
-            ]}
+          <field.TextField
+            label="Title"
+            placeholder="e.g. Run a half marathon"
           />
         )}
       </form.AppField>
-    )}
 
-    <form.Subscribe selector={(state) => state.values.goalType}>
-      {(goalType) => {
-        if (goalType === GoalQuantifyType.Numeric) {
-          return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <form.AppField name="numericTarget">
-                {(field) => (
-                  <field.NumberField
-                    label="Daily Target"
-                    placeholder="e.g. 30"
-                  />
-                )}
-              </form.AppField>
-              <form.AppField name="numericUnit">
-                {(field) => (
-                  <field.TextField
-                    label="Units"
-                    placeholder="e.g. km, hours, sessions"
-                  />
-                )}
-              </form.AppField>
-            </div>
-          )
-        } else {
-          return null
-        }
-      }}
-    </form.Subscribe>
-
-    <form.AppField name="publicity">
-      {(field) => (
-        <field.Select
-          label="Privacy"
-          values={[
-            { label: 'Public', value: GoalPublicityType.Public },
-            { label: 'Private', value: GoalPublicityType.Private },
-          ]}
-          placeholder="Select a publicity type"
-        />
-      )}
-    </form.AppField>
-
-    {/* Color selection */}
-    <form.AppField name="colour">
-      {(field) => <field.ColourSelect label="Colour" />}
-    </form.AppField>
-
-    {/* Icon selection */}
-    <form.AppField name="icon">
-      {(field) => <field.IconSelect label="Icon" />}
-    </form.AppField>
-
-    <div className="flex flex-row gap-1.5 justify-end">
-      <form.AppForm>
-        {!isCreate && (
-          <DeleteDialog
-            title="Delete Goal"
-            description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
-            onDelete={handleDelete}
-          >
-            <Button type="button" variant={'ghostDestructive'}>
-              Delete
-            </Button>
-          </DeleteDialog>
+      <form.AppField name="description">
+        {(field) => (
+          <field.TextField
+            label="Description"
+            placeholder="Optional. Add more details if needed"
+          />
         )}
-        <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
-      </form.AppForm>
-    </div>
-  </form>
+      </form.AppField>
+
+      {/* Goal type. Note: hiding when editing goal, as cannot convert goal entries between the two types */}
+      {isCreate && (
+        <form.AppField name="goalType">
+          {(field) => (
+            <field.RadioGroup
+              label="Goal Type"
+              values={[
+                { label: 'Numeric', value: GoalQuantifyType.Numeric },
+                { label: 'Boolean', value: GoalQuantifyType.Boolean },
+              ]}
+            />
+          )}
+        </form.AppField>
+      )}
+
+      <form.Subscribe selector={(state) => state.values.goalType}>
+        {(goalType) => {
+          if (goalType === GoalQuantifyType.Numeric) {
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <form.AppField name="numericTarget">
+                  {(field) => (
+                    <field.NumberField
+                      label="Daily Target"
+                      placeholder="e.g. 30"
+                    />
+                  )}
+                </form.AppField>
+                <form.AppField name="numericUnit">
+                  {(field) => (
+                    <field.TextField
+                      label="Units"
+                      placeholder="e.g. km, hours, sessions"
+                    />
+                  )}
+                </form.AppField>
+              </div>
+            )
+          } else {
+            return null
+          }
+        }}
+      </form.Subscribe>
+
+      <form.AppField name="publicity">
+        {(field) => (
+          <field.Select
+            label="Privacy"
+            values={[
+              { label: 'Public', value: GoalPublicityType.Public },
+              { label: 'Private', value: GoalPublicityType.Private },
+            ]}
+            placeholder="Select a publicity type"
+          />
+        )}
+      </form.AppField>
+
+      {/* Color selection */}
+      <form.AppField name="colour">
+        {(field) => <field.ColourSelect label="Colour" />}
+      </form.AppField>
+
+      {/* Icon selection */}
+      <form.AppField name="icon">
+        {(field) => <field.IconSelect label="Icon" />}
+      </form.AppField>
+
+      <div className="flex flex-row gap-1.5 justify-end">
+        <form.AppForm>
+          {!isCreate && (
+            <DeleteDialog
+              title="Delete Goal"
+              description="Deleting a goal is permanent. This will also delete any associated entries. Are you sure you want to delete this goal?"
+              onDelete={handleDelete}
+            >
+              <Button type="button" variant={'ghostDestructive'}>
+                Delete
+              </Button>
+            </DeleteDialog>
+          )}
+          <form.SubscribeButton label={isCreate ? 'Create' : 'Save'} />
+        </form.AppForm>
+      </div>
+    </form>
   )
 }
 
@@ -270,30 +266,35 @@ export const SkeletonGoalForm: React.FC = () => {
   )
 }
 
-
 /**
  * Public components
  */
 
 export function SkeletonGoalCreatePage() {
-  return <GoalPage>
-    <GoalHeader isCreate={true} />
-    <SkeletonGoalForm />
-  </GoalPage>
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={true} />
+      <SkeletonGoalForm />
+    </GoalPage>
+  )
 }
 
 export function SkeletonGoalEditPage() {
-  return <GoalPage>
-    <GoalHeader isCreate={false} />
-    <SkeletonGoalForm />
-  </GoalPage>
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={false} />
+      <SkeletonGoalForm />
+    </GoalPage>
+  )
 }
 
 export function GoalCreatePage() {
-  return <GoalPage>
-    <GoalHeader isCreate={true} />
-    <GoalForm isCreate={true}/>
-  </GoalPage>
+  return (
+    <GoalPage>
+      <GoalHeader isCreate={true} />
+      <GoalForm isCreate={true} />
+    </GoalPage>
+  )
 }
 
 export function GoalEditPage() {
@@ -305,9 +306,7 @@ export function GoalEditPage() {
   return (
     <GoalPage>
       <GoalHeader isCreate={false} />
-      {isLoading && 
-        <SkeletonGoalForm />
-      }
+      {isLoading && <SkeletonGoalForm />}
       {error && (
         <ErrorBodyComponent
           error={error}

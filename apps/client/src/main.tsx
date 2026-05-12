@@ -26,13 +26,13 @@ const router = createRouter({
   // TODOs #23 investigate slow loading
   defaultPendingMs: 1000,
   defaultPendingMinMs: 500,
-  defaultPendingComponent: () => <div className="flex justify-center items-center w-full h-full">
-    <Spinner className="size-28" />
-  </div>,
+  defaultPendingComponent: () => (
+    <div className="flex justify-center items-center w-full h-full">
+      <Spinner className="size-28" />
+    </div>
+  ),
   defaultNotFoundComponent: () => <NotFoundComponent />,
-  defaultErrorComponent: () => <div>
-    ERROR COMPOENT DEFAULT
-  </div>
+  defaultErrorComponent: () => <div>ERROR COMPOENT DEFAULT</div>,
 })
 
 // Register the router instance for type safety

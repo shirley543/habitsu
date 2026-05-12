@@ -18,7 +18,6 @@ const api = ky.create({
   retry: KY_FETCH_RETRY_NUM,
 })
 
-
 /**
  * Helper functions
  */
@@ -28,10 +27,9 @@ export async function checkAuthUser() {
     queryKey: ['user'],
     queryFn: async () => {
       try {
-        const fetchedUser = await fetchUser();
-        return fetchedUser;
-      }
-      catch (err: unknown) {
+        const fetchedUser = await fetchUser()
+        return fetchedUser
+      } catch (err: unknown) {
         if (err instanceof HTTPError) {
           if (err.response.status === 401) {
             return null
@@ -47,19 +45,18 @@ export async function checkAuthUser() {
 export function clearAuthUser() {
   // Remove user query (used for determining if logged in)
   queryClient.removeQueries({
-    queryKey: ['user']
-  });
+    queryKey: ['user'],
+  })
   // Also clear whole cache (ensure e.g. 'goals' data is cleared as only relevant to logged in user)
   queryClient.clear()
 }
-
 
 /**
  * /users
  */
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
-  return await api.get('users/me').json<UserResponseDto | null>();
+  return await api.get('users/me').json<UserResponseDto | null>()
 }
 
 export function useUser() {

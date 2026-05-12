@@ -20,7 +20,11 @@ import { TopBarClose } from '@/components/custom/TopBar'
 import { capitalizeFirstLetter } from '@/lib/stringUtils'
 import { Button } from '@/components/ui/button'
 import { useCurrentYear } from '@/hooks/useCurrentDate'
-import { ErrorBodyComponent, ErrorBodyComponentPosition, ErrorBodyComponentSize } from '@/components/custom/ErrorComponents'
+import {
+  ErrorBodyComponent,
+  ErrorBodyComponentPosition,
+  ErrorBodyComponentSize,
+} from '@/components/custom/ErrorComponents'
 import { Spinner } from '@/components/ui/spinner'
 
 interface EntryFormProps {
@@ -30,7 +34,7 @@ interface EntryFormProps {
   goalUnit: string
   entryDate?: Date
   defaultValues?: GoalEntryResponse
-  closeCallback: () => void;
+  closeCallback: () => void
 }
 
 const EntryForm: React.FC<EntryFormProps> = ({
@@ -73,7 +77,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
           entryId: defaultValues.id,
         },
         {
-          onSuccess: closeCallback
+          onSuccess: closeCallback,
         },
       )
     }
@@ -95,7 +99,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
         createGoalEntryMutateFn(
           { goalId: goalId, createDto: parsed },
           {
-            onSuccess: closeCallback
+            onSuccess: closeCallback,
           },
         )
       } else {
@@ -103,7 +107,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
           updateGoalEntryMutateFn(
             { goalId: goalId, entryId: defaultValues.id, updateDto: parsed },
             {
-              onSuccess: closeCallback
+              onSuccess: closeCallback,
             },
           )
         }
@@ -173,12 +177,7 @@ export function EntryCreatePage() {
   const dateStr = locationState.date
   const date = dateStr ? new Date(dateStr) : undefined
 
-  const {
-    data,
-    isLoading,
-    error,
-    refetch: goalRefetch
-  } = useGoal(goalId)
+  const { data, isLoading, error, refetch: goalRefetch } = useGoal(goalId)
 
   const navigateToGoals = () => {
     navigate({ to: '/goals' })
@@ -186,23 +185,32 @@ export function EntryCreatePage() {
 
   return (
     <div className="flex flex-col gap-3">
-      <TopBarClose title='Create Entry' closeCallback={navigateToGoals} />
-      {isLoading && <div className="flex justify-center items-center w-full h-full">
-        <Spinner className="size-28" />
-      </div>}
-      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalRefetch()} />}
-      {!isLoading && !error && data && <EntryForm
-        isCreate={true}
-        goalId={data.id}
-        goalType={data.goalType}
-        goalUnit={
-          data.goalType === GoalQuantifyType.Numeric
-            ? data.numericUnit
-            : ''
-        }
-        entryDate={date}
-        closeCallback={navigateToGoals}
-      />}
+      <TopBarClose title="Create Entry" closeCallback={navigateToGoals} />
+      {isLoading && (
+        <div className="flex justify-center items-center w-full h-full">
+          <Spinner className="size-28" />
+        </div>
+      )}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          size={ErrorBodyComponentSize.Small}
+          position={ErrorBodyComponentPosition.Centered}
+          onRefreshClick={() => goalRefetch()}
+        />
+      )}
+      {!isLoading && !error && data && (
+        <EntryForm
+          isCreate={true}
+          goalId={data.id}
+          goalType={data.goalType}
+          goalUnit={
+            data.goalType === GoalQuantifyType.Numeric ? data.numericUnit : ''
+          }
+          entryDate={date}
+          closeCallback={navigateToGoals}
+        />
+      )}
     </div>
   )
 }
@@ -227,8 +235,8 @@ export function EntryEditPage() {
     navigate({ to: '/goals' })
   }
 
-  const isLoading = goalIsLoading || entryIsLoading;
-  const error = goalError || entryError;
+  const isLoading = goalIsLoading || entryIsLoading
+  const error = goalError || entryError
   const displayForm =
     !goalIsLoading &&
     !goalError &&
@@ -239,23 +247,34 @@ export function EntryEditPage() {
 
   return (
     <div className="flex flex-col gap-3">
-      <TopBarClose title='Edit Entry' closeCallback={navigateToGoals} />
-      {isLoading && <div className="flex justify-center items-center w-full h-full">
-        <Spinner className="size-28" />
-      </div>}
-      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => goalRefetch()} />}
-      {displayForm && <EntryForm
-        isCreate={false}
-        goalId={Number(goalId)}
-        goalType={goalData.goalType}
-        goalUnit={
-          goalData.goalType === GoalQuantifyType.Numeric
-            ? goalData.numericUnit
-            : ''
-        }
-        defaultValues={entryData}
-        closeCallback={navigateToGoals}
-      />}
+      <TopBarClose title="Edit Entry" closeCallback={navigateToGoals} />
+      {isLoading && (
+        <div className="flex justify-center items-center w-full h-full">
+          <Spinner className="size-28" />
+        </div>
+      )}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          size={ErrorBodyComponentSize.Small}
+          position={ErrorBodyComponentPosition.Centered}
+          onRefreshClick={() => goalRefetch()}
+        />
+      )}
+      {displayForm && (
+        <EntryForm
+          isCreate={false}
+          goalId={Number(goalId)}
+          goalType={goalData.goalType}
+          goalUnit={
+            goalData.goalType === GoalQuantifyType.Numeric
+              ? goalData.numericUnit
+              : ''
+          }
+          defaultValues={entryData}
+          closeCallback={navigateToGoals}
+        />
+      )}
     </div>
   )
 }

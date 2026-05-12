@@ -11,13 +11,13 @@ interface ErrorBaseProps {
 }
 
 export enum ErrorBodyComponentSize {
-  Small = "small",
-  Large = "large",
+  Small = 'small',
+  Large = 'large',
 }
 
 export enum ErrorBodyComponentPosition {
-  TopMargin = "top-margin",
-  Centered = "centered"
+  TopMargin = 'top-margin',
+  Centered = 'centered',
 }
 
 interface ErrorBodyComponentProps extends ErrorBaseProps {
@@ -31,8 +31,8 @@ function ErrorBodyComponent({
   error,
   onRefreshClick,
   onBackClick,
-  size=ErrorBodyComponentSize.Large,
-  position=ErrorBodyComponentPosition.TopMargin
+  size = ErrorBodyComponentSize.Large,
+  position = ErrorBodyComponentPosition.TopMargin,
 }: ErrorBodyComponentProps) {
   const errorText = (() => {
     if (error instanceof HTTPError) {
@@ -43,14 +43,19 @@ function ErrorBodyComponent({
   })()
 
   return (
-    <div className={
-      clsx(
-        "flex flex-col items-center",
-        size === ErrorBodyComponentSize.Large ? "gap-4" : "gap-2",
-        position === ErrorBodyComponentPosition.TopMargin ? "pt-18" : "justify-center h-full",
-      )
-      }>
-      <CircleAlert size={size === ErrorBodyComponentSize.Large ? '64px' : '32px'} strokeWidth={size === ErrorBodyComponentSize.Large ? 2.5 : 2} />
+    <div
+      className={clsx(
+        'flex flex-col items-center',
+        size === ErrorBodyComponentSize.Large ? 'gap-4' : 'gap-2',
+        position === ErrorBodyComponentPosition.TopMargin
+          ? 'pt-18'
+          : 'justify-center h-full',
+      )}
+    >
+      <CircleAlert
+        size={size === ErrorBodyComponentSize.Large ? '64px' : '32px'}
+        strokeWidth={size === ErrorBodyComponentSize.Large ? 2.5 : 2}
+      />
       <div>
         <h2 className="text-base font-black text-center">
           Oops! Something went wrong
@@ -145,18 +150,18 @@ function triggerErrorToast(error: unknown) {
           default:
             return 'Something went wrong. Please try again.'
         }
-      })();
+      })()
       const msg = `${httpErrorLabel} (${err.response.status})`
-      return msg;
+      return msg
     } else if (err instanceof TypeError) {
       // e.g. Network failed
       return 'Network error. Please check your connection.'
     } else {
       return 'An unexpected error occurred.'
-    };
-  };
+    }
+  }
 
-  const errorMessage = getErrorMessage(error);
+  const errorMessage = getErrorMessage(error)
   toast.error(errorMessage, {
     position: 'top-center',
     duration: 5000,

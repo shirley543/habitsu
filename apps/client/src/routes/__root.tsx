@@ -35,21 +35,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     // Handle starting-way unauthorized errors on route load,
     // by checking whether user is logged in and whether route is public, and if not
     // redirect to login page
-    const isPublicPath = publicPaths.includes(location.pathname) || isProfilePath;
-    if (
-      !isLoggedInUser &&
-      !isPublicPath
-    ) {
+    const isPublicPath =
+      publicPaths.includes(location.pathname) || isProfilePath
+    if (!isLoggedInUser && !isPublicPath) {
       throw redirect({ to: '/login' })
     }
   },
   errorComponent: ({ error }) => {
-    return <ErrorBodyComponent
-      error={error}
-      onRefreshClick={() => {
-        // Reload current web page
-        window.location.reload(); 
-      }}
-    />
-  }
+    return (
+      <ErrorBodyComponent
+        error={error}
+        onRefreshClick={() => {
+          // Reload current web page
+          window.location.reload()
+        }}
+      />
+    )
+  },
 })

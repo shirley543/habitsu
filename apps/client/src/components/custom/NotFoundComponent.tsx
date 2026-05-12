@@ -16,13 +16,13 @@ function NotFoundComponent({
 
   const handleGoHome = () => {
     if (user) {
-      router.navigate({ to: '/goals'}) // logged-in home/dashboard
+      router.navigate({ to: '/goals' }) // logged-in home/dashboard
     } else {
-      router.navigate({ to: '/'}) // public landing page
+      router.navigate({ to: '/' }) // public landing page
     }
   }
-  
-  const router = useRouter();
+
+  const router = useRouter()
 
   return (
     <div className="flex flex-col gap-4 pt-18 items-center">

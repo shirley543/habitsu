@@ -39,13 +39,13 @@ const UpdateUserFormSchema = z
 type UpdateUserFormType = z.infer<typeof UpdateUserFormSchema>
 
 interface AccountDetailsFormProps {
-  defaultValues: UserResponseDto,
+  defaultValues: UserResponseDto
   closeCallback: () => void
 }
 
 const AccountDetailsForm: React.FC<AccountDetailsFormProps> = ({
   defaultValues,
-  closeCallback
+  closeCallback,
 }) => {
   const initialValues: UpdateUserFormType = defaultValues
 
@@ -150,11 +150,22 @@ export function AccountDetailsPage() {
   return (
     <div className="flex flex-col gap-3">
       <TopBarClose title="Account Details" closeCallback={navigateBack} />
-      {isLoading && <div className="flex justify-center items-center w-full h-full">
-        <Spinner className="size-28" />
-      </div>}
-      {error && <ErrorBodyComponent error={error} size={ErrorBodyComponentSize.Small} position={ErrorBodyComponentPosition.Centered} onRefreshClick={() => userRefetch()} />}
-      {!isLoading && !error && data && <AccountDetailsForm defaultValues={data} closeCallback={navigateBack}/>}
+      {isLoading && (
+        <div className="flex justify-center items-center w-full h-full">
+          <Spinner className="size-28" />
+        </div>
+      )}
+      {error && (
+        <ErrorBodyComponent
+          error={error}
+          size={ErrorBodyComponentSize.Small}
+          position={ErrorBodyComponentPosition.Centered}
+          onRefreshClick={() => userRefetch()}
+        />
+      )}
+      {!isLoading && !error && data && (
+        <AccountDetailsForm defaultValues={data} closeCallback={navigateBack} />
+      )}
     </div>
   )
 }

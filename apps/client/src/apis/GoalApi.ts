@@ -264,7 +264,7 @@ async function fetchGoalStatisticsBySearchParams(
 
 export function useGoalStatistics(
   searchParams: SearchParamsGoalEntryDto,
-  enabled: boolean
+  enabled: boolean,
 ) {
   return useQuery<GoalStatisticsReponse, HTTPError>({
     queryKey: ['goalStatistics', searchParams],

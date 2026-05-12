@@ -1,4 +1,9 @@
-import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import { redirect } from '@tanstack/react-router'
 import { HTTPError } from 'ky'
 import { triggerErrorToast } from '@/components/custom/ErrorComponents'
@@ -10,7 +15,10 @@ import { clearAuthUser } from '@/apis/UserApi'
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown, query) => {
-      console.error(`Query ${query.options.queryKey ?? '<unknown query>'} failed:`, error)
+      console.error(
+        `Query ${query.options.queryKey ?? '<unknown query>'} failed:`,
+        error,
+      )
 
       if (error instanceof HTTPError && error.response.status === 401) {
         clearAuthUser()
@@ -18,11 +26,14 @@ export const queryClient = new QueryClient({
       }
 
       triggerErrorToast(error)
-    }
+    },
   }),
   mutationCache: new MutationCache({
     onError: (error: unknown, _variables, _context, mutation) => {
-      console.error(`Mutation ${mutation.options.mutationKey ?? '<unknown mutation>'} failed:`, error)
+      console.error(
+        `Mutation ${mutation.options.mutationKey ?? '<unknown mutation>'} failed:`,
+        error,
+      )
 
       if (error instanceof HTTPError && error.response.status === 401) {
         clearAuthUser()
@@ -30,7 +41,7 @@ export const queryClient = new QueryClient({
       }
 
       triggerErrorToast(error)
-    }
+    },
   }),
 })
 
