@@ -26,7 +26,20 @@ const api = ky.create({
 export async function checkAuthUser() {
   const user = await queryClient.ensureQueryData({
     queryKey: ['user'],
-    queryFn: fetchUser,
+    queryFn: async () => {
+      try {
+        const user = await fetchUser();
+        return user;
+      }
+      catch (err: unknown) {
+        if (err instanceof HTTPError) {
+          if (err.response.status === 401) {
+            return null
+          }
+        }
+        throw err
+      }
+    },
   })
   return user
 }
@@ -46,24 +59,7 @@ export function clearAuthUser() {
  */
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
-  try {
-    const data = await api.get('users/me').json<UserResponseDto | null>();
-    return data;
-  } catch (err: unknown) {
-    if (err instanceof HTTPError) {
-      console.error('HTTP Error:', err.response.status)
-      if (err.response.status === 401) {
-        return null
-      }
-    } else if (err instanceof TypeError) {
-      console.error('Network error:', err.message)
-    } else {
-      console.error('Unexpected error:', err)
-    }
-
-    // TODOs #12 fix error handling if other error occurs e.g. backend down hence no HTTPError
-    throw err
-  }
+  return await api.get('users/me').json<UserResponseDto | null>();
 }
 
 export function useUser() {
