@@ -1,7 +1,7 @@
 meta {
-  name: Update Entry
+  name: Update Entry (Boolean)
   type: http
-  seq: 3
+  seq: 5
 }
 
 patch {
@@ -21,11 +21,12 @@ params:path {
 
 body:json {
   {
-    "note": "Updated note",
-    "numericValue": 3
+    "note": "Updated note"
   }
 }
 
 docs {
   Requires the `jwt` cookie set by Auth > Login. All fields are optional.
+
+  For BOOLEAN goals. `numericValue` does not apply.
 }

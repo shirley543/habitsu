@@ -1,7 +1,7 @@
 meta {
-  name: Create Entry
+  name: Create Entry (Boolean)
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
@@ -21,14 +21,13 @@ params:path {
 body:json {
   {
     "entryDate": "2026-06-10",
-    "note": "Drank 2.5 litres today",
-    "numericValue": 2.5
+    "note": "Read a chapter before bed"
   }
 }
 
 docs {
   Requires the `jwt` cookie set by Auth > Login.
 
-  `numericValue` only applies to NUMERIC goals; omit or set to null for
-  BOOLEAN goals. `note` may be null.
+  For BOOLEAN goals. Omit `numericValue` (or set to null). `note` may be
+  null.
 }
