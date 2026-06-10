@@ -1,0 +1,20 @@
+meta {
+  name: Get Goals by Username
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/profiles/:username/goals
+  body: none
+  auth: none
+}
+
+params:path {
+  username: alice
+}
+
+docs {
+  Optional auth: if the `jwt` cookie is present and belongs to the
+  profile owner, private goals are also included.
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Reorder Goals
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/goals/reorder
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  [
+    { "id": 1, "order": 2 },
+    { "id": 2, "order": 1 }
+  ]
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  `id` and `order` values must each be unique within the array.
+}

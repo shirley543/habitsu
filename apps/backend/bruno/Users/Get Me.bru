@@ -1,0 +1,15 @@
+meta {
+  name: Get Me
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/users/me
+  body: none
+  auth: none
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+}

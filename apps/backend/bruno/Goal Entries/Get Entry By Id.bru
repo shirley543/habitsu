@@ -1,0 +1,19 @@
+meta {
+  name: Get Entry By Id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/entries/:entryId
+  body: none
+  auth: none
+}
+
+params:path {
+  entryId: 1
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+}

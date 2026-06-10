@@ -1,0 +1,33 @@
+meta {
+  name: Create Entry (Boolean)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/goals/:goalId/entries
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+params:path {
+  goalId: 1
+}
+
+body:json {
+  {
+    "entryDate": "2026-06-10",
+    "note": "Read a chapter before bed"
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  For BOOLEAN goals. Omit `numericValue` (or set to null). `note` may be
+  null.
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Get Goal By Id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/goals/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Optional auth: the `jwt` cookie is used to determine whether the
+  requester is allowed to view a private goal.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Statistics
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/entries/statistics?goalId=1&year=2026
+  body: none
+  auth: none
+}
+
+params:query {
+  goalId: 1
+  year: 2026
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login. Returns yearly average,
+  yearly count, current streak length, and max streak length.
+}

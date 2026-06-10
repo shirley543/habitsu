@@ -1,0 +1,34 @@
+meta {
+  name: Create Goal (Boolean)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/goals
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Read before bed",
+    "description": "Read at least one chapter every night",
+    "icon": "book",
+    "colour": "9b59b6",
+    "publicity": "PRIVATE",
+    "visibility": true,
+    "goalType": "BOOLEAN"
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  `colour` must be a 6-digit hex string (no leading #).
+  `publicity` is one of "PUBLIC" | "PRIVATE".
+}
