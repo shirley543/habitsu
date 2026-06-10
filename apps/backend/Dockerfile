@@ -18,8 +18,9 @@ RUN npm ci
 COPY packages/validation-schemas packages/validation-schemas
 COPY apps/backend apps/backend
 
-# Build shared package first, then backend
+# Build shared package first, then Prisma client, then backend
 RUN npm run build -w @habit-tracker/validation-schemas
+RUN npx prisma generate --schema=apps/backend/prisma/schema.prisma
 RUN npm run build -w @habit-tracker/backend
 
 # --- Production Runtime ---
@@ -37,5 +38,5 @@ WORKDIR /usr/src/app/apps/backend
 # Expose the application port
 EXPOSE 3000
 
-# Command to run the application
-CMD ["node", "dist/main"]
+# Run pending Prisma migrations, then start the application
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
