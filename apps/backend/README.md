@@ -81,3 +81,35 @@ After installing Prisma Client package, each time you modify your Prisma schema,
 Whenever you update your Prisma schema, you also need to update your database schema using either:
 `prisma migrate dev` or `prisma db push` to keep the database schema in sync with your Prisma schema.
 Note that these commands will also run `prisma` generate under the hood to re-generate your Prisma client.
+
+### Docker
+
+1. Build just the backend image (run from the repo root, since the Dockerfile needs the shared `packages/validation-schemas` workspace)
+
+```bash
+docker build -f apps/backend/Dockerfile .
+```
+
+2. Build all images defined in `docker-compose.yml` (backend + db)
+
+```bash
+docker compose build
+```
+
+3. Start all services
+
+```bash
+docker compose up
+```
+
+4. Stop and remove the containers (the `pgdata` volume is kept, so DB data persists)
+
+```bash
+docker compose down
+```
+
+5. Same as above, but also delete the `pgdata` volume (wipes the database completely)
+
+```bash
+docker compose down -v
+```
