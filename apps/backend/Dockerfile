@@ -36,7 +36,7 @@ COPY --from=builder /usr/src/app/apps/backend ./apps/backend
 WORKDIR /usr/src/app/apps/backend
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 8080
 
 # Run pending Prisma migrations, then start the application
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]

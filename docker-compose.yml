@@ -22,7 +22,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/habit-tracker?schema=public
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
