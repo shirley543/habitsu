@@ -1,0 +1,37 @@
+meta {
+  name: Update Goal (Numeric)
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/goals/:id
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "title": "Drink more water",
+    "goalType": "NUMERIC",
+    "numericTarget": 3,
+    "numericUnit": "litres"
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  All base fields (title, description, icon, colour, publicity,
+  visibility) are optional. To update `numericTarget` and/or
+  `numericUnit`, `goalType: "NUMERIC"` must also be included.
+  Changing `goalType` itself is not allowed.
+}

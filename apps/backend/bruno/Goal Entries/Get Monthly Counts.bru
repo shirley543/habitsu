@@ -1,0 +1,21 @@
+meta {
+  name: Get Monthly Counts
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/entries/monthly-counts?goalId=1&year=2026
+  body: none
+  auth: none
+}
+
+params:query {
+  goalId: 1
+  year: 2026
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login. Returns per-month entry
+  counts for the given goal and year.
+}

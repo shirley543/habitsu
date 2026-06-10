@@ -1,0 +1,35 @@
+meta {
+  name: Update Goal (Boolean)
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/goals/:id
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "title": "Read before bed",
+    "goalType": "BOOLEAN"
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  All base fields (title, description, icon, colour, publicity,
+  visibility) are optional. `goalType: "BOOLEAN"` is included here for
+  consistency, but BOOLEAN goals have no additional type-specific fields.
+  Changing `goalType` itself is not allowed.
+}

@@ -1,0 +1,16 @@
+meta {
+  name: Get All Goals
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/goals
+  body: none
+  auth: none
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login. Returns all goals owned
+  by the authenticated user.
+}

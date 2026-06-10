@@ -1,0 +1,32 @@
+meta {
+  name: Update Me
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/users/me
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "alice",
+    "email": "alice@alice.com",
+    "password": "newstrongpassword123",
+    "currentPassword": "strongpassword123",
+    "profilePublicity": "PUBLIC"
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  All fields are optional. `currentPassword` is required when changing
+  `password`. `profilePublicity` is one of "PUBLIC" | "PRIVATE".
+}

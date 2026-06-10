@@ -1,0 +1,31 @@
+meta {
+  name: Update Entry
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/goals/:goalId/entries/:entryId
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+params:path {
+  goalId: 1
+  entryId: 1
+}
+
+body:json {
+  {
+    "note": "Updated note",
+    "numericValue": 3
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login. All fields are optional.
+}

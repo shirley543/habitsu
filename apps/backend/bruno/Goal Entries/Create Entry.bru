@@ -1,0 +1,34 @@
+meta {
+  name: Create Entry
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/goals/:goalId/entries
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+params:path {
+  goalId: 1
+}
+
+body:json {
+  {
+    "entryDate": "2026-06-10",
+    "note": "Drank 2.5 litres today",
+    "numericValue": 2.5
+  }
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login.
+
+  `numericValue` only applies to NUMERIC goals; omit or set to null for
+  BOOLEAN goals. `note` may be null.
+}

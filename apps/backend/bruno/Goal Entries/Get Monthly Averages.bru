@@ -1,0 +1,21 @@
+meta {
+  name: Get Monthly Averages
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/entries/monthly-averages?goalId=1&year=2026
+  body: none
+  auth: none
+}
+
+params:query {
+  goalId: 1
+  year: 2026
+}
+
+docs {
+  Requires the `jwt` cookie set by Auth > Login. Returns per-month
+  averages of `numericValue` for the given goal and year.
+}

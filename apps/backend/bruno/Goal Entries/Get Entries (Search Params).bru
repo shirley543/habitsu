@@ -1,0 +1,21 @@
+meta {
+  name: Get Entries (Search Params)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/entries?goalId=1&year=2026
+  body: none
+  auth: none
+}
+
+params:query {
+  goalId: 1
+  year: 2026
+}
+
+docs {
+  Optional auth via the `jwt` cookie. `year` is optional; omit it to
+  fetch entries across all years for the goal.
+}
