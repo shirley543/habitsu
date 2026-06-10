@@ -1,20 +1,38 @@
+# --- Build Environment ---
+
 # Use the official Node.js image as the base image
-FROM node:20
+FROM node:20 AS builder
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+# Copy workspace manifests first (better layer caching) to the working directory
+COPY package.json package-lock.json ./
+COPY apps/backend/package.json apps/backend/package.json
+COPY packages/validation-schemas/package.json packages/validation-schemas/package.json
 
-# Install the application dependencies
-RUN npm install
+# Install the application dependencies (clean-install from package-lock.json)
+RUN npm ci
+
+# Copy source for both workspaces
+COPY packages/validation-schemas packages/validation-schemas
+COPY apps/backend apps/backend
+
+# Build shared package first, then backend
+RUN npm run build -w @habit-tracker/validation-schemas
+RUN npm run build -w @habit-tracker/backend
+
+# --- Production Runtime ---
+FROM node:20
+WORKDIR /usr/src/app
 
 # Copy the rest of the application files
-COPY . .
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/packages/validation-schemas ./packages/validation-schemas
+COPY --from=builder /usr/src/app/apps/backend ./apps/backend
 
-# Build the NestJS application
-RUN npm run build
+# Set the working directory inside the container
+WORKDIR /usr/src/app/apps/backend
 
 # Expose the application port
 EXPOSE 3000
