@@ -16,7 +16,7 @@ import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
  * - EventBridge Scheduler: triggers the reminder check on a recurring schedule
  * - reminder-finder Lambda: queries the DB for goals due now, publishes one SQS message per goal
  * - SQS: buffers jobs so failures are isolated (one failed email doesn't block the rest)
- * - reminder-worker Lambda: reads from SQS, sends a reminder email via SES per goal (TODOs #84)
+ * - reminder-worker Lambda: reads from SQS, sends a reminder email via SES per goal
  */
 export class ReminderStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
