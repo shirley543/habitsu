@@ -5,6 +5,7 @@
 import { Client as DbClient } from 'pg';
 import { ScheduledEvent } from 'aws-lambda';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { DueGoalMessage } from '../reminder-types/reminder-types';
 
 const sqsClient = new SQSClient({
   region: process.env.AWS_REGION
@@ -28,13 +29,6 @@ interface DueGoalRow {
   user_email: string;
   goal_id: number;
   goal_title: string;
-}
-
-interface DueGoalMessage {
-  userId: number;
-  userEmail: string;
-  goalId: number;
-  goalTitle: string;
 }
 
 async function findDueGoals(db: DbClient): Promise<DueGoalRow[]> {
