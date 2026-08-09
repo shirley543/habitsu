@@ -37,13 +37,18 @@ export class ReminderStack extends cdk.Stack {
     // TODOs #84: currently nothing done if reminders are placed into dead-letter queue.
     // To update to e.g. have CloudWatch alarm on reminderDLQ's `ApproximateNumberOfMessagesVisible` or something else.
 
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable must be set to deploy ReminderStack');
+    }
+
     // Reminder-Finder Lambda:
     // - Grant reminder-finder permission to send to SQS
     const reminderFinder = new lambda.NodejsFunction(this, 'ReminderFinder', {
       entry: path.join(__dirname, '../lambda/reminder-finder/index.ts'),
       handler: 'handler',
       environment: {
-        DATABASE_URL: process.env.DATABASE_URL ?? '',
+        DATABASE_URL: databaseUrl,
         QUEUE_URL: reminderQueue.queueUrl,
       }
     });
@@ -56,6 +61,11 @@ export class ReminderStack extends cdk.Stack {
       target: new targets.LambdaInvoke(reminderFinder),
     });
 
+    const fromEmail = process.env.FROM_EMAIL;
+    if (!fromEmail) {
+      throw new Error('FROM_EMAIL environment variable must be set to deploy ReminderStack');
+    }
+
     // Reminder-Worker Lambda:
     // - Grant reminder-worker permission to consume from SQS
     //   (gives it ReceiveMessage/ DeleteMessage/ GetQueueAttributes IAM permissions)
@@ -65,7 +75,7 @@ export class ReminderStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambda/reminder-worker/index.ts'),
       handler: 'handler',
       environment: {
-        FROM_EMAIL: process.env.FROM_EMAIL ?? '',
+        FROM_EMAIL: fromEmail,
       }
     });
 

@@ -16,10 +16,15 @@ if (!QUEUE_URL) {
   throw new Error('QUEUE_URL environment variable is not set')
 }
 
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is not set')
+}
+
 async function getDbClient(): Promise<DbClient> {
   // TODOs #84: Currently env var (local PostgreSQL DB)
   // To swap this to a Secrets Manager fetch (for connecting to AWS RDS DB)
-  const dbClient = new DbClient({ connectionString: process.env.DATABASE_URL });
+  const dbClient = new DbClient({ connectionString: DATABASE_URL });
   await dbClient.connect();
   return dbClient;
 }
