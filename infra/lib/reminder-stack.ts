@@ -22,10 +22,20 @@ export class ReminderStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // SQS queue
+    // Reminder Queue SQS:
+    // Dead-letter queue: holds messages that failed processing maxReceiveCount times,
+    // so a permanently-broken message stops retrying forever and can be inspected separately
+    const reminderDLQ = new sqs.Queue(this, 'ReminderDLQ')
+
     const reminderQueue = new sqs.Queue(this, 'ReminderQueue', {
-      visibilityTimeout: cdk.Duration.seconds(30)
+      visibilityTimeout: cdk.Duration.seconds(30), // how long a received message is hidden from other consumers before it's retried
+      deadLetterQueue: {
+        queue: reminderDLQ,
+        maxReceiveCount: 3, // after 3 failed attempts, move to DLQ instead of retrying forever
+      }
     });
+    // TODOs #84: currently nothing done if reminders are placed into dead-letter queue.
+    // To update to e.g. have CloudWatch alarm on reminderDLQ's `ApproximateNumberOfMessagesVisible` or something else.
 
     // Reminder-Finder Lambda:
     // - Grant reminder-finder permission to send to SQS
