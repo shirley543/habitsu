@@ -87,7 +87,7 @@ export class ReminderStack extends cdk.Stack {
     }))
 
     reminderWorker.addEventSource(new SqsEventSource(reminderQueue, {
-      batchSize: 10,
+      batchSize: 10, // max messages pulled from SQS per Lambda invocation
       reportBatchItemFailures: true, // Lets failed items retry without reprocessing the whole batch
     }))
   }
