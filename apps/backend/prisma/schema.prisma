@@ -49,6 +49,7 @@ model Goal {
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   visibility    Boolean       @default(true)
   order         Int
+  reminder      GoalReminder?
 }
 
 model GoalEntry {
@@ -63,6 +64,15 @@ model GoalEntry {
   note         String?
 
   @@unique([goalId, entryDate])
+}
+
+model GoalReminder {
+  id        Int   @id @default(autoincrement())
+  goalId    Int   @unique
+  goal      Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  time      String
+  weekdays  Int[]
+  enabled   Boolean @default(true)
 }
 
 // TODOs #27: add db indexes for faster querying
