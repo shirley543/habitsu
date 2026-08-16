@@ -20,6 +20,5 @@ const app = new cdk.App();
 // });
 
 new ReminderStack(app, 'ReminderStack', {
-  // TODOs #84 figure out which AWS account to use
-  env: { account: '123456789012', region: 'ap-southeast-4' },
+  env: { account: '790072401370', region: 'ap-southeast-2' },
 })

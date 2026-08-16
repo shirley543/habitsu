@@ -22,7 +22,7 @@ if (!DATABASE_URL) {
 }
 
 async function getDbClient(): Promise<DbClient> {
-  // TODOs #84: Currently env var (local PostgreSQL DB)
+  // TODOs #85: Currently env var (local PostgreSQL DB)
   // To swap this to a Secrets Manager fetch (for connecting to AWS RDS DB)
   const dbClient = new DbClient({ connectionString: DATABASE_URL });
   await dbClient.connect();

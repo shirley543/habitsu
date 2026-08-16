@@ -23,8 +23,10 @@ export class ReminderStack extends cdk.Stack {
     super(scope, id, props);
 
     // Reminder Queue SQS:
-    // Dead-letter queue: holds messages that failed processing maxReceiveCount times,
-    // so a permanently-broken message stops retrying forever and can be inspected separately
+    // - Dead-letter queue: holds messages that failed processing maxReceiveCount times,
+    //   so a permanently-broken message stops retrying forever and can be inspected separately
+    // - CloudWatch alarm: triggered when DLQ contains a single visible message for even a single period
+    //   Future work: have alarm actually trigger alert e.g. email, Slack message, etc
     const reminderDLQ = new sqs.Queue(this, 'ReminderDLQ')
 
     const reminderQueue = new sqs.Queue(this, 'ReminderQueue', {
@@ -34,8 +36,13 @@ export class ReminderStack extends cdk.Stack {
         maxReceiveCount: 3, // after 3 failed attempts, move to DLQ instead of retrying forever
       }
     });
-    // TODOs #84: currently nothing done if reminders are placed into dead-letter queue.
-    // To update to e.g. have CloudWatch alarm on reminderDLQ's `ApproximateNumberOfMessagesVisible` or something else.
+
+    reminderDLQ.metricApproximateNumberOfMessagesVisible().createAlarm(this, 'ReminderDLQAlarm',
+      {
+        threshold: 1,
+        evaluationPeriods: 1,
+      }
+    )
 
     const databaseUrl = process.env.DATABASE_URL;
     if (!databaseUrl) {
@@ -83,7 +90,9 @@ export class ReminderStack extends cdk.Stack {
 
     reminderWorker.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
-      resources: ['*'] // TODOs #84: Alternatively, scope to a specific verified identity ARN
+      resources: ['*'] // TODOs #86: Scope to a specific verified identity ARN 
+      // (format `arn:aws:ses:${this.region}:${this.account}:identity/${fromEmail}`),
+      // once sending domain configured
     }))
 
     reminderWorker.addEventSource(new SqsEventSource(reminderQueue, {
