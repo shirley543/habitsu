@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as cdk from 'aws-cdk-lib/core';
+import { NetworkStack } from '../lib/network-stack';
+import { DatabaseStack } from '../lib/database-stack';
 import { ReminderStack } from '../lib/reminder-stack';
 
 const app = new cdk.App();
@@ -19,6 +21,13 @@ const app = new cdk.App();
 //   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 // });
 
+const env: cdk.Environment = { account: '790072401370', region: 'ap-southeast-2' };
+
+const network = new NetworkStack(app, 'NetworkStack', { env });
+const database = new DatabaseStack(app, 'DatabaseStack', { env, vpc: network.vpc, dbSecurityGroup: network.dbSecurityGroup });
+
 new ReminderStack(app, 'ReminderStack', {
-  env: { account: '790072401370', region: 'ap-southeast-2' },
+  env,
+  vpc: network.vpc, // TODOs #85: fix VPC not being referenced by ReminderStack
+  db: database.dbInstance,
 })
