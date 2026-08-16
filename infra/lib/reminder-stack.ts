@@ -58,9 +58,6 @@ export class ReminderStack extends cdk.Stack {
       throw new Error('Database secret must be set to deploy ReminderStack');
     }
     const databaseUrl = `postgresql://${databaseSecret.secretValueFromJson('username')}:${databaseSecret.secretValueFromJson('password')}@${props.dbInstance.instanceEndpoint.hostname}:5432/habittracker`;
-    // TODOs #85 surely rds construct/ instance allows for getting the database URL more directly than formatting it like this manually?
-    // How to avoid db name `habittracker` drift/ manual sync
-    //
     // Currently using CloudFormation dynamic reference (assembled at deploy time, thus not rotation-safe)
     // Future work: use Runtime fetch (rotation-safe, but more config needed)
 

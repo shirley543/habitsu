@@ -28,6 +28,7 @@ const database = new DatabaseStack(app, 'DatabaseStack', { env, vpc: network.vpc
 
 new ReminderStack(app, 'ReminderStack', {
   env,
-  vpc: network.vpc, // TODOs #85: fix VPC not being referenced by ReminderStack
-  db: database.dbInstance,
+  vpc: network.vpc,
+  dbInstance: database.dbInstance,
+  appSecurityGroup: network.appSecurityGroup,
 })
