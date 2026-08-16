@@ -7,6 +7,8 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as targets from 'aws-cdk-lib/aws-scheduler-targets';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as rds from 'aws-cdk-lib/aws-rds';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 /**
  * Purpose of the stack is to send daily habit reminders to users
@@ -18,8 +20,15 @@ import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
  * - SQS: buffers jobs so failures are isolated (one failed email doesn't block the rest)
  * - reminder-worker Lambda: reads from SQS, sends a reminder email via SES per goal
  */
+
+export interface ReminderStackProps extends cdk.StackProps {
+  vpc: ec2.Vpc;
+  dbInstance: rds.DatabaseInstance;
+  appSecurityGroup: ec2.SecurityGroup;
+}
+
 export class ReminderStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: ReminderStackProps) {
     super(scope, id, props);
 
     // Reminder Queue SQS:
@@ -44,10 +53,16 @@ export class ReminderStack extends cdk.Stack {
       }
     )
 
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
-      throw new Error('DATABASE_URL environment variable must be set to deploy ReminderStack');
+    const databaseSecret = props.dbInstance.secret;
+    if (!databaseSecret) {
+      throw new Error('Database secret must be set to deploy ReminderStack');
     }
+    const databaseUrl = `postgresql://${databaseSecret.secretValueFromJson('username')}:${databaseSecret.secretValueFromJson('password')}@${props.dbInstance.instanceEndpoint.hostname}:5432/habittracker`;
+    // TODOs #85 surely rds construct/ instance allows for getting the database URL more directly than formatting it like this manually?
+    // How to avoid db name `habittracker` drift/ manual sync
+    //
+    // Currently using CloudFormation dynamic reference (assembled at deploy time, thus not rotation-safe)
+    // Future work: use Runtime fetch (rotation-safe, but more config needed)
 
     // Reminder-Finder Lambda:
     // - Grant reminder-finder permission to send to SQS
@@ -57,7 +72,10 @@ export class ReminderStack extends cdk.Stack {
       environment: {
         DATABASE_URL: databaseUrl,
         QUEUE_URL: reminderQueue.queueUrl,
-      }
+      },
+      vpc: props.vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+      securityGroups: [props.appSecurityGroup],
     });
     reminderQueue.grantSendMessages(reminderFinder);
 
@@ -84,6 +102,8 @@ export class ReminderStack extends cdk.Stack {
       environment: {
         FROM_EMAIL: fromEmail,
       }
+      // Note: no vpc/ vpcSubnets/ securityGroups, as it only touches
+      // SQS/SES (never the private DB) thus no need to be VPC-attached
     });
 
     reminderQueue.grantConsumeMessages(reminderWorker);
