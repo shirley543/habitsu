@@ -9,10 +9,10 @@ import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 export interface BackendStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
   // TODOs #84 currently Backend image, while living in same VPC as RDS,
-  // security group + connection info not set up; need to address for Backend
+  // connection info not set up; need to address for Backend
   // to communicate with RDS successfully
   // dbInstance: rds.DatabaseInstance;
-  // appSecurityGroup: ec2.SecurityGroup;
+  appSecurityGroup: ec2.SecurityGroup;
 }
 
 export class BackendStack extends cdk.Stack {
@@ -35,6 +35,7 @@ export class BackendStack extends cdk.Stack {
     // Application Load Balancer (ALB + target group + security groups all provisioned by this L3 construct).
     this.loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'BackendService', {
       vpc: props.vpc,
+      securityGroups: [props.appSecurityGroup],
       cluster: this.ecsCluster, // cluster this service's tasks run on
       cpu: 256,                 // Fargate task-level vCPU units allocation (1024 = 1 vCPU)
       memoryLimitMiB: 1024,     // Fargate task-level memory allocation (all containers within it)

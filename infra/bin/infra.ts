@@ -25,9 +25,15 @@ const app = new cdk.App();
 const env: cdk.Environment = { account: '790072401370', region: 'ap-southeast-2' };
 
 const network = new NetworkStack(app, 'NetworkStack', { env });
-const database = new DatabaseStack(app, 'DatabaseStack', { env, vpc: network.vpc, dbSecurityGroup: network.dbSecurityGroup });
+const database = new DatabaseStack(app, 'DatabaseStack', {
+  env, vpc: network.vpc,
+  dbSecurityGroup: network.dbSecurityGroup
+});
 
-const backend = new BackendStack(app, 'BackendStack', { vpc: network.vpc })
+const backend = new BackendStack(app, 'BackendStack', {
+  vpc: network.vpc,
+  appSecurityGroup: network.appSecurityGroup,
+});
 
 new ReminderStack(app, 'ReminderStack', {
   env,
