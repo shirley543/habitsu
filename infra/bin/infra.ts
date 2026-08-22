@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import { NetworkStack } from '../lib/network-stack';
 import { DatabaseStack } from '../lib/database-stack';
 import { ReminderStack } from '../lib/reminder-stack';
+import { BackendStack } from '../lib/backend-stack';
 
 const app = new cdk.App();
 // new InfraStack(app, 'InfraStack', {
@@ -25,6 +26,8 @@ const env: cdk.Environment = { account: '790072401370', region: 'ap-southeast-2'
 
 const network = new NetworkStack(app, 'NetworkStack', { env });
 const database = new DatabaseStack(app, 'DatabaseStack', { env, vpc: network.vpc, dbSecurityGroup: network.dbSecurityGroup });
+
+const backend = new BackendStack(app, 'BackendStack', { vpc: network.vpc })
 
 new ReminderStack(app, 'ReminderStack', {
   env,
