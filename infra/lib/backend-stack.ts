@@ -16,7 +16,6 @@ export interface BackendStackProps extends cdk.StackProps {
 }
 
 export class BackendStack extends cdk.Stack {
-  public readonly ecsCluster: ecs.Cluster;
   public readonly ecrRepository: ecr.Repository;
   public readonly loadBalancedFargateService: ecsPatterns.ApplicationLoadBalancedFargateService;
 
@@ -36,7 +35,6 @@ export class BackendStack extends cdk.Stack {
     this.loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'BackendService', {
       vpc: props.vpc,
       securityGroups: [props.appSecurityGroup],
-      cluster: this.ecsCluster, // cluster this service's tasks run on
       cpu: 256,                 // Fargate task-level vCPU units allocation (1024 = 1 vCPU)
       memoryLimitMiB: 1024,     // Fargate task-level memory allocation (all containers within it)
       taskImageOptions: {
