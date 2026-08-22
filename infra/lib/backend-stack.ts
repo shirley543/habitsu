@@ -23,14 +23,6 @@ export class BackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: BackendStackProps) {
     super(scope, id, props);
 
-    // ECS Cluster: logical grouping the Fargate service runs in.
-    // No EC2 instances to provision/ manage, since Fargate is serverless compute.
-    // TODOs #85 revisit this, is ECS cluster needed for backend (only foresee one
-    // long-running compute service i.e. the NestJS API)
-    this.ecsCluster = new ecs.Cluster(this, 'Cluster', {
-      vpc: props.vpc, // VPC the cluster's tasks are launched into
-    });
-
     // ECR Repository: stores the backend's built container images (pushed via `docker push`),
     // which the Fargate service pulls from to run tasks.
     this.ecrRepository = new ecr.Repository(this, 'HabitTrackerBackendEcrRepository', {
@@ -42,6 +34,7 @@ export class BackendStack extends cdk.Stack {
     // Fargate Service: runs the backend container on the cluster, fronted by an
     // Application Load Balancer (ALB + target group + security groups all provisioned by this L3 construct).
     this.loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'BackendService', {
+      vpc: props.vpc,
       cluster: this.ecsCluster, // cluster this service's tasks run on
       cpu: 256,                 // Fargate task-level vCPU units allocation (1024 = 1 vCPU)
       memoryLimitMiB: 1024,     // Fargate task-level memory allocation (all containers within it)
