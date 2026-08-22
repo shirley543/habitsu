@@ -11,7 +11,7 @@ export interface BackendStackProps extends cdk.StackProps {
   // TODOs #84 currently Backend image, while living in same VPC as RDS,
   // connection info not set up; need to address for Backend
   // to communicate with RDS successfully
-  // dbInstance: rds.DatabaseInstance;
+  dbInstance: rds.DatabaseInstance;
   appSecurityGroup: ec2.SecurityGroup;
 }
 
@@ -30,11 +30,25 @@ export class BackendStack extends cdk.Stack {
       emptyOnDelete: true,                      // let DESTROY succeed even if images are still in the repo
     });
 
+    // Formatting Database url for environment variable
+    // Note: Currently using CloudFormation dynamic reference (assembled at deploy time, thus not rotation-safe)
+    // Future work: use Runtime fetch (rotation-safe, but more config needed)
+    const databaseSecret = props.dbInstance.secret;
+    if (!databaseSecret) {
+      throw new Error('Database secret must be set to deploy ReminderStack');
+    }
+    const databaseUrl = `postgresql://${databaseSecret.secretValueFromJson('username')}:${databaseSecret.secretValueFromJson('password')}@${props.dbInstance.instanceEndpoint.hostname}:5432/habittracker`;
+
     // Fargate Service: runs the backend container on the cluster, fronted by an
     // Application Load Balancer (ALB + target group + security groups all provisioned by this L3 construct).
     this.loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'BackendService', {
       vpc: props.vpc,
       securityGroups: [props.appSecurityGroup],
+      // TODOs #85: Update this to instead fetch secret value from secrets manager (so that describe task definition just shows secrets reference)
+      // (shouldn't be formatting databaseUrl manually; describe task definition will then show plaintext database URL string)
+      environment: {
+        DATABASE_URL: databaseUrl,
+      },
       cpu: 256,                 // Fargate task-level vCPU units allocation (1024 = 1 vCPU)
       memoryLimitMiB: 1024,     // Fargate task-level memory allocation (all containers within it)
       taskImageOptions: {
